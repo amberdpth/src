@@ -278,6 +278,9 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 W_FireShotgun
 ================
 */
+
+void(float shotcount, vector dir, vector spread) FirePassingBullets;
+
 void() W_FireShotgun =
 {
 	local vector dir;
@@ -288,7 +291,10 @@ void() W_FireShotgun =
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
 	dir = aim (self, 100000);
-	FireBullets (6, dir, '0.04 0.04 0');
+	
+	//FireBullets (6, dir, '0.04 0.04 0');
+
+	FirePassingBullets(6, dir, '0.04 0.04 0');
 };
 
 

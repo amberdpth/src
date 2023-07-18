@@ -1,4 +1,4 @@
-void(vector shots, vector dir) FirePassingBullets =
+void(float shotcount, vector dir, vector spread) FirePassingBullets =
 {
 	vector direction;
 	vector src;
@@ -10,9 +10,9 @@ void(vector shots, vector dir) FirePassingBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
-	while (shots[0])
+	while (shotcount)
 	{
-		direction = dir + crandom() * shots[1] * v_right + crandom() * shots[2] * v_up;
+		direction = dir + crandom() * spread[0] * v_right + crandom() * spread[1] * v_up;
 
 		traceline(src, src + direction*2048, 0, self);
 
@@ -52,7 +52,8 @@ void(vector shots, vector dir) FirePassingBullets =
 				}
 			}
 
-		shots[0]--;
+		shotcount--;
+		
 		}
 	}
 

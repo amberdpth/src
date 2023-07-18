@@ -1,0 +1,6 @@
+../csprogs.dat
+
+#define CSQC
+
+fteextensions.qc
+csqc_main.qc
