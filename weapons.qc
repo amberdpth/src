@@ -23,6 +23,14 @@ void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
 void(vector org, vector vel, float damage) SpawnBlood;
 void() SuperDamageSound;
 
+void()	player_axe1;
+void()	player_axeb1;
+void()	player_axec1;
+void()	player_axed1;
+void()	player_shot1;
+void()	player_nail1;
+void()	player_light1;
+void()	player_rocket1;
 
 // called by worldspawn
 void() W_Precache =
@@ -278,9 +286,6 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 W_FireShotgun
 ================
 */
-
-void(float shotcount, vector dir, vector spread) FirePassingBullets;
-
 void() W_FireShotgun =
 {
 	local vector dir;
@@ -291,10 +296,7 @@ void() W_FireShotgun =
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
 	dir = aim (self, 100000);
-	
-	//FireBullets (6, dir, '0.04 0.04 0');
-
-	FirePassingBullets(6, dir, '0.04 0.04 0');
+	FireBullets (6, dir, '0.04 0.04 0');
 };
 
 
@@ -565,17 +567,12 @@ void() GrenadeTouch =
 		self.avelocity = '0 0 0';
 };
 
-
-float() gl_inacc =
-{
-	return random(-grenadelauncher_inaccuracy[self.it_grenade_mk],
-		grenadelauncher_inaccuracy[self.it_grenade_mk]);
-}
-
 void() W_FireGrenade =
 {
 	local entity missile;
+	player_rocket1();
 
+	self.attack_finished = time + 0.6;
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
@@ -889,14 +886,7 @@ W_Attack
 An attack impulse can be triggered now
 ============
 */
-void()	player_axe1;
-void()	player_axeb1;
-void()	player_axec1;
-void()	player_axed1;
-void()	player_shot1;
-void()	player_nail1;
-void()	player_light1;
-void()	player_rocket1;
+
 
 void() W_Attack =
 {
@@ -945,11 +935,7 @@ void() W_Attack =
 		player_nail1 ();
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
-	{
-		player_rocket1();
-		W_FireGrenade();
-		self.attack_finished = time + 0.6;
-	}
+		self.attack_grenadelauncher();
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();

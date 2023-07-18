@@ -475,6 +475,21 @@ void() weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_GRENADE_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
+
+		if (other.items & IT_GRENADE_LAUNCHER)
+		{
+			if (other.grenadelauncher_mk == 1)
+			{
+				other.grenadelauncher_mk = 2;
+				self.netname = "grenade launcher mkII";
+			}
+			else
+			{
+				other.grenadelauncher_mk = 1;
+				self.netname = "grenade launcher mkI";
+			}
+		}
+
 	}
 	else if (self.classname == "weapon_lightning")
 	{

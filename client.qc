@@ -27,6 +27,9 @@ void (vector org, entity death_owner) spawn_tdeath;
 
 float	modelindex_eyes, modelindex_player;
 
+.float skill_armor;
+
+
 /*
 =============================================================================
 
@@ -558,8 +561,6 @@ void() PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin, self);
-
-	self.it_grenade_mk = 10;
 };
 
 
@@ -1444,3 +1445,4 @@ void(entity targ, entity attacker) ClientObituary =
 		}
 	}
 };
+
