@@ -709,6 +709,9 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
+.float multidamage_flag;
+.float multidamage;
+
 .float it_grenade_mk;
 
 float grenadelauncher_speed[] = 

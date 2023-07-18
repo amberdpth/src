@@ -8,6 +8,9 @@ ai.qc
 combat.qc
 items.qc
 weapons.qc
+
+passing_bullets.qc
+
 world.qc
 client.qc
 player.qc
