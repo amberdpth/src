@@ -347,14 +347,20 @@ void() worldspawn =
 	// 63 testing
 	lightstyle(63, "a");
 
+	clientstat(STAT_AX_SKILL,EV_FLOAT,axe_skills);
 	clientstat(STAT_SG_SKILL,EV_FLOAT,shotgun_skills);
 	clientstat(STAT_NG_SKILL,EV_FLOAT,nailgun_skills);
+	clientstat(STAT_GL_SKILL,EV_FLOAT,grenades_skills);
+	clientstat(STAT_RL_SKILL,EV_FLOAT,rockets_skills);
+	
 }
 
 void() RestoreGame =
 {
+	clientstat(STAT_AX_SKILL,EV_FLOAT,axe_skills);
 	clientstat(STAT_SG_SKILL,EV_FLOAT,shotgun_skills);
 	clientstat(STAT_NG_SKILL,EV_FLOAT,nailgun_skills);
+	clientstat(STAT_GL_SKILL,EV_FLOAT,grenades_skills);
 }
 
 void() StartFrame =

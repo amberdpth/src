@@ -293,6 +293,11 @@ void(entity attacker, float damage) T_BeamDamage =
 			{
 				if (CanDamage (head, attacker))
 				{
+					if (self.classname == "grenade")
+						self.owner.grenades_skills = self.owner.grenades_skills + 0.0001 * points;
+					if (self.classname == "missile")
+						self.owner.rockets_skills = self.owner.rockets_skills + 0.0001 * points;
+
 					if (head.classname == "monster_shambler")
 						T_Damage (head, attacker, attacker, points*0.5);
 					else

@@ -77,6 +77,7 @@ void() W_FireAxe =
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
 		T_Damage (trace_ent, self, self, 20);
+		self.axe_skills = self.axe_skills + 0.03;
 	}
 	else
 	{	// hit wall
@@ -240,7 +241,7 @@ void(float damage, vector dir) TraceAttack =
 		AddMultiDamage (trace_ent, damage);
 
 		if (self.flags & FL_CLIENT)
-			self.shotgun_skills = self.shotgun_skills + ADD_SG_SKILL;
+			self.shotgun_skills = self.shotgun_skills + 0.005;
 	}
 	else
 	{
@@ -294,7 +295,7 @@ void() W_FireShotgun =
 	vector dir;
 	float shotcount = 6;
 	float spread_h;
-	
+
 	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skills / 100);
 
 	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
@@ -375,13 +376,15 @@ void() T_MissileTouch =
 		return;
 	}
 
-	damg = 100 + random()*20;
+	damg = 100;
 
 	if (other.health)
 	{
 		if (other.classname == "monster_shambler")
-			// mostly immune
 			damg = damg * 0.5;
+
+		self.owner.rockets_skills = self.owner.rockets_skills + 0.01;
+
 		T_Damage (other, self, self.owner, damg );
 	}
 
@@ -581,9 +584,7 @@ void() GrenadeTouch =
 void() W_FireGrenade =
 {
 	local entity missile;
-	player_rocket1();
 
-	self.attack_finished = time + 0.6;
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
@@ -661,6 +662,13 @@ void() W_FireSuperSpikes =
 {
 	local vector dir;
 
+	if (self.ammo_nails < 2)
+	{
+		self.weapon = W_BestWeapon ();
+		W_SetCurrentAmmo ();
+		return;
+	}
+
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
@@ -717,7 +725,7 @@ void() spike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + ADD_NG_SKILL;
+			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.0009;
 	}
 	else
 	{
@@ -762,7 +770,7 @@ void() superspike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + ADD_NG_SKILL;
+			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.0009;
 	}
 	else
 	{
@@ -798,6 +806,7 @@ void() W_SetCurrentAmmo =
 		self.currentammo = 0;
 		self.weaponmodel = "progs/v_axe.mdl";
 		self.weaponframe = 0;
+		self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -805,6 +814,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_shot.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
+		self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
@@ -812,6 +822,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_shot2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
+		self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
 	}
 	else if (self.weapon == IT_NAILGUN)
 	{
@@ -819,6 +830,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
+		self.reload_time = lerp(0.08, 0.044, self.nailgun_skills / 100);
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
@@ -826,6 +838,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
+		self.reload_time = lerp(0.111, 0.6, self.nailgun_skills / 100);
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
@@ -833,6 +846,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
+		self.reload_time = lerp(0.8,0.35, self.grenades_skills / 100);
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
@@ -840,6 +854,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
+		self.reload_time = lerp(0.7,0.39, self.rockets_skills / 100);
 	}
 	else if (self.weapon == IT_LIGHTNING)
 	{
@@ -913,13 +928,6 @@ void() W_Attack =
 	// wake monsters up
 	self.show_hostile = time + 1;
 
-	self.shotgun_reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
-	self.supershotgun_reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
-	self.nailgun_reload_time = lerp(0.08, 0.044, self.nailgun_skills / 100);
-	self.supernailgun_reload_time = lerp(0.111, 0.6, self.nailgun_skills / 100);
-
-	dprint("sg reload:", ftos(self.shotgun_reload_time),"\n","ssg reload:", ftos(self.supershotgun_reload_time),"\n");
-
 	if (self.weapon == IT_AXE)
 	{
 		sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
@@ -935,33 +943,17 @@ void() W_Attack =
 		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SHOTGUN)
-	{
 		player_shot1 ();
-	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
-	{
 		player_shot1 ();
-	}
 	else if (self.weapon == IT_NAILGUN)
-	{
 		player_nail1 ();
-	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
-	{
 		player_nail1 ();
-	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
-	{
 		player_rocket1();
-		W_FireGrenade();
-		self.attack_finished = time + 0.6;
-	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
-	{
 		player_rocket1();
-		W_FireRocket();
-		self.attack_finished = time + 0.8;
-	}
 	else if (self.weapon == IT_LIGHTNING)
 	{
 		player_light1();

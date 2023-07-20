@@ -79,9 +79,12 @@ void() SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
-
-	parm20 = self.shotgun_skills;
-	parm21 = self.nailgun_skills;
+	
+	parm20 = self.axe_skills;
+	parm21 = self.shotgun_skills;
+	parm22 = self.nailgun_skills;
+	parm23 = self.grenades_skills;
+	parm24 = self.rockets_skills;
 };
 
 void() SetNewParms =
@@ -115,8 +118,11 @@ void() DecodeLevelParms =
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
 
-	self.shotgun_skills = parm20;
-	self.nailgun_skills = parm21;
+	self.axe_skills = parm20;
+	self.shotgun_skills = parm21;
+	self.nailgun_skills = parm22;
+	self.grenades_skills = parm23;
+	self.rockets_skills = parm24;
 };
 
 /*
@@ -1138,9 +1144,11 @@ void() PlayerPostThink =
 	if (self.deadflag)
 		return;
 
-	
+	self.axe_skills = bound(1, self.axe_skills, 100);
 	self.shotgun_skills = bound(1, self.shotgun_skills, 100);
 	self.nailgun_skills = bound(1, self.nailgun_skills, 100);
+	self.grenades_skills = bound(1, self.grenades_skills, 100);
+	self.rockets_skills = bound(1, self.rockets_skills, 100);
 		
 	W_WeaponFrame ();
 
