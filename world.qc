@@ -346,6 +346,15 @@ void() worldspawn =
 
 	// 63 testing
 	lightstyle(63, "a");
+
+	clientstat(STAT_SG_SKILL,EV_FLOAT,shotgun_skills);
+	clientstat(STAT_NG_SKILL,EV_FLOAT,nailgun_skills);
+}
+
+void() RestoreGame =
+{
+	clientstat(STAT_SG_SKILL,EV_FLOAT,shotgun_skills);
+	clientstat(STAT_NG_SKILL,EV_FLOAT,nailgun_skills);
 }
 
 void() StartFrame =

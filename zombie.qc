@@ -376,7 +376,6 @@ void() zombie_paine4	=[	$paine4,	zombie_paine5	] {ai_pain(3);};
 void() zombie_paine5	=[	$paine5,	zombie_paine6	]
 {
 	ai_pain(1);
-	zombie_explode();
 };
 void() zombie_paine6	=[	$paine6,	zombie_paine7	] {ai_pain(2);};
 void() zombie_paine7	=[	$paine7,	zombie_paine8	] {ai_pain(1);};
@@ -544,8 +543,6 @@ void() monster_zombie =
 	self.th_pain = zombie_pain;
 	self.th_die = zombie_die;
 	self.th_missile = zombie_missile;
-
-	self.exploding_zombie = 1;
 
 	if (self.spawnflags & SPAWN_CRUCIFIED)
 	{

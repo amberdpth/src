@@ -712,4 +712,24 @@ float(entity targ, entity inflictor) CanDamage;
 .float multidamage_flag;
 .float multidamage;
 
-.float explosive_zombie;
+float MAX_SHOTGUN_SKILL = 100;
+
+.float shotgun_skills;
+.float nailgun_skills;
+
+.float reload_time;
+.float shotgun_reload_time;
+.float supershotgun_reload_time;
+.float nailgun_reload_time;
+.float supernailgun_reload_time;
+
+float lerp(float a, float b, float f)
+{
+    return a * (1.0 - f) + (b * f);
+}
+
+#define ADD_SG_SKILL 0.0011
+#define ADD_NG_SKILL 0.0011
+
+#define STAT_SG_SKILL 31
+#define STAT_NG_SKILL 32

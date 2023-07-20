@@ -159,14 +159,47 @@ void()	player_run =[	$rockrun1,	player_run	]
 
 void()	player_shot1 =	[$shotatt1, player_shot2	]
 {
+	if (self.weapon == IT_SHOTGUN)
+	{
+		W_FireShotgun ();
+		self.reload_time = self.shotgun_reload_time;
+	}
+	if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+		W_FireSuperShotgun();
+		self.reload_time = self.supershotgun_reload_time;
+	}
+
+	self.attack_finished = self.nextthink = time + 0.1;
 	self.weaponframe=1;
 	self.effects = self.effects | EF_MUZZLEFLASH;
+	self.attack_finished = time + 0.1;
 };
-void()	player_shot2 =	[$shotatt2, player_shot3	] {self.weaponframe=2;};
-void()	player_shot3 =	[$shotatt3, player_shot4	] {self.weaponframe=3;};
-void()	player_shot4 =	[$shotatt4, player_shot5	] {self.weaponframe=4;};
-void()	player_shot5 =	[$shotatt5, player_shot6	] {self.weaponframe=5;};
-void()	player_shot6 =	[$shotatt6, player_run	] {self.weaponframe=6;};
+void()	player_shot2 =	[$shotatt2, player_shot3	] 
+{
+	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
+	self.weaponframe = 2;
+};
+void()	player_shot3 =	[$shotatt3, player_shot4	] 
+{
+	self.attack_finished = self.nextthink = time + self.reload_time / 6;
+	self.weaponframe = 3;
+};
+void()	player_shot4 =	[$shotatt4, player_shot5	] 
+{
+	self.attack_finished = self.nextthink = time + self.reload_time / 6;
+	self.weaponframe = 4;
+};
+void()	player_shot5 =	[$shotatt5, player_shot6	] 
+{
+	self.attack_finished = self.nextthink = time + self.reload_time / 6;
+	self.weaponframe = 5;
+};
+void()	player_shot6 =	[$shotatt6, player_run	] 
+{
+	self.attack_finished = self.nextthink = time + self.reload_time / 6;
+	self.weaponframe = 6;
+};
 
 void()	player_axe1 =	[$axatt1, player_axe2	] {self.weaponframe=1;};
 void()	player_axe2 =	[$axatt2, player_axe3	] {self.weaponframe=2;};
@@ -195,21 +228,7 @@ void() player_nail1   =[$nailatt1, player_nail2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
-	if (!self.button0)
-	{
-		player_run ();
-		return;
-	}
-	self.weaponframe = self.weaponframe + 1;
-	if (self.weaponframe == 9)
-		self.weaponframe = 1;
-	SuperDamageSound();
-	W_FireSpikes (4);
-	self.attack_finished = time + 0.2;
-};
-void() player_nail2   =[$nailatt2, player_nail1  ]
-{
-	self.effects = self.effects | EF_MUZZLEFLASH;
+
 
 	if (!self.button0)
 	{
@@ -217,11 +236,60 @@ void() player_nail2   =[$nailatt2, player_nail1  ]
 		return;
 	}
 	self.weaponframe = self.weaponframe + 1;
+
 	if (self.weaponframe == 9)
 		self.weaponframe = 1;
+
 	SuperDamageSound();
-	W_FireSpikes (-4);
-	self.attack_finished = time + 0.2;
+
+	if (self.weapon == IT_NAILGUN)
+	{
+		self.reload_time = self.nailgun_reload_time;
+		W_FireSpikes(3.2);
+	}
+	if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.reload_time = self.supernailgun_reload_time;
+		W_FireSuperSpikes();
+	}
+
+	self.attack_finished = self.nextthink = time + self.reload_time;
+};
+
+void() player_nail2   =[$nailatt2, player_nail1  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (self.weapon == IT_NAILGUN)
+		self.reload_time = self.nailgun_reload_time;
+	if (self.weapon == IT_SUPER_NAILGUN)
+		self.reload_time = self.supernailgun_reload_time;
+
+	if (!self.button0)
+	{
+		player_run ();
+		return;
+	}
+
+	self.weaponframe = self.weaponframe + 1;
+
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+
+	SuperDamageSound();
+
+	if (self.weapon == IT_NAILGUN)
+	{
+		self.reload_time = self.nailgun_reload_time;
+		W_FireSpikes(-3.2);
+	}
+	if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.reload_time = self.supernailgun_reload_time;
+		W_FireSuperSpikes();
+	}
+
+	self.attack_finished = self.nextthink = time + self.reload_time;
 };
 
 //============================================================================

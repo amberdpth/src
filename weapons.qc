@@ -238,6 +238,9 @@ void(float damage, vector dir) TraceAttack =
 	{
 		SpawnBlood (org, vel*0.2, damage);
 		AddMultiDamage (trace_ent, damage);
+
+		if (self.flags & FL_CLIENT)
+			self.shotgun_skills = self.shotgun_skills + ADD_SG_SKILL;
 	}
 	else
 	{
@@ -288,7 +291,11 @@ W_FireShotgun
 */
 void() W_FireShotgun =
 {
-	local vector dir;
+	vector dir;
+	float shotcount = 6;
+	float spread_h;
+	
+	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skills / 100);
 
 	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
 
@@ -296,7 +303,7 @@ void() W_FireShotgun =
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
 	dir = aim (self, 100000);
-	FireBullets (6, dir, '0.04 0.04 0');
+	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
 
@@ -307,13 +314,17 @@ W_FireSuperShotgun
 */
 void() W_FireSuperShotgun =
 {
-	local vector dir;
-
 	if (self.currentammo == 1)
 	{
 		W_FireShotgun ();
 		return;
 	}
+
+	vector dir;
+	float shotcount = 14;
+
+	float spread_h = lerp(0.2, 0.012, self.shotgun_skills / 100);
+	float spread_v = lerp(0.1, 0.05, self.shotgun_skills / 100);
 
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
 
@@ -321,7 +332,7 @@ void() W_FireSuperShotgun =
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
 	dir = aim (self, 100000);
-	FireBullets (14, dir, '0.14 0.08 0');
+	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
 
@@ -653,7 +664,7 @@ void() W_FireSuperSpikes =
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
-	dir = aim (self, 1000);
+	dir = v_forward;
 	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis, "progs/s_spike.mdl");
@@ -667,12 +678,6 @@ void(float ox) W_FireSpikes =
 
 	makevectors (self.v_angle);
 
-	if (self.ammo_nails >= 2 && self.weapon == IT_SUPER_NAILGUN)
-	{
-		W_FireSuperSpikes ();
-		return;
-	}
-
 	if (self.ammo_nails < 1)
 	{
 		self.weapon = W_BestWeapon ();
@@ -681,11 +686,9 @@ void(float ox) W_FireSpikes =
 	}
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
-	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
-	dir = aim (self, 1000);
+	dir = v_forward;
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
-
 	self.punchangle_x = -2;
 };
 
@@ -705,11 +708,16 @@ void() spike_touch =
 		return;
 	}
 
+	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 15;
+
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (9);
-		T_Damage (other, self, self.owner, 9);
+		spawn_touchblood (damage);
+		T_Damage (other, self, self.owner, damage);
+
+		if (self.owner.flags & FL_CLIENT)
+			self.owner.nailgun_skills = self.owner.nailgun_skills + ADD_NG_SKILL;
 	}
 	else
 	{
@@ -745,11 +753,16 @@ void() superspike_touch =
 		return;
 	}
 
+	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 20;
+
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (18);
-		T_Damage (other, self, self.owner, 18);
+		spawn_touchblood (damage);
+		T_Damage (other, self, self.owner, damage);
+
+		if (self.owner.flags & FL_CLIENT)
+			self.owner.nailgun_skills = self.owner.nailgun_skills + ADD_NG_SKILL;
 	}
 	else
 	{
@@ -900,6 +913,13 @@ void() W_Attack =
 	// wake monsters up
 	self.show_hostile = time + 1;
 
+	self.shotgun_reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
+	self.supershotgun_reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
+	self.nailgun_reload_time = lerp(0.08, 0.044, self.nailgun_skills / 100);
+	self.supernailgun_reload_time = lerp(0.111, 0.6, self.nailgun_skills / 100);
+
+	dprint("sg reload:", ftos(self.shotgun_reload_time),"\n","ssg reload:", ftos(self.supershotgun_reload_time),"\n");
+
 	if (self.weapon == IT_AXE)
 	{
 		sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
@@ -917,14 +937,10 @@ void() W_Attack =
 	else if (self.weapon == IT_SHOTGUN)
 	{
 		player_shot1 ();
-		W_FireShotgun ();
-		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		player_shot1 ();
-		W_FireSuperShotgun ();
-		self.attack_finished = time + 0.7;
 	}
 	else if (self.weapon == IT_NAILGUN)
 	{
@@ -935,7 +951,11 @@ void() W_Attack =
 		player_nail1 ();
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
-		self.attack_grenadelauncher();
+	{
+		player_rocket1();
+		W_FireGrenade();
+		self.attack_finished = time + 0.6;
+	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();

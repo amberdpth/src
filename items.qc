@@ -360,14 +360,10 @@ WEAPONS
 
 void() bound_other_ammo =
 {
-	if (other.ammo_shells > 100)
-		other.ammo_shells = 100;
-	if (other.ammo_nails > 200)
-		other.ammo_nails = 200;
-	if (other.ammo_rockets > 100)
-		other.ammo_rockets = 100;
-	if (other.ammo_cells > 100)
-		other.ammo_cells = 100;
+	other.ammo_shells = bound(0, other.ammo_shells, 400);
+	other.ammo_nails = bound(0, other.ammo_nails, 250);
+	other.ammo_rockets = bound(0, other.ammo_rockets, 120);
+	other.ammo_cells = bound(0, other.ammo_cells, 300);
 };
 
 
@@ -475,20 +471,6 @@ void() weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_GRENADE_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
-
-		if (other.items & IT_GRENADE_LAUNCHER)
-		{
-			if (other.grenadelauncher_mk == 1)
-			{
-				other.grenadelauncher_mk = 2;
-				self.netname = "grenade launcher mkII";
-			}
-			else
-			{
-				other.grenadelauncher_mk = 1;
-				self.netname = "grenade launcher mkI";
-			}
-		}
 
 	}
 	else if (self.classname == "weapon_lightning")

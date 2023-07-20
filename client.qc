@@ -79,6 +79,9 @@ void() SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
+
+	parm20 = self.shotgun_skills;
+	parm21 = self.nailgun_skills;
 };
 
 void() SetNewParms =
@@ -111,6 +114,9 @@ void() DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
+
+	self.shotgun_skills = parm20;
+	self.nailgun_skills = parm21;
 };
 
 /*
@@ -1132,7 +1138,10 @@ void() PlayerPostThink =
 	if (self.deadflag)
 		return;
 
-	// do weapon stuff
+	
+	self.shotgun_skills = bound(1, self.shotgun_skills, 100);
+	self.nailgun_skills = bound(1, self.nailgun_skills, 100);
+		
 	W_WeaponFrame ();
 
 	// check to see if player landed and play landing sound
