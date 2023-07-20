@@ -631,7 +631,7 @@ void() ammo_touch =
 	// shotgun
 	if (self.weapon == 1)
 	{
-		if (other.ammo_shells >= 100)
+		if (other.ammo_shells >= 400)
 			return;
 		other.ammo_shells = other.ammo_shells + self.aflag;
 	}
@@ -639,7 +639,7 @@ void() ammo_touch =
 	// spikes
 	if (self.weapon == 2)
 	{
-		if (other.ammo_nails >= 200)
+		if (other.ammo_nails >= 250)
 			return;
 		other.ammo_nails = other.ammo_nails + self.aflag;
 	}
@@ -647,7 +647,7 @@ void() ammo_touch =
 	//	rockets
 	if (self.weapon == 3)
 	{
-		if (other.ammo_rockets >= 100)
+		if (other.ammo_rockets >= 120)
 			return;
 		other.ammo_rockets = other.ammo_rockets + self.aflag;
 	}
@@ -655,7 +655,7 @@ void() ammo_touch =
 	//	cells
 	if (self.weapon == 4)
 	{
-		if (other.ammo_cells >= 100)
+		if (other.ammo_cells >= 300)
 			return;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}

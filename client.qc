@@ -1144,11 +1144,11 @@ void() PlayerPostThink =
 	if (self.deadflag)
 		return;
 
-	self.axe_skills = bound(1, self.axe_skills, 100);
-	self.shotgun_skills = bound(1, self.shotgun_skills, 100);
-	self.nailgun_skills = bound(1, self.nailgun_skills, 100);
-	self.grenades_skills = bound(1, self.grenades_skills, 100);
-	self.rockets_skills = bound(1, self.rockets_skills, 100);
+	self.axe_skills = bound(0, self.axe_skills, 100);
+	self.shotgun_skills = bound(0, self.shotgun_skills, 100);
+	self.nailgun_skills = bound(0, self.nailgun_skills, 100);
+	self.grenades_skills = bound(0, self.grenades_skills, 100);
+	self.rockets_skills = bound(0, self.rockets_skills, 100);
 		
 	W_WeaponFrame ();
 

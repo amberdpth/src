@@ -361,6 +361,7 @@ void() RestoreGame =
 	clientstat(STAT_SG_SKILL,EV_FLOAT,shotgun_skills);
 	clientstat(STAT_NG_SKILL,EV_FLOAT,nailgun_skills);
 	clientstat(STAT_GL_SKILL,EV_FLOAT,grenades_skills);
+	clientstat(STAT_RL_SKILL,EV_FLOAT,rockets_skills);
 }
 
 void() StartFrame =

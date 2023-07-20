@@ -223,7 +223,9 @@ void()	army_die2	=[	$death2,	army_die3	] {};
 void()	army_die3	=[	$death3,	army_die4	]
 {
 	self.solid = SOLID_NOT;
-	self.ammo_shells = 5;
+	self.ammo_shells = rint(random(2,10));
+	self.ammo_nails = rint(random(3,7));
+	self.ammo_rockets = rint(random(2));
 	DropBackpack();
 };
 void()	army_die4	=[	$death4,	army_die5	] {};
@@ -239,7 +241,9 @@ void()	army_cdie2	=[	$deathc2,	army_cdie3	] {ai_back(5);};
 void()	army_cdie3	=[	$deathc3,	army_cdie4	]
 {
 	self.solid = SOLID_NOT;
-	self.ammo_shells = 5;
+	self.ammo_shells = rint(random(2,10));
+	self.ammo_nails = rint(random(3,7));
+	self.ammo_rockets = rint(random(2));
 	DropBackpack();
 	ai_back(4);
 };
