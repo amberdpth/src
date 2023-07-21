@@ -725,7 +725,7 @@ void() spike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.0009;
+			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.009;
 	}
 	else
 	{
@@ -770,7 +770,7 @@ void() superspike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.0009;
+			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.009;
 	}
 	else
 	{

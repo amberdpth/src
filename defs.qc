@@ -736,3 +736,5 @@ float lerp(float a, float b, float f)
 #define STAT_AX_SKILL 33
 #define STAT_GL_SKILL 34
 #define STAT_RL_SKILL 35
+
+#define RATE_ROCKETS_SKILL 0

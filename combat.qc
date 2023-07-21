@@ -254,54 +254,18 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 				{
 					if (CanDamage (head, inflictor))
 					{
-						// shambler takes half damage from all explosions
+						if (attacker.flags & FL_CLIENT)
+						{
+							if (self.classname == "grenade")
+								attacker.grenades_skills = attacker.grenades_skills + 0.001 * points;;
+							if (self.classname == "missile")
+								attacker.rockets_skills = attacker.rockets_skills + 0.001 * points;
+						}
 						if (head.classname == "monster_shambler")
 							T_Damage (head, inflictor, attacker, points*0.5);
 						else
 							T_Damage (head, inflictor, attacker, points);
 					}
-				}
-			}
-		}
-		head = head.chain;
-	}
-};
-
-/*
-============
-T_BeamDamage
-============
-*/
-void(entity attacker, float damage) T_BeamDamage =
-{
-	local float points;
-	local entity head;
-
-	head = findradius(attacker.origin, damage+40);
-
-	while (head)
-	{
-		if (head.takedamage)
-		{
-			points = 0.5*vlen (attacker.origin - head.origin);
-			if (points < 0)
-				points = 0;
-			points = damage - points;
-			if (head == attacker)
-				points = points * 0.5;
-			if (points > 0)
-			{
-				if (CanDamage (head, attacker))
-				{
-					if (self.classname == "grenade")
-						self.owner.grenades_skills = self.owner.grenades_skills + 0.0001 * points;
-					if (self.classname == "missile")
-						self.owner.rockets_skills = self.owner.rockets_skills + 0.0001 * points;
-
-					if (head.classname == "monster_shambler")
-						T_Damage (head, attacker, attacker, points*0.5);
-					else
-						T_Damage (head, attacker, attacker, points);
 				}
 			}
 		}
