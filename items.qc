@@ -409,22 +409,17 @@ void(float old, float new) Deathmatch_Weapon =
 weapon_touch
 =============
 */
-float() W_BestWeapon;
 
 void() weapon_touch =
 {
-	local float hadammo, best, new, old;
-	local entity stemp;
+	local float hadammo, new;
 	local float leave;
 
 	if (!(other.flags & FL_CLIENT))
 		return;
 
 	// if the player was using his best weapon, change up to the new one if better
-	stemp = self;
-	self = other;
-	best = W_BestWeapon();
-	self = stemp;
+
 	new = 0;
 
 	if (deathmatch == 2 || coop)
@@ -493,21 +488,7 @@ void() weapon_touch =
 
 	bound_other_ammo ();
 
-	// change to the weapon
-	old = other.items;
 	other.items = other.items | new;
-
-	stemp = self;
-	self = other;
-
-	if (!deathmatch)
-		self.weapon = new;
-	else
-		Deathmatch_Weapon (old, new);
-
-	W_SetCurrentAmmo();
-
-	self = stemp;
 
 	if (leave)
 		return;
@@ -614,8 +595,8 @@ AMMO
 
 void() ammo_touch =
 {
-	local entity stemp;
-	local float best;
+
+	entity stemp;
 
 	if (other.classname != "player")
 		return;
@@ -623,10 +604,7 @@ void() ammo_touch =
 		return;
 
 	// if the player was using his best weapon, change up to the new one if better
-	stemp = self;
-	self = other;
-	best = W_BestWeapon();
-	self = stemp;
+
 
 	// shotgun
 	if (self.weapon == 1)
@@ -670,15 +648,6 @@ void() ammo_touch =
 	stuffcmd (other, "bf\n");
 
 	// change to a better weapon if appropriate
-
-	if ( other.weapon == best )
-	{
-		stemp = self;
-		self = other;
-		self.weapon = W_BestWeapon();
-		W_SetCurrentAmmo ();
-		self = stemp;
-	}
 
 	// if changed current ammo, update it
 	stemp = self;
@@ -1239,8 +1208,7 @@ PLAYER BACKPACKS
 void() BackpackTouch =
 {
 	local string	s;
-	local float   best, old, new;
-	local entity	stemp;
+	local float   old, new;
 	local float   acount;
 
 	if (other.classname != "player")
@@ -1258,12 +1226,6 @@ void() BackpackTouch =
 			sprint (other, "the ");
 			sprint (other, self.netname);
 		}
-
-	// if the player was using his best weapon, change up to the new one if better
-	stemp = self;
-	self = other;
-	best = W_BestWeapon();
-	self = stemp;
 
 	// change weapons
 	other.ammo_shells = other.ammo_shells + self.ammo_shells;

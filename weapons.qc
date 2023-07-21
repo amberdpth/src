@@ -23,6 +23,8 @@ void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
 void(vector org, vector vel, float damage) SpawnBlood;
 void() SuperDamageSound;
 
+float() W_BestWeapon;
+
 void()	player_axe1;
 void()	player_axeb1;
 void()	player_axec1;
@@ -72,12 +74,14 @@ void() W_FireAxe =
 
 	org = trace_endpos - v_forward*4;
 
+	damage_total = 20;
+
 	if (trace_ent.takedamage)
 	{
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
 		T_Damage (trace_ent, self, self, 20);
-		self.axe_skills = self.axe_skills + 0.03;
+		skill_up_axe();
 	}
 	else
 	{	// hit wall
@@ -88,6 +92,9 @@ void() W_FireAxe =
 		WriteCoord (MSG_BROADCAST, org_y);
 		WriteCoord (MSG_BROADCAST, org_z);
 	}
+
+	damage_pass = 0.0;
+	damage_total = 0.0;
 };
 
 
@@ -235,13 +242,13 @@ void(float damage, vector dir) TraceAttack =
 
 	org = trace_endpos - dir*4;
 
+	damage_total += damage;
+
 	if (trace_ent.takedamage)
 	{
 		SpawnBlood (org, vel*0.2, damage);
-		AddMultiDamage (trace_ent, damage);
-
-		if (self.flags & FL_CLIENT)
-			self.shotgun_skills = self.shotgun_skills + 0.005;
+		trace_ent.multidamage_flag = TRUE;
+		trace_ent.multidamage = trace_ent.multidamage + damage;
 	}
 	else
 	{
@@ -282,7 +289,20 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 
 		shotcount = shotcount - 1;
 	}
-	ApplyMultiDamage ();
+
+	entity e = findflags(world,multidamage_flag,TRUE);
+
+	while(e)
+	{
+		T_Damage(e, self, self, e.multidamage);
+		skill_up_shotgun();
+		e.multidamage = 0;
+		e.multidamage_flag = FALSE;
+		e = findflags(e,multidamage_flag,TRUE);
+	}
+
+	damage_total = 0;
+	damage_pass = 0;
 };
 
 /*
@@ -377,20 +397,24 @@ void() T_MissileTouch =
 	}
 
 	damg = 100;
+	damage_total = damg;
 
 	if (other.health)
 	{
 		if (other.classname == "monster_shambler")
-			damg = damg * 0.5;
-
-		self.owner.rockets_skills = self.owner.rockets_skills + 0.01;
+			damg = damg * (0.5 + 0.5 * (self.rockets_skills / 100));
 
 		T_Damage (other, self, self.owner, damg );
+
+		entity oself = self;
+		self = self.owner;
+		skill_up_rocket();
+		self = oself;
 	}
 
-	// don't do radius damage to the other, because all the damage
-	// was done in the impact
-	T_RadiusDamage (self, self.owner, 120, other);
+	damg = damg + lerp(0, 40, self.rockets_skills / 100); // extra radius depending on rockets skill
+
+	T_RadiusDamage (self, self.owner, damg, other);
 
 	self.origin = self.origin - 8*normalize(self.velocity);
 
@@ -399,6 +423,10 @@ void() T_MissileTouch =
 	WriteCoord (MSG_BROADCAST, self.origin_x);
 	WriteCoord (MSG_BROADCAST, self.origin_y);
 	WriteCoord (MSG_BROADCAST, self.origin_z);
+
+	
+	damage_total = 0.0;
+	damage_pass = 0.0;
 
 	BecomeExplosion ();
 };
@@ -554,13 +582,20 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	T_RadiusDamage (self, self.owner, 120, world);
+	float damage = 100 + lerp(0, 60, self.grenades_skills / 100);
+
+	damage_total = damage;
+
+	T_RadiusDamage (self, self.owner, damage, world);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
 	WriteCoord (MSG_BROADCAST, self.origin_x);
 	WriteCoord (MSG_BROADCAST, self.origin_y);
 	WriteCoord (MSG_BROADCAST, self.origin_z);
+
+	damage_total = 0.0;
+	damage_pass = 0.0;
 
 	BecomeExplosion ();
 };
@@ -570,6 +605,7 @@ void() GrenadeTouch =
 	if (other == self.owner)
 		// don't explode on owner
 		return;
+
 	if (other.takedamage == DAMAGE_AIM)
 	{
 		GrenadeExplode();
@@ -717,6 +753,7 @@ void() spike_touch =
 	}
 
 	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 15;
+	damage_total = damage;
 
 	// hit something that bleeds
 	if (other.takedamage)
@@ -725,7 +762,12 @@ void() spike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.009;
+		{
+			entity oself = self;
+			self = self.owner;
+			skill_up_nailgun();
+			self = oself;
+		}
 	}
 	else
 	{
@@ -741,6 +783,9 @@ void() spike_touch =
 		WriteCoord (MSG_BROADCAST, self.origin_y);
 		WriteCoord (MSG_BROADCAST, self.origin_z);
 	}
+
+	damage_total = 0.0;
+	damage_pass = 0.0;
 
 	remove(self);
 
@@ -762,15 +807,19 @@ void() superspike_touch =
 	}
 
 	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 20;
+	damage_total = damage;
 
 	// hit something that bleeds
 	if (other.takedamage)
 	{
+		
 		spawn_touchblood (damage);
 		T_Damage (other, self, self.owner, damage);
 
-		if (self.owner.flags & FL_CLIENT)
-			self.owner.nailgun_skills = self.owner.nailgun_skills + 0.009;
+		entity oself = self;
+		self = self.owner;
+		skill_up_nailgun();
+		self = oself;
 	}
 	else
 	{
@@ -780,6 +829,9 @@ void() superspike_touch =
 		WriteCoord (MSG_BROADCAST, self.origin_y);
 		WriteCoord (MSG_BROADCAST, self.origin_z);
 	}
+
+	damage_total = 0.0;
+	damage_pass = 0.0;
 
 	remove(self);
 
@@ -797,7 +849,10 @@ PLAYER WEAPON USE
 void() W_SetCurrentAmmo =
 {
 	// get out of any weapon firing states
-	player_run ();
+	if (self.attack_finished < time)
+		player_run ();
+	else
+		return;
 
 	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
 

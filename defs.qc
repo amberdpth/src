@@ -712,17 +712,9 @@ float(entity targ, entity inflictor) CanDamage;
 .float multidamage_flag;
 .float multidamage;
 
-float MAX_SHOTGUN_SKILL = 100;
+float damage_total;
+float damage_pass;
 
-.float ga_skills;
-.float ya_skills;
-.float ra_skills;
-.float axe_skills;
-.float shotgun_skills;
-.float nailgun_skills;
-.float grenades_skills;
-.float rockets_skills;
-.float lightning_skills;
 
 .float reload_time;
 
@@ -731,10 +723,9 @@ float lerp(float a, float b, float f)
     return a * (1.0 - f) + (b * f);
 }
 
-#define STAT_SG_SKILL 31
-#define STAT_NG_SKILL 32
-#define STAT_AX_SKILL 33
-#define STAT_GL_SKILL 34
-#define STAT_RL_SKILL 35
+#define STAT_SG_SKILL 32
+#define STAT_NG_SKILL 33
+#define STAT_AX_SKILL 34
+#define STAT_GL_SKILL 35
+#define STAT_RL_SKILL 36
 
-#define RATE_ROCKETS_SKILL 0

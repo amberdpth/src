@@ -124,6 +124,8 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	local	entity	oldself;
 	local	float	save;
 	local	float	take;
+	if (attacker.flags & FL_CLIENT)
+		damage_pass += (damage_total ? damage : 0);
 
 	if (!targ.takedamage)
 		return;
@@ -222,6 +224,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	}
 
 	self = oldself;
+
 };
 
 /*
@@ -235,6 +238,9 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 	local	entity	head;
 	local	vector	org;
 
+	if (damage <= 0)
+		return;
+
 	head = findradius(inflictor.origin, damage+40);
 
 	while (head)
@@ -245,26 +251,37 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 			{
 				org = head.origin + (head.mins + head.maxs)*0.5;
 				points = 0.5*vlen (inflictor.origin - org);
+
 				if (points < 0)
 					points = 0;
+
 				points = damage - points;
+
 				if (head == attacker)
 					points = points * 0.5;
+
 				if (points > 0)
 				{
 					if (CanDamage (head, inflictor))
 					{
-						if (attacker.flags & FL_CLIENT)
-						{
-							if (self.classname == "grenade")
-								attacker.grenades_skills = attacker.grenades_skills + 0.001 * points;;
-							if (self.classname == "missile")
-								attacker.rockets_skills = attacker.rockets_skills + 0.001 * points;
-						}
 						if (head.classname == "monster_shambler")
 							T_Damage (head, inflictor, attacker, points*0.5);
 						else
 							T_Damage (head, inflictor, attacker, points);
+					}
+
+					if (attacker.flags & FL_CLIENT)
+					{
+						entity mis = self;
+
+						self = attacker;
+
+						if (mis.classname == "grenade")
+							skill_up_grenade();
+						if (mis.classname == "missile")
+							skill_up_rocket();
+							
+						self = mis;
 					}
 				}
 			}
