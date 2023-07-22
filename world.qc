@@ -351,8 +351,7 @@ void() worldspawn =
 	clientstat(STAT_SHOTGUN_LEVEL,EV_FLOAT,shotgun_skills);
 	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
 	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
-
-	
+	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
 }
 
 void() RestoreGame =
@@ -361,6 +360,7 @@ void() RestoreGame =
 	clientstat(STAT_SHOTGUN_LEVEL,EV_FLOAT,shotgun_skills);
 	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
 	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
+	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
 
 }
 

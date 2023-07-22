@@ -91,14 +91,12 @@ void() Laser_Touch =
 };
 
 void(vector org, vector vec) LaunchLaser =
-{
-	local	vector	new_vec;
-
+{		
 	if (self.classname == "monster_enforcer")
 		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
-	new_vec = normalize(vec);
-
+	vec = normalize(vec);
+	
 	newmis = spawn();
 	newmis.owner = self;
 	newmis.movetype = MOVETYPE_FLY;
@@ -106,7 +104,7 @@ void(vector org, vector vec) LaunchLaser =
 	newmis.effects = EF_DIMLIGHT;
 
 	setmodel (newmis, "progs/laser.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');
+	setsize (newmis, '0 0 0', '0 0 0');		
 
 	setorigin (newmis, org);
 
@@ -126,7 +124,7 @@ void() enforcer_fire =
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 	makevectors (self.angles);
-
+	
 	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
 
 	LaunchLaser(org, self.enemy.origin - self.origin);

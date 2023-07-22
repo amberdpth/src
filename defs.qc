@@ -728,6 +728,8 @@ float lerp(float a, float b, float f)
 #define STAT_AXE_LEVEL 34
 #define STAT_EXPLOSIVES_LEVEL 35
 
+#define STAT_ARMORTYPE 36
+
 .vector start_dir;
 .float fly_error[6];
 .float error_fraction;

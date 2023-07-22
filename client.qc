@@ -321,34 +321,67 @@ void() execute_changelevel =
 	WriteByte (MSG_ALL, SVC_INTERMISSION);
 };
 
+string maplist[] =
+{
+	"e1m1","e1m2","e1m3","e1m4","e1m5","e1m6","e1m7",
+	"e2m1","e2m2","e2m3","e2m4","e2m5","e2m6","e2m7",
+	"e3m1","e3m2","e3m3","e3m4","e3m5","e3m6","e3m7",
+	"e4m1","e4m2","e4m3","e4m4","e4m5","e4m6","e4m7","e4m8",
+	"addy_cl_m1.bsp",
+	"addy_cl_m2.bsp",
+	"addy_cl_m3.bsp",
+	"addy_cl_m4.bsp",
+	"czg03.bsp",
+	"czg04.bsp",
+	"dbdreaming.bsp",
+	"devotion.bsp",
+	"eber1.bsp",
+	"eod_1.bsp",
+	"eod_2.bsp",
+	"eod_3.bsp",
+	"eod_4.bsp",
+	"eod_5.bsp",
+	"eod_6.bsp",
+	"eod_7.bsp",
+	"eod_8.bsp",
+	"filenames",
+	"fortressofsecrets.bsp",
+	"frogsaction.bsp",
+	"kelluva.bsp",
+	"lb_fall01.bsp",
+	"lb_fall02.bsp",
+	"lee1m1.bsp",
+	"markiesm1.bsp",
+	"outpost91.bsp",
+	"plaw01.bsp",
+	"rgdeep.bsp",
+	"rgfire.bsp",
+	"silvasp01.bsp",
+	"sodahalls.bsp",
+	"suzy1024.bsp",
+	"thuby01.bsp",
+	"unused_bmfbr.bsp",
+	"unused_burnham.bsp",
+	"unused_cunnah.bsp",
+	"unused_doompope.bsp",
+	"unused_greenwood.bsp",
+	"unused_konig.bsp",
+	"unused_mars.bsp",
+	"unused_mh.bsp",
+	"unused_mihu.bsp",
+	"unused_rhoq.bsp",
+	"unused_skorly.bsp",
+	"unused_zigi.bsp",
+};
 
 void() changelevel_touch =
 {
 	if (other.classname != "player")
 		return;
 
-	if ((cvar("noexit") == 1) || ((cvar("noexit") == 2) && (mapname != "start")))
-	{
-		T_Damage (other, self, self, 50000);
-		return;
-	}
-
-	// don't print the messages in singleplayer
-	if (coop || deathmatch)
-	{
-		bprint(other.netname);
-		bprint(" exited the level\n");
-	}
-
-	nextmap = self.map;
+	nextmap = maplist[rint(random(maplist.length - 1))];
 
 	SUB_UseTargets ();
-
-	if ( (self.spawnflags & 1) && (deathmatch == 0) )
-	{	// NO_INTERMISSION
-		GotoNextMap();
-		return;
-	}
 
 	self.touch = SUB_Null;
 

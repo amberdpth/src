@@ -886,81 +886,76 @@ PLAYER WEAPON USE
 
 void() W_SetCurrentAmmo =
 {
-	// get out of any weapon firing states
-	if (self.attack_finished < time)
-	{
-		player_run ();
 		
-		self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
 
-		if (self.weapon == IT_AXE)
-		{
-			self.currentammo = 0;
-			self.weaponmodel = "progs/v_axe.mdl";
-			self.weaponframe = 0;
-			self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
-		}
-		else if (self.weapon == IT_SHOTGUN)
-		{
-			self.currentammo = self.ammo_shells;
-			self.weaponmodel = "progs/v_shot.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_SHELLS;
-			self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
-		}
-		else if (self.weapon == IT_SUPER_SHOTGUN)
-		{
-			self.currentammo = self.ammo_shells;
-			self.weaponmodel = "progs/v_shot2.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_SHELLS;
-			self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
-		}
-		else if (self.weapon == IT_NAILGUN)
-		{
-			self.currentammo = self.ammo_nails;
-			self.weaponmodel = "progs/v_nail.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_NAILS;
-			self.reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
-		}
-		else if (self.weapon == IT_SUPER_NAILGUN)
-		{
-			self.currentammo = self.ammo_nails;
-			self.weaponmodel = "progs/v_nail2.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_NAILS;
-			self.reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
-		}
-		else if (self.weapon == IT_GRENADE_LAUNCHER)
-		{
-			self.currentammo = self.ammo_rockets;
-			self.weaponmodel = "progs/v_rock.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_ROCKETS;
-			self.reload_time = lerp(0.8,0.35, self.explosive_skills / 100);
-		}
-		else if (self.weapon == IT_ROCKET_LAUNCHER)
-		{
-			self.currentammo = self.ammo_rockets;
-			self.weaponmodel = "progs/v_rock2.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_ROCKETS;
-			self.reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
-		}
-		else if (self.weapon == IT_LIGHTNING)
-		{
-			self.currentammo = self.ammo_cells;
-			self.weaponmodel = "progs/v_light.mdl";
-			self.weaponframe = 0;
-			self.items = self.items | IT_CELLS;
-		}
-		else
-		{
-			self.currentammo = 0;
-			self.weaponmodel = string_null;
-			self.weaponframe = 0;
-		}
+	if (self.weapon == IT_AXE)
+	{
+		self.currentammo = 0;
+		self.weaponmodel = "progs/v_axe.mdl";
+		self.weaponframe = 0;
+		self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
+	}
+	else if (self.weapon == IT_SHOTGUN)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/v_shot.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+		self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
+	}
+	else if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/v_shot2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+		self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
+	}
+	else if (self.weapon == IT_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.weaponmodel = "progs/v_nail.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_NAILS;
+		self.reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
+	}
+	else if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.weaponmodel = "progs/v_nail2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_NAILS;
+		self.reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
+	}
+	else if (self.weapon == IT_GRENADE_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponmodel = "progs/v_rock.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+		self.reload_time = lerp(0.8,0.35, self.explosive_skills / 100);
+	}
+	else if (self.weapon == IT_ROCKET_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponmodel = "progs/v_rock2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+		self.reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
+	}
+	else if (self.weapon == IT_LIGHTNING)
+	{
+		self.currentammo = self.ammo_cells;
+		self.weaponmodel = "progs/v_light.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_CELLS;
+	}
+	else
+	{
+		self.currentammo = 0;
+		self.weaponmodel = string_null;
+		self.weaponframe = 0;
 	}
 
 };

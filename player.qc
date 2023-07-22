@@ -135,6 +135,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 {
 	self.weaponframe=0;
 
+
 	if (!self.velocity_x && !self.velocity_y)
 	{
 		self.walkframe=0;
@@ -298,6 +299,7 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 	{
 		if (self.ammo_nails < 1)
 		{
+			player_run ();
 			W_SetCurrentAmmo ();
 			return;
 		}
@@ -308,6 +310,7 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 	{
 		if (self.ammo_nails < 2)
 		{
+			player_run ();
 			W_SetCurrentAmmo ();
 			return;
 		}

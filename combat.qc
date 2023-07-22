@@ -65,18 +65,14 @@ float(entity targ, entity inflictor) CanDamage =
 	return FALSE;
 };
 
-
-/*
-============
-Killed
-============
-*/
 void(entity targ, entity attacker) Killed =
 {
 	local entity oself;
 
 	oself = self;
 	self = targ;
+
+	self.solid = SOLID_NOT;
 
 	if (self.health < -99)
 		// don't let sbar look bad if a player
@@ -109,51 +105,36 @@ void(entity targ, entity attacker) Killed =
 	self = oself;
 };
 
-
-/*
-============
-T_Damage
-
-The damage is coming from inflictor, but get mad at attacker
-This should be the only function that ever reduces health.
-============
-*/
-void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
+void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 {
 	local	vector	dir;
 	local	entity	oldself;
 	local	float	save;
 	local	float	take;
-	if (attacker.flags & FL_CLIENT)
-		damage_pass += (damage_total ? damage : 0);
 
 	if (!targ.takedamage)
 		return;
 
-	// used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;
-	// keep track of the source of damage, used in gibs
 	damage_inflictor = inflictor;
 
-	// check for quad damage powerup on the attacker
 	if (attacker.super_damage_finished > time)
 		damage = damage * 4;
 
-	// save damage based on the target's armor level
+	if (attacker.flags & FL_CLIENT)
+		damage_pass += (damage_total ? damage : 0);
+
 	save = ceil(targ.armortype*damage);
 	if (save >= targ.armorvalue)
 	{
 		save = targ.armorvalue;
-		targ.armortype = 0;	// lost all armor
+		targ.armortype = 0;
 		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
 	}
 
 	targ.armorvalue = targ.armorvalue - save;
 	take = ceil(damage-save);
 
-	// add to the damage total for clients, which will be sent as a single
-	// message at the end of the frame
-	// FIXME: remove after combining shotgun blasts?
 	if (targ.flags & FL_CLIENT)
 	{
 		targ.dmg_take = targ.dmg_take + take;
@@ -161,7 +142,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		targ.dmg_inflictor = inflictor;
 	}
 
-	// figure momentum add
 	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK) )
 	{
 		dir = targ.origin - (inflictor.absmin + inflictor.absmax) * 0.5;
@@ -169,7 +149,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		targ.velocity = targ.velocity + dir*damage*8;
 	}
 
-	// check for godmode or invincibility
 	if (targ.flags & FL_GODMODE)
 		return;
 	if (targ.invincible_finished >= time)
@@ -182,11 +161,9 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		return;
 	}
 
-	// team play damage avoidance
 	if ( (teamplay == 1) && (targ.team > 0)&&(targ.team == attacker.team) )
 		return;
 
-	// do the damage
 	targ.health = targ.health - take;
 
 	if (targ.health <= 0)
@@ -195,13 +172,11 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 		return;
 	}
 
-	// react to the damage
 	oldself = self;
 	self = targ;
 
 	if ((self.flags & FL_MONSTER) && attacker != world)
 	{
-		// get mad unless of the same class (except for soldiers)
 		if (self != attacker && attacker != self.enemy)
 		{
 			if ((self.classname != attacker.classname)
@@ -218,7 +193,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage=
 	if (self.th_pain)
 	{
 		self.th_pain(attacker, take);
-		// nightmare mode monsters don't go into pain frames often
 		if (skill == 3)
 			self.pain_finished = time + 5;
 	}
