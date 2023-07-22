@@ -282,7 +282,6 @@ void()	enf_die1	=[	$death1,	enf_die2	] {};
 void()	enf_die2	=[	$death2,	enf_die3	] {};
 void()	enf_die3	=[	$death3,	enf_die4	]
 {
-	self.solid = SOLID_NOT;
 	self.ammo_cells = 5;
 	DropBackpack();
 };
@@ -302,7 +301,6 @@ void()	enf_fdie1	=[	$fdeath1,	enf_fdie2	] {};
 void()	enf_fdie2	=[	$fdeath2,	enf_fdie3	] {};
 void()	enf_fdie3	=[	$fdeath3,	enf_fdie4	]
 {
-	self.solid = SOLID_NOT;
 	self.ammo_cells = 5;
 	DropBackpack();
 };

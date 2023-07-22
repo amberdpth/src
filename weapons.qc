@@ -23,7 +23,6 @@ void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
 void(vector org, vector vel, float damage) SpawnBlood;
 void() SuperDamageSound;
 
-float() W_BestWeapon;
 
 void()	player_axe1;
 void()	player_axeb1;
@@ -322,8 +321,12 @@ void() W_FireShotgun =
 
 	self.punchangle_x = -2;
 
+	vector error_v = v_up * random(-lerp(0.06, 0.0012, self.shotgun_skills / 100), lerp(0.06, 0.0012, self.shotgun_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.06, 0.0012, self.shotgun_skills / 100), lerp(0.06, 0.0012, self.shotgun_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
-	dir = aim (self, 100000);
+	
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
@@ -351,8 +354,12 @@ void() W_FireSuperShotgun =
 
 	self.punchangle_x = -4;
 
+	
+	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
-	dir = aim (self, 100000);
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
@@ -431,16 +438,43 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
+void() missile_think =
+{
+	vector error;
 
+	error[0] = sin(time * self.fly_error[0]) + sin(time * self.fly_error[1]);
+	error[1] = sin(time * self.fly_error[2]) + sin(time * self.fly_error[3]);
+	error[2] = sin(time * self.fly_error[4]) + sin(time * self.fly_error[5]);
+
+	dprint(vtos(error),"\n");
+
+	self.error_fraction = bound(0, self.error_fraction + frametime , 1);
+
+
+	vector new_vel = normalize(self.start_dir + error * 0.08) * 1000;
+
+	self.velocity[0] = lerp(self.velocity[0], new_vel[0], frametime * 16);
+	self.velocity[1] = lerp(self.velocity[1], new_vel[1], frametime * 16);
+	self.velocity[2] = lerp(self.velocity[2], new_vel[2], frametime * 16);
+
+	self.angles = vectoangles(self.velocity);
+
+	self.think = missile_think;
+	self.nextthink = time;
+}
 
 /*
 ================
 W_FireRocket
 ================
 */
+
+
+
 void() W_FireRocket =
 {
-	local entity missile;
+	entity missile;
+	vector dir;
 
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
@@ -456,15 +490,28 @@ void() W_FireRocket =
 
 	// set missile speed
 	makevectors (self.v_angle);
-	missile.velocity = aim(self, 1000);
+
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
+	missile.velocity = dir;
+	missile.start_dir = dir;
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles(missile.velocity);
+
+	missile.fly_error[0] = random(-64, 64);
+	missile.fly_error[1] = random(-64, 64);
+	missile.fly_error[2] = random(-64, 64);
+	missile.fly_error[3] = random(-64, 64);
+	missile.fly_error[4] = random(-64, 64);
+	missile.fly_error[5] = random(-64, 64);
 
 	missile.touch = T_MissileTouch;
 
 	// set missile duration
-	missile.nextthink = time + 5;
-	missile.think = SUB_Remove;
+	missile.nextthink = time;
+	missile.think = missile_think;
 
 	setmodel (missile, "progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
@@ -534,11 +581,7 @@ void() W_FireLightning =
 	local float cells;
 
 	if (self.ammo_cells < 1)
-	{
-		self.weapon = W_BestWeapon ();
-		W_SetCurrentAmmo ();
 		return;
-	}
 
 	// explode if under water
 	if (self.waterlevel > 1)
@@ -619,7 +662,8 @@ void() GrenadeTouch =
 
 void() W_FireGrenade =
 {
-	local entity missile;
+	entity missile;
+	vector dir;
 
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
@@ -636,14 +680,12 @@ void() W_FireGrenade =
 	// set missile speed
 	makevectors (self.v_angle);
 
-	if (self.v_angle_x)
-		missile.velocity = v_forward*600 + v_up * 200 + crandom()*v_right*10 + crandom()*v_up*10;
-	else
-	{
-		missile.velocity = aim(self, 10000);
-		missile.velocity = missile.velocity * 600;
-		missile.velocity_z = 200;
-	}
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
+	missile.velocity = dir * 585;
+	missile.velocity[2] = missile.velocity[2] + v_up[2] * 240;
 
 	missile.avelocity = '300 300 300';
 
@@ -702,7 +744,11 @@ void() W_FireSuperSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
-	dir = v_forward;
+
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	dir = v_forward + error_h + error_v;
+	
 	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis, "progs/s_spike.mdl");
@@ -718,7 +764,11 @@ void(float ox) W_FireSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
-	dir = v_forward;
+
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
 	self.punchangle_x = -2;
 };
@@ -739,7 +789,7 @@ void() spike_touch =
 		return;
 	}
 
-	float damage = rint(lerp(0, 10, self.owner.spike_skills / 100)) + 8;
+	float damage = floor(lerp(0, 10, self.owner.spike_skills / 100)) + 8;
 	damage_total = damage;
 
 	// hit something that bleeds
@@ -793,7 +843,7 @@ void() superspike_touch =
 		return;
 	}
 
-	float damage = rint(lerp(0, 10, self.owner.spike_skills / 100)) + 10;
+	float damage = floor(lerp(0, 10, self.owner.spike_skills / 100)) + 10;
 
 	damage_total = damage;
 
@@ -915,26 +965,6 @@ void() W_SetCurrentAmmo =
 
 };
 
-float() W_BestWeapon =
-{
-	local float it;
-
-	it = self.items;
-
-	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
-		return IT_LIGHTNING;
-	else if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
-		return IT_SUPER_NAILGUN;
-	else if(self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN) )
-		return IT_SUPER_SHOTGUN;
-	else if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
-		return IT_NAILGUN;
-	else if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
-		return IT_SHOTGUN;
-
-	return IT_AXE;
-};
-
 float() W_CheckNoAmmo =
 {
 	if (self.currentammo > 0)
@@ -942,8 +972,6 @@ float() W_CheckNoAmmo =
 
 	if (self.weapon == IT_AXE)
 		return TRUE;
-
-	self.weapon = W_BestWeapon ();
 
 	W_SetCurrentAmmo ();
 

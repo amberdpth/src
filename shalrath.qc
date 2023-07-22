@@ -134,7 +134,6 @@ void() shalrath_die =
 
 	sound (self, CHAN_VOICE, "shalrath/death.wav", 1, ATTN_NORM);
 	shal_death1();
-	self.solid = SOLID_NOT;
 };
 
 /*

@@ -298,7 +298,6 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 	{
 		if (self.ammo_nails < 1)
 		{
-			self.weapon = W_BestWeapon ();
 			W_SetCurrentAmmo ();
 			return;
 		}
@@ -309,7 +308,6 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 	{
 		if (self.ammo_nails < 2)
 		{
-			self.weapon = W_BestWeapon ();
 			W_SetCurrentAmmo ();
 			return;
 		}

@@ -142,7 +142,7 @@ void() f_death1 =[      $death1,        f_death2        ]
 {
 	sound (self, CHAN_VOICE, "fish/death.wav", 1, ATTN_NORM);
 };
-void() f_death2 =[      $death2,        f_death3        ] {self.solid = SOLID_NOT;};
+void() f_death2 =[      $death2,        f_death3        ] {};
 void() f_death3 =[      $death3,        f_death4        ] {};
 void() f_death4 =[      $death4,        f_death5        ] {};
 void() f_death5 =[      $death5,        f_death6        ] {};
