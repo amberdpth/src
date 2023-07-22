@@ -30,7 +30,7 @@ void()	player_axeb1;
 void()	player_axec1;
 void()	player_axed1;
 void()	player_shot1;
-void()	player_nail1;
+void()	player_nail;
 void()	player_light1;
 void()	player_rocket1;
 
@@ -81,7 +81,7 @@ void() W_FireAxe =
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
 		T_Damage (trace_ent, self, self, 20);
-		skill_up_axe();
+		skillup_axe();
 	}
 	else
 	{	// hit wall
@@ -295,7 +295,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	while(e)
 	{
 		T_Damage(e, self, self, e.multidamage);
-		skill_up_shotgun();
+		skillup_shotgun();
 		e.multidamage = 0;
 		e.multidamage_flag = FALSE;
 		e = findflags(e,multidamage_flag,TRUE);
@@ -402,17 +402,17 @@ void() T_MissileTouch =
 	if (other.health)
 	{
 		if (other.classname == "monster_shambler")
-			damg = damg * (0.5 + 0.5 * (self.rockets_skills / 100));
+			damg = damg * (0.5 + 0.5 * (self.explosive_skills / 100));
 
 		T_Damage (other, self, self.owner, damg );
 
 		entity oself = self;
 		self = self.owner;
-		skill_up_rocket();
+		skillup_explosives();
 		self = oself;
 	}
 
-	damg = damg + lerp(0, 40, self.rockets_skills / 100); // extra radius depending on rockets skill
+	damg = damg + lerp(0, 40, self.explosive_skills / 100); // extra radius depending on rockets skill
 
 	T_RadiusDamage (self, self.owner, damg, other);
 
@@ -582,7 +582,7 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	float damage = 100 + lerp(0, 60, self.grenades_skills / 100);
+	float damage = 100 + lerp(0, 60, self.explosive_skills / 100);
 
 	damage_total = damage;
 
@@ -698,15 +698,9 @@ void() W_FireSuperSpikes =
 {
 	local vector dir;
 
-	if (self.ammo_nails < 2)
-	{
-		self.weapon = W_BestWeapon ();
-		W_SetCurrentAmmo ();
-		return;
-	}
+	makevectors (self.v_angle);
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
-	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 	dir = v_forward;
 	launch_spike (self.origin + '0 0 16', dir);
@@ -721,13 +715,6 @@ void(float ox) W_FireSpikes =
 	local vector dir;
 
 	makevectors (self.v_angle);
-
-	if (self.ammo_nails < 1)
-	{
-		self.weapon = W_BestWeapon ();
-		W_SetCurrentAmmo ();
-		return;
-	}
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
@@ -752,7 +739,7 @@ void() spike_touch =
 		return;
 	}
 
-	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 15;
+	float damage = rint(lerp(0, 10, self.owner.spike_skills / 100)) + 8;
 	damage_total = damage;
 
 	// hit something that bleeds
@@ -765,7 +752,7 @@ void() spike_touch =
 		{
 			entity oself = self;
 			self = self.owner;
-			skill_up_nailgun();
+			skillup_spikes();
 			self = oself;
 		}
 	}
@@ -806,7 +793,8 @@ void() superspike_touch =
 		return;
 	}
 
-	float damage = rint(lerp(0, 10, self.owner.nailgun_skills / 100)) + 20;
+	float damage = rint(lerp(0, 10, self.owner.spike_skills / 100)) + 10;
+
 	damage_total = damage;
 
 	// hit something that bleeds
@@ -818,7 +806,7 @@ void() superspike_touch =
 
 		entity oself = self;
 		self = self.owner;
-		skill_up_nailgun();
+		skillup_spikes ();
 		self = oself;
 	}
 	else
@@ -850,80 +838,81 @@ void() W_SetCurrentAmmo =
 {
 	// get out of any weapon firing states
 	if (self.attack_finished < time)
+	{
 		player_run ();
-	else
-		return;
+		
+		self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
 
-	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+		if (self.weapon == IT_AXE)
+		{
+			self.currentammo = 0;
+			self.weaponmodel = "progs/v_axe.mdl";
+			self.weaponframe = 0;
+			self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
+		}
+		else if (self.weapon == IT_SHOTGUN)
+		{
+			self.currentammo = self.ammo_shells;
+			self.weaponmodel = "progs/v_shot.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_SHELLS;
+			self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
+		}
+		else if (self.weapon == IT_SUPER_SHOTGUN)
+		{
+			self.currentammo = self.ammo_shells;
+			self.weaponmodel = "progs/v_shot2.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_SHELLS;
+			self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
+		}
+		else if (self.weapon == IT_NAILGUN)
+		{
+			self.currentammo = self.ammo_nails;
+			self.weaponmodel = "progs/v_nail.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_NAILS;
+			self.reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
+		}
+		else if (self.weapon == IT_SUPER_NAILGUN)
+		{
+			self.currentammo = self.ammo_nails;
+			self.weaponmodel = "progs/v_nail2.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_NAILS;
+			self.reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
+		}
+		else if (self.weapon == IT_GRENADE_LAUNCHER)
+		{
+			self.currentammo = self.ammo_rockets;
+			self.weaponmodel = "progs/v_rock.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_ROCKETS;
+			self.reload_time = lerp(0.8,0.35, self.explosive_skills / 100);
+		}
+		else if (self.weapon == IT_ROCKET_LAUNCHER)
+		{
+			self.currentammo = self.ammo_rockets;
+			self.weaponmodel = "progs/v_rock2.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_ROCKETS;
+			self.reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
+		}
+		else if (self.weapon == IT_LIGHTNING)
+		{
+			self.currentammo = self.ammo_cells;
+			self.weaponmodel = "progs/v_light.mdl";
+			self.weaponframe = 0;
+			self.items = self.items | IT_CELLS;
+		}
+		else
+		{
+			self.currentammo = 0;
+			self.weaponmodel = string_null;
+			self.weaponframe = 0;
+		}
+	}
 
-	if (self.weapon == IT_AXE)
-	{
-		self.currentammo = 0;
-		self.weaponmodel = "progs/v_axe.mdl";
-		self.weaponframe = 0;
-		self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
-	}
-	else if (self.weapon == IT_SHOTGUN)
-	{
-		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_SHELLS;
-		self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
-	}
-	else if (self.weapon == IT_SUPER_SHOTGUN)
-	{
-		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot2.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_SHELLS;
-		self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
-	}
-	else if (self.weapon == IT_NAILGUN)
-	{
-		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_NAILS;
-		self.reload_time = lerp(0.08, 0.044, self.nailgun_skills / 100);
-	}
-	else if (self.weapon == IT_SUPER_NAILGUN)
-	{
-		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail2.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_NAILS;
-		self.reload_time = lerp(0.111, 0.6, self.nailgun_skills / 100);
-	}
-	else if (self.weapon == IT_GRENADE_LAUNCHER)
-	{
-		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_ROCKETS;
-		self.reload_time = lerp(0.8,0.35, self.grenades_skills / 100);
-	}
-	else if (self.weapon == IT_ROCKET_LAUNCHER)
-	{
-		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock2.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_ROCKETS;
-		self.reload_time = lerp(0.7,0.39, self.rockets_skills / 100);
-	}
-	else if (self.weapon == IT_LIGHTNING)
-	{
-		self.currentammo = self.ammo_cells;
-		self.weaponmodel = "progs/v_light.mdl";
-		self.weaponframe = 0;
-		self.items = self.items | IT_CELLS;
-	}
-	else
-	{
-		self.currentammo = 0;
-		self.weaponmodel = string_null;
-		self.weaponframe = 0;
-	}
 };
 
 float() W_BestWeapon =
@@ -1002,9 +991,9 @@ void() W_Attack =
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 		player_shot1 ();
 	else if (self.weapon == IT_NAILGUN)
-		player_nail1 ();
+		player_nail ();
 	else if (self.weapon == IT_SUPER_NAILGUN)
-		player_nail1 ();
+		player_nail ();
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 		player_rocket1();
 	else if (self.weapon == IT_ROCKET_LAUNCHER)

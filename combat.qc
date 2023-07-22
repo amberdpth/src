@@ -273,14 +273,8 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 					if (attacker.flags & FL_CLIENT)
 					{
 						entity mis = self;
-
 						self = attacker;
-
-						if (mis.classname == "grenade")
-							skill_up_grenade();
-						if (mis.classname == "missile")
-							skill_up_rocket();
-							
+						skillup_explosives();
 						self = mis;
 					}
 				}

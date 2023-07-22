@@ -134,6 +134,7 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 void()	player_run =[	$rockrun1,	player_run	]
 {
 	self.weaponframe=0;
+
 	if (!self.velocity_x && !self.velocity_y)
 	{
 		self.walkframe=0;
@@ -288,51 +289,51 @@ void()	player_axed4 =	[$axattd4, player_run	]
 
 //============================================================================
 
-void() player_nail1   =[$nailatt1, player_nail2  ]
+.float nailgun_lefty;
+
+void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), player_nail  ]
 {
-	self.effects = self.effects | EF_MUZZLEFLASH;
+	
+	if (self.weapon == IT_NAILGUN)
+	{
+		if (self.ammo_nails < 1)
+		{
+			self.weapon = W_BestWeapon ();
+			W_SetCurrentAmmo ();
+			return;
+		}
+
+		W_FireSpikes(self.nailgun_lefty ? 3.2 : -3.2);
+	}
+	if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		if (self.ammo_nails < 2)
+		{
+			self.weapon = W_BestWeapon ();
+			W_SetCurrentAmmo ();
+			return;
+		}
+
+		W_FireSuperSpikes();
+	}
 
 	if (!self.button0)
 	{
 		player_run ();
 		return;
 	}
-	self.weaponframe = self.weaponframe + 1;
 
-	if (self.weaponframe == 9)
-		self.weaponframe = 1;
-
-	SuperDamageSound();
-
-	if (self.weapon == IT_NAILGUN)
-		W_FireSpikes(3.2);
-	if (self.weapon == IT_SUPER_NAILGUN)
-		W_FireSuperSpikes();
-
-	self.attack_finished = self.nextthink = time + self.reload_time;
-};
-
-void() player_nail2   =[$nailatt2, player_nail1  ]
-{
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
-	if (!self.button0)
-	{
-		player_run ();
-		return;
-	}
-
 	self.weaponframe = self.weaponframe + 1;
+
+	self.nailgun_lefty = self.nailgun_lefty ? 0 : 1;
 
 	if (self.weaponframe == 9)
 		self.weaponframe = 1;
 
 	SuperDamageSound();
 
-	if (self.weapon == IT_NAILGUN)
-		W_FireSpikes(-3.2);
-	if (self.weapon == IT_SUPER_NAILGUN)
-		W_FireSuperSpikes();
 
 	self.attack_finished = self.nextthink = time + self.reload_time;
 };

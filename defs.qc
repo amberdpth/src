@@ -723,9 +723,8 @@ float lerp(float a, float b, float f)
     return a * (1.0 - f) + (b * f);
 }
 
-#define STAT_SG_SKILL 32
-#define STAT_NG_SKILL 33
-#define STAT_AX_SKILL 34
-#define STAT_GL_SKILL 35
-#define STAT_RL_SKILL 36
+#define STAT_SHOTGUN_LEVEL 32
+#define STAT_SPIKES_LEVEL 33
+#define STAT_AXE_LEVEL 34
+#define STAT_EXPLOSIVES_LEVEL 35
 
