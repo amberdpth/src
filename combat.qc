@@ -129,14 +129,8 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		damage_pass += (damage_total ? damage : 0);
 
 	save = ceil(targ.armortype*damage);
-	if (save >= targ.armorvalue)
-	{
-		save = targ.armorvalue;
-		targ.armortype = 0;
-		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
-	}
 
-	targ.armorvalue = targ.armorvalue - save;
+	targ.armorvalue = (targ.armorvalue ? targ.armorvalue - save : 0.0);
 	take = ceil(damage-save);
 
 	if (targ.flags & FL_CLIENT)
@@ -212,9 +206,11 @@ T_RadiusDamage
 */
 void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDamage =
 {
-	local	float 	points;
-	local	entity	head;
-	local	vector	org;
+	float 	points;
+	entity	head;
+	vector	org;
+	entity mis;
+	float passing_damage;
 
 	if (damage <= 0)
 		return;
@@ -235,24 +231,36 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 
 				points = damage - points;
 
-				if (head == attacker)
-					points = points * 0.5;
-
 				if (points > 0)
 				{
+					if (head == attacker)
+						points = points * lerp(1, 0, attacker.explosives_protection); // self damage
+					else
+						points = points * lerp(1, 0.5, attacker.explosives_protection); // enemy damage
+
 					if (CanDamage (head, inflictor))
+						points = points * 1.1;
+					else
 					{
-						if (head.classname == "monster_shambler")
-							T_Damage (head, inflictor, attacker, points*0.5);
-						else
-							T_Damage (head, inflictor, attacker, points);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skills / 100) : 0.1);
+						points = points * passing_damage;
 					}
+						
+					T_Damage (head, inflictor, attacker, points);
 
 					if (attacker.flags & FL_CLIENT)
 					{
-						entity mis = self;
+						mis = self;
 						self = attacker;
 						skillup_explosives();
+						self = mis;
+					}
+					// only combat armor skill rise up with splash damage
+					if ((head.flags & FL_CLIENT) && (head.armor_flag == COMBAT_ARMOR_FLAG))
+					{
+						mis = self;
+						self = head;
+						skillup_combat_armor_wearing(points / damage);
 						self = mis;
 					}
 				}

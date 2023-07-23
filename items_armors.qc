@@ -7,13 +7,6 @@ void() armor_touch =
 
     other.armor_flag = self.armor_flag;
     other.armor_level = self.armor_level;
-    other.armor_min_protect = self.armor_min_protect;
-    other.armor_max_protect = self.armor_max_protect;
-    other.armor_min_speed = self.armor_min_speed;
-    other.armor_max_speed = self.armor_max_speed;
-    other.armor_min_value = self.armor_min_value;
-    other.armor_max_value = self.armor_max_value;
-    
 
 	self.solid = SOLID_NOT;
 	self.model = string_null;
@@ -29,20 +22,46 @@ void() armor_touch =
 void() item_armor_jacket =
 {
     float r = rint(random(3));
+	float r_armor = rint(random(3));
 
-    float jacket_levels[] = { JACKET_MK1, JACKET_MK2, JACKET_MK3, JACKET_MK4 };
-    
-
-
+    float levels[] = { 0,1,2,3 };
+	
     self.touch = armor_touch;
-    precache_model("progs/armor_jacket.mdl");
-    setmodel(self, "progs/armor_jacket.mdl");
 
-    self.skin = r;
-    self.armor_flag = ARMOR_JACKET_FLAG;
-    self.armor_level = jacket_levels[r];
+	switch(r_armor)
+	{
+		case 0:
+			precache_model("progs/armor_jacket.mdl");
+			setmodel(self, "progs/armor_jacket.mdl");
+			self.skin = r;
+			self.armor_flag = JACKET_ARMOR_FLAG;
+			self.armor_level = levels[r];
+			break;
+		case 1:
+			precache_model("progs/armor_combat.mdl");
+			setmodel(self, "progs/armor_combat.mdl");
+			self.skin = r;
+			self.armor_flag = COMBAT_ARMOR_FLAG;
+			self.armor_level = levels[r];
+			break;
+		case 2:
+			precache_model("progs/armor_body.mdl");
+			setmodel(self, "progs/armor_body.mdl");
+			self.skin = r;
+			self.armor_flag = BODY_ARMOR_FLAG;
+			self.armor_level = levels[r];
+			break;
+		case 3:
+			precache_model("progs/armor_default.mdl");
+			setmodel(self, "progs/armor_default.mdl");
+			self.skin = r;
+			self.armor_flag = CLASSIC_ARMOR_FLAG;
+			self.armor_level = levels[r];
+			break;
+	}
+
+
     
-    self.skin = 0;
     setsize(self, '-16 -16 0', '16 16 56');
     StartItem();
     

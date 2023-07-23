@@ -85,7 +85,7 @@ void() SetChangeParms =
 	parm22 = self.spike_skills;
 	parm23 = self.explosive_skills;
 
-	parm24 = self.armor_jacket_wearing_skill;
+	parm24 = self.jacket_armor_wearing_skill;
 
 	parm40 = self.armor_flag;
 	parm41 = self.armor_level;
@@ -127,7 +127,7 @@ void() DecodeLevelParms =
 	self.spike_skills = parm22;
 	self.explosive_skills = parm23;
 
-	self.armor_jacket_wearing_skill = parm24;
+	self.jacket_armor_wearing_skill = parm24;
 
 	self.armor_flag = parm40;
 	self.armor_level = parm41;
@@ -1169,7 +1169,6 @@ void() CheckPowerups =
 };
 void() InitPlayerParams =
 {
-	self.maxspeed = 320;
 	self.explosives_protection = 0;
 }
 
@@ -1180,26 +1179,16 @@ void() CheckSKills =
 	self.spike_skills = bound(0, self.spike_skills, 100);
 	self.explosive_skills = bound(0, self.explosive_skills, 100);
 
-	self.armor_jacket_wearing_skill = bound(0, self.armor_jacket_wearing_skill, 100);
+	self.jacket_armor_wearing_skill = bound(0, self.jacket_armor_wearing_skill, 100);
 
 	self.explosives_protection = lerp(0, 0.15, self.explosive_skills / 100);
+
+
 }
 
 void() CheckArmors =
 {
-	float jacket_maxspeed_fraction = 0;
-
-	/*
-	self.armor_flag;
-    self.armor_min_protect;
-    self.armor_max_protect;
-    self.armor_min_speed;
-    self.armor_max_speed;
-    self.armor_min_value;
-    self.armor_max_value;
-	*/
-
-	if (self.armor_flag == ARMOR_JACKET_FLAG)
+	if (self.armor_flag == JACKET_ARMOR_FLAG)
 	{
 		self.armor_min_protect = jacket_min_protect[self.armor_level];
 		self.armor_max_protect = jacket_max_protect[self.armor_level];
@@ -1208,24 +1197,110 @@ void() CheckArmors =
 		self.armor_min_value = jacket_min_value[self.armor_level];
 		self.armor_max_value = jacket_max_value[self.armor_level];
 
-		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.armor_jacket_wearing_skill / 100));
+		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.jacket_armor_wearing_skill / 100));
 		self.armorvalue = bound(0, self.armorvalue, self.armor_max_value);
 
 		self.armortype = lerp(self.armor_min_protect, self.armor_max_protect, self.armorvalue / self.max_armorvalue);
-
-		jacket_maxspeed_fraction += (self.armor_jacket_wearing_skill / 100);
-		jacket_maxspeed_fraction += (self.health / self.max_health);
-		jacket_maxspeed_fraction += self.explosives_protection;
-		jacket_maxspeed_fraction /= 3;
-		jacket_maxspeed_fraction = bound(0,jacket_maxspeed_fraction,1);
-
-		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, jacket_maxspeed_fraction);
-
 		
-		self.explosives_protection = self.explosives_protection + lerp(0.06, 0.12, self.armor_jacket_wearing_skill / 100);
+		self.explosives_protection = self.explosives_protection + lerp(0.06, 0.12, self.jacket_armor_wearing_skill / 100);
+	}
+	else if (self.armor_flag == COMBAT_ARMOR_FLAG)
+	{
+		self.armor_min_protect = combat_min_protect[self.armor_level];
+		self.armor_max_protect = combat_max_protect[self.armor_level];
+		self.armor_min_speed = combat_min_speed[self.armor_level];
+		self.armor_max_speed = combat_max_speed[self.armor_level];
+		self.armor_min_value = combat_min_value[self.armor_level];
+		self.armor_max_value = combat_max_value[self.armor_level];
+
+		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.combat_armor_wearing_skill / 100));
+		self.armorvalue = bound(0, self.armorvalue, self.armor_max_value);
+
+		self.armortype = lerp(self.armor_min_protect, self.armor_max_protect, self.armorvalue / self.max_armorvalue);
+		
+		self.explosives_protection = self.explosives_protection + lerp(0.1, 0.35, self.combat_armor_wearing_skill / 100);
+	}
+	else if (self.armor_flag == BODY_ARMOR_FLAG)
+	{
+		self.armor_min_protect = body_min_protect[self.armor_level];
+		self.armor_max_protect = body_max_protect[self.armor_level];
+		self.armor_min_speed = body_min_speed[self.armor_level];
+		self.armor_max_speed = body_max_speed[self.armor_level];
+		self.armor_min_value = body_min_value[self.armor_level];
+		self.armor_max_value = body_max_value[self.armor_level];
+
+		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.body_armor_wearing_skill / 100));
+		self.armorvalue = bound(0, self.armorvalue, self.armor_max_value);
+
+		self.armortype = lerp(self.armor_min_protect, self.armor_max_protect, self.armorvalue / self.max_armorvalue);
+		
+		self.explosives_protection = self.explosives_protection + lerp(0.2, 0.5, self.body_armor_wearing_skill / 100);
+	}
+	else if (self.armor_flag == CLASSIC_ARMOR_FLAG)
+	{
+		self.armor_min_protect = classic_min_protect[self.armor_level];
+		self.armor_max_protect = classic_max_protect[self.armor_level];
+		self.armor_min_speed = classic_min_speed[self.armor_level];
+		self.armor_max_speed = classic_max_speed[self.armor_level];
+		self.armor_min_value = classic_min_value[self.armor_level];
+		self.armor_max_value = classic_max_value[self.armor_level];
+
+		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.classic_armor_wearing_skill / 100));
+		self.armorvalue = bound(0, self.armorvalue, self.armor_max_value);
+
+		self.armortype = lerp(self.armor_min_protect, self.armor_max_protect, self.armorvalue / self.max_armorvalue);
+		
+		self.explosives_protection = self.explosives_protection + lerp(0.1, 0.4, self.classic_armor_wearing_skill / 100);
 	}
 }
 
+void() CheckMaxSpeed =
+{
+
+	self.maxspeed = 320;
+
+	self.maxspeed = (self.health < 100 ? lerp(self.maxspeed * 0.76, self.maxspeed, self.health / 100) : self.maxspeed);
+
+	float jacket_maxspeed_fraction = 0;
+	float combat_maxspeed_fraction = 0;
+
+	if (self.armor_flag == JACKET_ARMOR_FLAG)
+	{
+		jacket_maxspeed_fraction += (self.jacket_armor_wearing_skill / 100);
+		jacket_maxspeed_fraction += (self.health / self.max_health);
+		jacket_maxspeed_fraction = jacket_maxspeed_fraction / 2;
+		jacket_maxspeed_fraction = bound(0,jacket_maxspeed_fraction,1);
+		
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, jacket_maxspeed_fraction);
+	}
+	else if (self.armor_flag == COMBAT_ARMOR_FLAG)
+	{
+		combat_max_speed_fraction += self.combat_armor_wearing_skill / 100;
+		combat_max_speed_fraction = combat_max_speed_fraction * 0.33 + (self.health / self.max_health) * 0.67;
+		combat_max_speed_fraction = bound(0,combat_maxspeed_fraction,1);
+
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, combat_max_speed_fraction);
+	}
+}
+
+void() CheckWeaponStats =
+{
+	self.ax_reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
+	self.sg_reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
+	self.ssg_reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
+	self.ng_reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
+	self.sng_reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
+	self.gl_reload_time = lerp(0.8, 0.35, self.explosive_skills / 100);
+	self.rl_reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
+
+	switch (self.armor_flag)
+	{
+		case JACKET_ARMOR_FLAG:
+			self.ax_reload_time = lerp(self.ax_reload_time * 0.9, self.ax_reload_time * 0.6, self.jacket_armor_wearing_skill / 100);
+			self.sg_reload_time = lerp(self.sg_reload_time * 0.96, self.sg_reload_time * 0.76, self.jacket_armor_wearing_skill / 100);
+			break;
+	}
+}
 
 /*
 ================
@@ -1236,15 +1311,17 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
-	InitPlayerParams();
-	CheckSKills();
-	CheckArmors();
-
 	// intermission or finale
 	if (self.view_ofs == '0 0 0')
 		return;
 	if (self.deadflag)
 		return;
+
+	InitPlayerParams();
+	CheckSKills();
+	CheckArmors();
+	CheckMaxSpeed();
+	CheckWeaponStats();
 		
 	W_WeaponFrame ();
 

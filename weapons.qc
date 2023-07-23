@@ -894,7 +894,7 @@ void() W_SetCurrentAmmo =
 		self.currentammo = 0;
 		self.weaponmodel = "progs/v_axe.mdl";
 		self.weaponframe = 0;
-		self.reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
+		
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -902,7 +902,8 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_shot.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
-		self.reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
+
+		
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
@@ -910,7 +911,6 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_shot2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
-		self.reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
 	}
 	else if (self.weapon == IT_NAILGUN)
 	{
@@ -918,15 +918,13 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
-		self.reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
 		self.weaponmodel = "progs/v_nail2.mdl";
 		self.weaponframe = 0;
-		self.items = self.items | IT_NAILS;
-		self.reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
+		self.items = self.items | IT_NAILS;	
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
@@ -934,7 +932,6 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
-		self.reload_time = lerp(0.8,0.35, self.explosive_skills / 100);
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
@@ -942,7 +939,6 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
-		self.reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
 	}
 	else if (self.weapon == IT_LIGHTNING)
 	{
@@ -950,6 +946,7 @@ void() W_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_light.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_CELLS;
+		//self.reload_time = self.lg_reload_time;
 	}
 	else
 	{
@@ -999,6 +996,9 @@ void() W_Attack =
 	{
 		sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
 		r = random();
+
+		self.reload_time = self.ax_reload_time;
+
 		if (r < 0.25)
 			player_axe1 ();
 		else if (r<0.5)
@@ -1007,20 +1007,37 @@ void() W_Attack =
 			player_axec1 ();
 		else
 			player_axed1 ();
-		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SHOTGUN)
+	{
+		self.reload_time = self.sg_reload_time;	
 		player_shot1 ();
+	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+		self.reload_time = self.ssg_reload_time;
 		player_shot1 ();
+	}
 	else if (self.weapon == IT_NAILGUN)
+	{
+		self.reload_time = self.ng_reload_time;
 		player_nail ();
+	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.reload_time = self.sng_reload_time;
 		player_nail ();
+	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
+	{
+		self.reload_time = self.gl_reload_time;
 		player_rocket1();
+	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
+	{
+		self.reload_time = self.rl_reload_time;
 		player_rocket1();
+	}
 	else if (self.weapon == IT_LIGHTNING)
 	{
 		player_light1();
