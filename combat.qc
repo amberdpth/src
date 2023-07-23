@@ -65,12 +65,16 @@ float(entity targ, entity inflictor) CanDamage =
 	return FALSE;
 };
 
+void(float min, float max) drop_armorshard;
+
 void(entity targ, entity attacker) Killed =
 {
 	local entity oself;
 
 	oself = self;
 	self = targ;
+
+	drop_armorshard(1,3);
 
 	self.solid = SOLID_NOT;
 

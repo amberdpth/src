@@ -10,6 +10,7 @@ fight.qc
 ai.qc
 combat.qc
 items.qc
+items_armors.qc
 weapons.qc
 
 passing_bullets.qc

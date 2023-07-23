@@ -299,6 +299,7 @@ void() worldspawn =
 	precache_model ("progs/s_spike.mdl");
 
 	precache_model ("progs/backpack.mdl");
+	precache_model ("progs/armor_shard.mdl");
 
 	precache_model ("progs/zom_gib.mdl");
 

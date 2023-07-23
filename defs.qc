@@ -717,6 +717,7 @@ float damage_pass;
 
 
 .float reload_time;
+.float explosives_protection;
 
 float lerp(float a, float b, float f)
 {
@@ -729,7 +730,36 @@ float lerp(float a, float b, float f)
 #define STAT_EXPLOSIVES_LEVEL 35
 
 #define STAT_ARMORTYPE 36
+#define STAT_ARMORFLAG 37
+#define STAT_ARMORLEVEL 38
 
 .vector start_dir;
 .float fly_error[6];
 .float error_fraction;
+
+.float armor_flag;
+.float armor_level;
+
+.float max_armorvalue;
+
+.float armor_min_protect;
+.float armor_max_protect;
+.float armor_min_speed;
+.float armor_max_speed;
+.float armor_min_value;
+.float armor_max_value;
+
+// JACKET
+
+#define ARMOR_JACKET_FLAG 1
+#define JACKET_MK1 1
+#define JACKET_MK2 2
+#define JACKET_MK3 3
+#define JACKET_MK4 4
+
+float jacket_min_protect[] = { 0.12, 0.17, 0.2, 0.22 };
+float jacket_max_protect[] = {0.28, 0.32, 0.34, 0.37 };
+float jacket_min_speed[] = { 20, 26, 29, 32 };
+float jacket_max_speed[] = { 42, 49, 51, 56 };
+float jacket_min_value[] = { 60, 65, 70, 75 };
+float jacket_max_value[] = { 100, 105, 115, 120 };

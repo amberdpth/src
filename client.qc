@@ -84,7 +84,11 @@ void() SetChangeParms =
 	parm21 = self.shotgun_skills;
 	parm22 = self.spike_skills;
 	parm23 = self.explosive_skills;
-	parm24 = self.explosive_skills;
+
+	parm24 = self.armor_jacket_wearing_skill;
+
+	parm40 = self.armor_flag;
+	parm41 = self.armor_level;
 };
 
 void() SetNewParms =
@@ -122,7 +126,11 @@ void() DecodeLevelParms =
 	self.shotgun_skills = parm21;
 	self.spike_skills = parm22;
 	self.explosive_skills = parm23;
-	self.explosive_skills = parm24;
+
+	self.armor_jacket_wearing_skill = parm24;
+
+	self.armor_flag = parm40;
+	self.armor_level = parm41;
 };
 
 /*
@@ -996,6 +1004,8 @@ void() PlayerPreThink =
 		W_SetCurrentAmmo ();
 };
 
+
+
 /*
 ================
 CheckPowerups
@@ -1157,6 +1167,64 @@ void() CheckPowerups =
 	}
 
 };
+void() InitPlayerParams =
+{
+	self.maxspeed = 320;
+	self.explosives_protection = 0;
+}
+
+void() CheckSKills =
+{
+	self.axe_skills = bound(0, self.axe_skills, 100);
+	self.shotgun_skills = bound(0, self.shotgun_skills, 100);
+	self.spike_skills = bound(0, self.spike_skills, 100);
+	self.explosive_skills = bound(0, self.explosive_skills, 100);
+
+	self.armor_jacket_wearing_skill = bound(0, self.armor_jacket_wearing_skill, 100);
+
+	self.explosives_protection = lerp(0, 0.15, self.explosive_skills / 100);
+}
+
+void() CheckArmors =
+{
+	float jacket_maxspeed_fraction = 0;
+
+	/*
+	self.armor_flag;
+    self.armor_min_protect;
+    self.armor_max_protect;
+    self.armor_min_speed;
+    self.armor_max_speed;
+    self.armor_min_value;
+    self.armor_max_value;
+	*/
+
+	if (self.armor_flag == ARMOR_JACKET_FLAG)
+	{
+		self.armor_min_protect = jacket_min_protect[self.armor_level];
+		self.armor_max_protect = jacket_max_protect[self.armor_level];
+		self.armor_min_speed = jacket_min_speed[self.armor_level];
+		self.armor_max_speed = jacket_max_speed[self.armor_level];
+		self.armor_min_value = jacket_min_value[self.armor_level];
+		self.armor_max_value = jacket_max_value[self.armor_level];
+
+		self.max_armorvalue = floor(lerp(self.armor_min_value, self.armor_max_value, self.armor_jacket_wearing_skill / 100));
+		self.armorvalue = bound(0, self.armorvalue, self.armor_max_value);
+
+		self.armortype = lerp(self.armor_min_protect, self.armor_max_protect, self.armorvalue / self.max_armorvalue);
+
+		jacket_maxspeed_fraction += (self.armor_jacket_wearing_skill / 100);
+		jacket_maxspeed_fraction += (self.health / self.max_health);
+		jacket_maxspeed_fraction += self.explosives_protection;
+		jacket_maxspeed_fraction /= 3;
+		jacket_maxspeed_fraction = bound(0,jacket_maxspeed_fraction,1);
+
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, jacket_maxspeed_fraction);
+
+		
+		self.explosives_protection = self.explosives_protection + lerp(0.06, 0.12, self.armor_jacket_wearing_skill / 100);
+	}
+}
 
 
 /*
@@ -1168,17 +1236,15 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
+	InitPlayerParams();
+	CheckSKills();
+	CheckArmors();
+
 	// intermission or finale
 	if (self.view_ofs == '0 0 0')
 		return;
 	if (self.deadflag)
 		return;
-
-	self.axe_skills = bound(0, self.axe_skills, 100);
-	self.shotgun_skills = bound(0, self.shotgun_skills, 100);
-	self.spike_skills = bound(0, self.spike_skills, 100);
-	self.explosive_skills = bound(0, self.explosive_skills, 100);
-
 		
 	W_WeaponFrame ();
 

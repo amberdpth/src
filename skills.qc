@@ -1,7 +1,5 @@
 
-.float ga_skills;
-.float ya_skills;
-.float ra_skills;
+.float armor_jacket_wearing_skill;
 
 .float axe_skills;
 .float shotgun_skills;
