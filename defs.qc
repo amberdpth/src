@@ -792,3 +792,10 @@ float body_min_value[] = { 115, 125, 150, 185 };
 float body_max_value[] = { 190, 200, 225, 250 };
 
 #define CLASSIC_ARMOR_FLAG 4
+
+float classic_min_protect[] = { 0.36, 0.42, 0.48, 0.58 };
+float classic_max_protect[] = {0.71, 0.78, 0.87, 0.98 };
+float classic_min_speed[] = { -30, -12, 2, 7 };
+float classic_max_speed[] = { -10, -2, 8, 12 };
+float classic_min_value[] = { 115, 125, 150, 185 };
+float classic_max_value[] = { 190, 200, 225, 250 };

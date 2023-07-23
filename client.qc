@@ -1275,11 +1275,11 @@ void() CheckMaxSpeed =
 	}
 	else if (self.armor_flag == COMBAT_ARMOR_FLAG)
 	{
-		combat_max_speed_fraction += self.combat_armor_wearing_skill / 100;
-		combat_max_speed_fraction = combat_max_speed_fraction * 0.33 + (self.health / self.max_health) * 0.67;
-		combat_max_speed_fraction = bound(0,combat_maxspeed_fraction,1);
+		combat maxspeed_fraction += self.combat_armor_wearing_skill / 100;
+		combat maxspeed_fraction = combat maxspeed_fraction * 0.33 + (self.health / self.max_health) * 0.67;
+		combat maxspeed_fraction = bound(0,combat_maxspeed_fraction,1);
 
-		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, combat_max_speed_fraction);
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, combat maxspeed_fraction);
 	}
 }
 
