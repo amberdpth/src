@@ -252,17 +252,17 @@ void() item_megahealth_rot =
 
 float(float w) RankForWeapon =
 {
-	if (w == IT_LIGHTNING)
+	if (w == W_LIGHTNING)
 		return 1;
-	if (w == IT_ROCKET_LAUNCHER)
+	if (w == W_ROCKET_LAUNCHER)
 		return 2;
-	if (w == IT_SUPER_NAILGUN)
+	if (w == W_SUPER_NAILGUN)
 		return 3;
-	if (w == IT_GRENADE_LAUNCHER)
+	if (w == W_GRENADE_LAUNCHER)
 		return 4;
-	if (w == IT_SUPER_SHOTGUN)
+	if (w == W_SUPER_SHOTGUN)
 		return 5;
-	if (w == IT_NAILGUN)
+	if (w == W_NAILGUN)
 		return 6;
 	return 7;
 };
@@ -312,51 +312,51 @@ void() weapon_touch =
 
 	if (self.classname == "weapon_nailgun")
 	{
-		if (leave && (other.weapons & IT_NAILGUN) )
+		if (leave && (other.weapons & W_NAILGUN) )
 			return;
 		hadammo = other.ammo_nails;
-		new = IT_NAILGUN;
+		new = W_NAILGUN;
 		other.ammo_nails = other.ammo_nails + 30;
 	}
 	else if (self.classname == "weapon_supernailgun")
 	{
-		if (leave && (other.weapons & IT_SUPER_NAILGUN) )
+		if (leave && (other.weapons & W_SUPER_NAILGUN) )
 			return;
 		hadammo = other.ammo_rockets;
-		new = IT_SUPER_NAILGUN;
+		new = W_SUPER_NAILGUN;
 		other.ammo_nails = other.ammo_nails + 30;
 	}
 	else if (self.classname == "weapon_supershotgun")
 	{
-		if (leave && (other.weapons & IT_SUPER_SHOTGUN) )
+		if (leave && (other.weapons & W_SUPER_SHOTGUN) )
 			return;
 		hadammo = other.ammo_rockets;
-		new = IT_SUPER_SHOTGUN;
+		new = W_SUPER_SHOTGUN;
 		other.ammo_shells = other.ammo_shells + 5;
 	}
 	else if (self.classname == "weapon_rocketlauncher")
 	{
-		if (leave && (other.weapons & IT_ROCKET_LAUNCHER) )
+		if (leave && (other.weapons & W_ROCKET_LAUNCHER) )
 			return;
 		hadammo = other.ammo_rockets;
-		new = IT_ROCKET_LAUNCHER;
+		new = W_ROCKET_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
 	}
 	else if (self.classname == "weapon_grenadelauncher")
 	{
-		if (leave && (other.weapons & IT_GRENADE_LAUNCHER) )
+		if (leave && (other.weapons & W_GRENADE_LAUNCHER) )
 			return;
 		hadammo = other.ammo_rockets;
-		new = IT_GRENADE_LAUNCHER;
+		new = W_GRENADE_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
 
 	}
 	else if (self.classname == "weapon_lightning")
 	{
-		if (leave && (other.weapons & IT_LIGHTNING) )
+		if (leave && (other.weapons & W_LIGHTNING) )
 			return;
 		hadammo = other.ammo_rockets;
-		new = IT_LIGHTNING;
+		new = W_LIGHTNING;
 		other.ammo_cells = other.ammo_cells + 15;
 	}
 	else
@@ -392,7 +392,7 @@ void() weapon_supershotgun =
 {
 	precache_model ("progs/g_shot.mdl");
 	setmodel (self, "progs/g_shot.mdl");
-	self.weapon = IT_SUPER_SHOTGUN;
+	self.weapon = W_SUPER_SHOTGUN;
 	self.netname = "Double-barrelled Shotgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -405,7 +405,7 @@ void() weapon_nailgun =
 {
 	precache_model ("progs/g_nail.mdl");
 	setmodel (self, "progs/g_nail.mdl");
-	self.weapon = IT_NAILGUN;
+	self.weapon = W_NAILGUN;
 	self.netname = "Nailgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -418,7 +418,7 @@ void() weapon_supernailgun =
 {
 	precache_model ("progs/g_nail2.mdl");
 	setmodel (self, "progs/g_nail2.mdl");
-	self.weapon = IT_SUPER_NAILGUN;
+	self.weapon = W_SUPER_NAILGUN;
 	self.netname = "Super Nailgun";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -431,7 +431,7 @@ void() weapon_grenadelauncher =
 {
 	precache_model ("progs/g_rock.mdl");
 	setmodel (self, "progs/g_rock.mdl");
-	self.weapon = IT_GRENADE_LAUNCHER;
+	self.weapon = W_GRENADE_LAUNCHER;
 	self.netname = "Grenade Launcher";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -444,7 +444,7 @@ void() weapon_rocketlauncher =
 {
 	precache_model ("progs/g_rock2.mdl");
 	setmodel (self, "progs/g_rock2.mdl");
-	self.weapon = IT_ROCKET_LAUNCHER;
+	self.weapon = W_ROCKET_LAUNCHER;
 	self.netname = "Rocket Launcher";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -458,7 +458,7 @@ void() weapon_lightning =
 {
 	precache_model ("progs/g_light.mdl");
 	setmodel (self, "progs/g_light.mdl");
-	self.weapon = IT_LIGHTNING;
+	self.weapon = W_LIGHTNING;
 	self.netname = "Thunderbolt";
 	self.touch = weapon_touch;
 	setsize (self, '-16 -16 0', '16 16 56');
@@ -719,7 +719,7 @@ void() key_touch =
 		return;
 	if (other.health <= 0)
 		return;
-	if (other.items & self.items)
+	if (other.keys & self.keys)
 		return;
 
 	sprint (other, "You got the ");

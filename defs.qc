@@ -715,6 +715,7 @@ enumflags
 {
 	W_SHOTGUN,
 	W_SUPER_SHOTGUN,
+	W_TRIPLE_SHOTGUN,
 	W_NAILGUN,
 	W_SUPER_NAILGUN,
 	W_GRENADE_LAUNCHER,
@@ -736,15 +737,13 @@ enumflags
 	W_INVULNERABILITY,
 	W_SUIT,
 	W_QUAD,
-	W_23,
-	W_24
 };
 
 .float keys;
 
 enumflags
 {
-	NO_KEY,SILVER_KEY,GOLD_KEY
+	SILVER_KEY,GOLD_KEY
 };
 
 .float multidamage_flag;
@@ -754,6 +753,7 @@ enumflags
 .float ax_reload_time;
 .float sg_reload_time;
 .float ssg_reload_time;
+.float tsg_reload_time;
 .float ng_reload_time;
 .float sng_reload_time;
 .float gl_reload_time;
@@ -766,25 +766,6 @@ float lerp(float a, float b, float f)
 {
     return a * (1.0 - f) + (b * f);
 }
-
-enum 
-{
-	STAT_SHOTGUN_LEVEL = 32,
-	STAT_SPIKES_LEVEL,
-	STAT_AXE_LEVEL,
-	STAT_EXPLOSIVES_LEVEL,
-	STAT_ARMORTYPE,
-	STAT_ARMORFLAG,
-	STAT_ARMORLEVEL,
-	STAT_JACKET_LEVEL,
-	STAT_COMBAT_LEVEL,
-	STAT_BODY_LEVEL,
-	STAT_CLASSIC_LEVEL,
-	STAT_ARMOR_LEVEL,
-	STAT_ARMOR_FLAG,
-	STAT_WEAPONS,
-};
-
 
 .vector start_dir;
 .float fly_error[6];

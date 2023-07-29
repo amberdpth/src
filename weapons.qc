@@ -300,7 +300,7 @@ W_FireShotgun
 void() W_FireShotgun =
 {
 	vector dir;
-	float shotcount = 6;
+	float shotcount = 7;
 	float spread_h;
 
 	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skills / 100);
@@ -326,7 +326,7 @@ W_FireSuperShotgun
 */
 void() W_FireSuperShotgun =
 {
-	if (self.currentammo == 1)
+	if (self.currentammo < 2)
 	{
 		W_FireShotgun ();
 		return;
@@ -335,7 +335,7 @@ void() W_FireSuperShotgun =
 	vector dir;
 	float shotcount = 14;
 
-	float spread_h = lerp(0.2, 0.012, self.shotgun_skills / 100);
+	float spread_h = lerp(0.3, 0.012, self.shotgun_skills / 100);
 	float spread_v = lerp(0.1, 0.05, self.shotgun_skills / 100);
 
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
@@ -348,6 +348,40 @@ void() W_FireSuperShotgun =
 	dir = v_forward + error_h + error_v;
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+	FireBullets (shotcount, dir, [spread_h, spread_v]);
+};
+
+
+/*
+================
+W_FireTripleShotgun
+================
+*/
+void() W_FireTripleShotgun =
+{
+	if (self.currentammo < 3)
+	{
+		W_FireSuperShotgun ();
+		return;
+	}
+
+	vector dir;
+	float shotcount = 21;
+
+	float spread_h;
+
+	float spread_v = spread_h = lerp(0.1, 0.06, self.shotgun_skills / 100);
+
+	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+
+	self.punchangle_x = -6;
+
+	
+	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	dir = v_forward + error_h + error_v;
+
+	self.currentammo = self.ammo_shells = self.ammo_shells - 3;
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
@@ -666,7 +700,8 @@ void() W_FireGrenade =
 	dir = v_forward + error_h + error_v;
 
 	missile.velocity = dir * 585;
-	missile.velocity[2] = missile.velocity[2] + v_up[2] * 240;
+	missile.velocity[2] = missile.velocity[2] + v_up[2] * 180;
+	missile.velocity = missile.velocity + v_up * 60;
 
 	missile.avelocity = '300 300 300';
 

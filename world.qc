@@ -287,6 +287,7 @@ void() worldspawn =
 	precache_model ("progs/v_shot2.mdl");
 	precache_model ("progs/v_nail2.mdl");
 	precache_model ("progs/v_rock2.mdl");
+	precache_model ("progs/v_shot3.mdl");
 
 	precache_model ("progs/bolt.mdl");		// for lightning gun
 	precache_model ("progs/bolt2.mdl");		// for lightning gun
@@ -360,7 +361,9 @@ void() worldspawn =
 
 	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
 	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
+
 	clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
+	clientstat(STAT_KEYS,EV_FLOAT,keys);
 }
 
 void() RestoreGame =
@@ -377,7 +380,9 @@ void() RestoreGame =
 
 	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
 	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
-	clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
+
+	//clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
+	clientstat(STAT_KEYS,EV_FLOAT,keys);
 
 }
 

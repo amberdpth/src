@@ -248,14 +248,11 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 
 				if (points > 0)
 				{
-
-					points = points * lerp(1, 0.5, head.explosives_protection); // enemy damage
-
 					if (CanDamage (head, inflictor))
-						points = points * 1.1;
+						points = points * 1;
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skills / 100) : 0.1);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skills / 100) : 0.25);
 						points = points * passing_damage;
 					}
 						

@@ -135,7 +135,7 @@ void() DecodeLevelParms =
 {
 	if (world.model == "maps/start.bsp")
 	{
-		self.weapons = W_AXE | W_SHOTGUN;
+		self.weapons = W_AXE | W_SHOTGUN | W_TRIPLE_SHOTGUN;
 		self.weapon = W_AXE;
 		return;
 	}

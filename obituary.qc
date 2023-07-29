@@ -38,12 +38,12 @@ void(entity targ, entity attacker) ClientObituary =
 				attacker.frags = attacker.frags - 1;
 				bprint (targ.netname);
 
-				if (targ.weapon == IT_LIGHTNING && targ.waterlevel > 1)
+				if (targ.weapon == W_LIGHTNING && targ.waterlevel > 1)
 				{
 					bprint (" discharges into the water.\n");
 					return;
 				}
-				if (targ.weapon == IT_GRENADE_LAUNCHER)
+				if (targ.weapon == W_GRENADE_LAUNCHER)
 					bprint (" tries to put the pin back in\n");
 				else
 					bprint (" becomes bored with life\n");
@@ -69,32 +69,32 @@ void(entity targ, entity attacker) ClientObituary =
 				attacker.frags = attacker.frags + 1;
 
 				rnum = attacker.weapon;
-				if (rnum == IT_AXE)
+				if (rnum == W_AXE)
 				{
 					deathstring = " was ax-murdered by ";
 					deathstring2 = "\n";
 				}
-				if (rnum == IT_SHOTGUN)
+				if (rnum == W_SHOTGUN)
 				{
 					deathstring = " chewed on ";
 					deathstring2 = "'s boomstick\n";
 				}
-				if (rnum == IT_SUPER_SHOTGUN)
+				if (rnum == W_SUPER_SHOTGUN)
 				{
 					deathstring = " ate 2 loads of ";
 					deathstring2 = "'s buckshot\n";
 				}
-				if (rnum == IT_NAILGUN)
+				if (rnum == W_NAILGUN)
 				{
 					deathstring = " was nailed by ";
 					deathstring2 = "\n";
 				}
-				if (rnum == IT_SUPER_NAILGUN)
+				if (rnum == W_SUPER_NAILGUN)
 				{
 					deathstring = " was punctured by ";
 					deathstring2 = "\n";
 				}
-				if (rnum == IT_GRENADE_LAUNCHER)
+				if (rnum == W_GRENADE_LAUNCHER)
 				{
 					deathstring = " eats ";
 					deathstring2 = "'s pineapple\n";
@@ -104,7 +104,7 @@ void(entity targ, entity attacker) ClientObituary =
 						deathstring2 = "'s grenade\n";
 					}
 				}
-				if (rnum == IT_ROCKET_LAUNCHER)
+				if (rnum == W_ROCKET_LAUNCHER)
 				{
 					deathstring = " rides ";
 					deathstring2 = "'s rocket\n";
@@ -114,7 +114,7 @@ void(entity targ, entity attacker) ClientObituary =
 						deathstring2 = "'s rocket\n" ;
 					}
 				}
-				if (rnum == IT_LIGHTNING)
+				if (rnum == W_LIGHTNING)
 				{
 					deathstring = " accepts ";
 					if (attacker.waterlevel > 1)

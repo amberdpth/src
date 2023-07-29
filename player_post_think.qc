@@ -115,6 +115,7 @@ void() CheckStats =
 	self.ax_reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
 	self.sg_reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
 	self.ssg_reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
+	self.tsg_reload_time = lerp(0.71, 0.44, self.shotgun_skills / 100);
 	self.ng_reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
 	self.sng_reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
 	self.gl_reload_time = lerp(0.8, 0.35, self.explosive_skills / 100);

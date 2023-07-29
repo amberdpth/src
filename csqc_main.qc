@@ -1,19 +1,4 @@
-enum 
-{
-	STAT_SHOTGUN_LEVEL = 32,
-	STAT_SPIKES_LEVEL,
-	STAT_AXE_LEVEL,
-	STAT_EXPLOSIVES_LEVEL,
-	STAT_ARMORTYPE,
-	STAT_ARMORFLAG,
-	STAT_ARMORLEVEL,
-	STAT_JACKET_LEVEL,
-	STAT_COMBAT_LEVEL,
-	STAT_BODY_LEVEL,
-	STAT_ARMOR_LEVEL,
-	STAT_ARMOR_FLAG,
-	STAT_WEAPONS,
-};
+
 
 void(float apilevel, string enginename, float engineversion) CSQC_Init =
 {
@@ -38,6 +23,11 @@ void(float w, float h) DrawStats =
     drawstring('32 380', strcat("spikes:", ftos(getstatf(STAT_NAILS))), '8 8', '1 1 1', 1, 0);
     drawstring('32 388', strcat("grenades:", ftos(getstatf(STAT_ROCKETS))), '8 8', '1 1 1', 1, 0);
     drawstring('32 396', strcat("cells:", ftos(getstatf(STAT_CELLS))), '8 8', '1 1 1', 1, 0);
+
+    if (getstatf(STAT_KEYS) & 1)
+        drawpic('192 8', "gfx/sb_key1", '16 16 0', '1 1 1', 1, 0);
+    if (getstatf(STAT_KEYS) & 2)
+        drawpic('208 8', "gfx/sb_key2", '16 16 0', '1 1 1', 1, 0);
 }
 
 

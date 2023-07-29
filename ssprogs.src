@@ -4,6 +4,7 @@
 
 fteextensions.qc
 defs.qc
+stats_shared.qc
 subs.qc
 skills.qc
 fight.qc

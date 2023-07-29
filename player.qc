@@ -116,7 +116,7 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 		return;
 	}
 
-	if (self.weapon == IT_AXE)
+	if (self.weapon == W_AXE)
 	{
 		if (self.walkframe >= 12)
 			self.walkframe = 0;
@@ -143,7 +143,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 		return;
 	}
 
-	if (self.weapon == IT_AXE)
+	if (self.weapon == W_AXE)
 	{
 		if (self.walkframe == 6)
 			self.walkframe = 0;
@@ -161,10 +161,12 @@ void()	player_run =[	$rockrun1,	player_run	]
 
 void()	player_shot1 =	[$shotatt1, player_shot2	]
 {
-	if (self.weapon == IT_SHOTGUN)
+	if (self.weapon == W_SHOTGUN)
 		W_FireShotgun ();
-	if (self.weapon == IT_SUPER_SHOTGUN)
+	else if (self.weapon == W_SUPER_SHOTGUN)
 		W_FireSuperShotgun();
+	if (self.weapon == W_TRIPLE_SHOTGUN)
+		W_FireTripleShotgun();
 
 	self.weaponframe=1;
 	self.effects = self.effects | EF_MUZZLEFLASH;
@@ -295,7 +297,7 @@ void()	player_axed4 =	[$axattd4, player_run	]
 void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), player_nail  ]
 {
 	
-	if (self.weapon == IT_NAILGUN)
+	if (self.weapon == W_NAILGUN)
 	{
 		if (self.ammo_nails < 1)
 		{
@@ -306,7 +308,7 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 
 		W_FireSpikes(self.nailgun_lefty ? 3.2 : -3.2);
 	}
-	if (self.weapon == IT_SUPER_NAILGUN)
+	if (self.weapon == W_SUPER_NAILGUN)
 	{
 		if (self.ammo_nails < 2)
 		{
@@ -378,10 +380,10 @@ void() player_rocket1   =[$rockatt1, player_rocket2  ]
 	self.weaponframe=1;
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
-	if (self.weapon == IT_ROCKET_LAUNCHER)
+	if (self.weapon == W_ROCKET_LAUNCHER)
 		W_FireRocket();
 
-	if (self.weapon == IT_GRENADE_LAUNCHER)
+	if (self.weapon == W_GRENADE_LAUNCHER)
 		W_FireGrenade();
 
 	self.attack_finished = time + 0.1;
@@ -519,7 +521,7 @@ void(entity attacker, float damage) player_pain =
 		// eyes don't have pain frames
 		return;
 
-	if (self.weapon == IT_AXE)
+	if (self.weapon == W_AXE)
 		player_axpain1 ();
 	else
 		player_pain1 ();
@@ -747,7 +749,7 @@ void() PlayerDie =
 	self.angles_x = 0;
 	self.angles_z = 0;
 
-	if (self.weapon == IT_AXE)
+	if (self.weapon == W_AXE)
 	{
 		player_die_ax1 ();
 		return;

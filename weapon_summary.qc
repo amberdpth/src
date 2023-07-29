@@ -50,8 +50,12 @@ void() W_SetCurrentAmmo =
 		self.currentammo = self.ammo_cells;
 		self.weaponmodel = "progs/v_light.mdl";
 		self.weaponframe = 0;
-
-		//self.reload_time = self.lg_reload_time;
+	}
+	else if (self.weapon == W_TRIPLE_SHOTGUN)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/v_shot3.mdl";
+		self.weaponframe = 0;
 	}
 	else
 	{
@@ -118,6 +122,11 @@ void() W_Attack =
             player_shot1 ();
             break;
 
+		case W_TRIPLE_SHOTGUN:
+			self.reload_time = self.tsg_reload_time;
+			player_shot1 ();
+			break;
+
         case W_NAILGUN:
             self.reload_time = self.ng_reload_time;
             player_nail ();
@@ -155,51 +164,23 @@ void() W_ChangeWeapon =
 	fl = 0;
 
 	if (self.impulse == 1)
-	{
 		fl = W_AXE;
-	}
 	else if (self.impulse == 2)
-	{
 		fl = W_SHOTGUN;
-		if (self.ammo_shells < 1)
-			am = 1;
-	}
 	else if (self.impulse == 3)
-	{
 		fl = W_SUPER_SHOTGUN;
-		if (self.ammo_shells < 2)
-			am = 1;
-	}
 	else if (self.impulse == 4)
-	{
 		fl = W_NAILGUN;
-		if (self.ammo_nails < 1)
-			am = 1;
-	}
 	else if (self.impulse == 5)
-	{
 		fl = W_SUPER_NAILGUN;
-		if (self.ammo_nails < 2)
-			am = 1;
-	}
 	else if (self.impulse == 6)
-	{
 		fl = W_GRENADE_LAUNCHER;
-		if (self.ammo_rockets < 1)
-			am = 1;
-	}
 	else if (self.impulse == 7)
-	{
 		fl = W_ROCKET_LAUNCHER;
-		if (self.ammo_rockets < 1)
-			am = 1;
-	}
 	else if (self.impulse == 8)
-	{
 		fl = W_LIGHTNING;
-		if (self.ammo_cells < 1)
-			am = 1;
-	}
+	else if (self.impulse == 9)
+		fl = W_TRIPLE_SHOTGUN;
 
 	self.impulse = 0;
 
@@ -207,13 +188,6 @@ void() W_ChangeWeapon =
 	{
 		// don't have the weapon or the ammo
 		sprint (self, "no weapon.\n");
-		return;
-	}
-
-	if (am)
-	{
-		// don't have the ammo
-		sprint (self, "not enough ammo.\n");
 		return;
 	}
 
@@ -225,6 +199,9 @@ void() W_ChangeWeapon =
 void() CycleWeaponCommand =
 {
 	self.impulse = 0;
+	
+	if (self.weapons == 0)
+		return;
 
 	while (1)
 	{
@@ -235,6 +212,8 @@ void() CycleWeaponCommand =
 		else if (self.weapon == W_SHOTGUN)
 			self.weapon = W_SUPER_SHOTGUN;
 		else if (self.weapon == W_SUPER_SHOTGUN)
+			self.weapon = W_TRIPLE_SHOTGUN;
+		else if (self.weapon == W_TRIPLE_SHOTGUN)
 			self.weapon = W_NAILGUN;
 		else if (self.weapon == W_NAILGUN)
 			self.weapon = W_SUPER_NAILGUN;
@@ -265,6 +244,9 @@ void() CycleWeaponReverseCommand =
 {
 	self.impulse = 0;
 
+	if (self.weapons == 0)
+		return;
+
 	while (1)
 	{
 		if (self.weapon == W_LIGHTNING)
@@ -276,6 +258,8 @@ void() CycleWeaponReverseCommand =
 		else if (self.weapon == W_SUPER_NAILGUN)
 			self.weapon = W_NAILGUN;
 		else if (self.weapon == W_NAILGUN)
+			self.weapon = W_TRIPLE_SHOTGUN;
+		else if (self.weapon == W_TRIPLE_SHOTGUN)
 			self.weapon = W_SUPER_SHOTGUN;
 		else if (self.weapon == W_SUPER_SHOTGUN)
 			self.weapon = W_SHOTGUN;
@@ -294,7 +278,7 @@ void() CycleWeaponReverseCommand =
 
 void() ImpulseCommands =
 {
-	if (self.impulse >= 1 && self.impulse <= 8)
+	if (self.impulse >= 1 && self.impulse <= 9)
 		W_ChangeWeapon ();
 
 	if (self.impulse == 10)
