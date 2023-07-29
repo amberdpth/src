@@ -333,9 +333,6 @@ void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), playe
 	if (self.weaponframe == 9)
 		self.weaponframe = 1;
 
-	SuperDamageSound();
-
-
 	self.attack_finished = self.nextthink = time + self.reload_time;
 };
 
@@ -353,7 +350,6 @@ void() player_light1   =[$light1, player_light2  ]
 	self.weaponframe = self.weaponframe + 1;
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
-	SuperDamageSound();
 	W_FireLightning();
 	self.attack_finished = time + 0.2;
 };
@@ -369,7 +365,7 @@ void() player_light2   =[$light2, player_light1  ]
 	self.weaponframe = self.weaponframe + 1;
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
-	SuperDamageSound();
+
 	W_FireLightning();
 	self.attack_finished = time + 0.2;
 };

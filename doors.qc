@@ -130,7 +130,7 @@ void() door_fire =
 		objerror ("door_fire: self.owner != self");
 
 	// play use key sound
-	if (self.items)
+	if (self.keys)
 		sound (self, CHAN_ITEM, self.noise4, 1, ATTN_NORM);
 
 	self.message = string_null;		// no more message
@@ -230,13 +230,13 @@ void() door_touch =
 	}
 
 	// key door stuff
-	if (!self.items)
+	if (!self.keys)
 		return;
 
 	// FIXME: blink key on player's status bar
-	if ( (self.items & other.items) != self.items )
+	if ( (self.keys & other.keys) != self.keys )
 	{
-		if (self.owner.items == IT_KEY1)
+		if (self.owner.keys == SILVER_KEY)
 		{
 			if (world.worldtype == 2)
 			{
@@ -275,7 +275,7 @@ void() door_touch =
 		return;
 	}
 
-	other.items = other.items - self.items;
+	other.keys = other.keys - self.keys;
 	self.touch = SUB_Null;
 	if (self.enemy)
 		// get paired door
@@ -381,7 +381,7 @@ void() LinkDoors =
 				return;
 			if (self.targetname != string_null)
 				return;
-			if (self.items)
+			if (self.keys)
 				return;
 
 			self.owner.trigger_field = spawn_field(cmins, cmaxs);
@@ -517,9 +517,9 @@ void() func_door =
 	self.use = door_use;
 
 	if (self.spawnflags & DOOR_SILVER_KEY)
-		self.items = IT_KEY1;
+		self.keys = SILVER_KEY;
 	if (self.spawnflags & DOOR_GOLD_KEY)
-		self.items = IT_KEY2;
+		self.keys = GOLD_KEY;
 
 	if (!self.speed)
 		self.speed = 100;
@@ -550,7 +550,7 @@ void() func_door =
 		self.th_die = door_killed;
 	}
 
-	if (self.items)
+	if (self.keys)
 		self.wait = -1;
 
 	self.touch = door_touch;

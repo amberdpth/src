@@ -299,7 +299,6 @@ float	DAMAGE_NO				= 0;
 float	DAMAGE_YES				= 1;
 float	DAMAGE_AIM				= 2;
 
-// items
 float	IT_AXE					= 4096;
 float	IT_SHOTGUN				= 1;
 float	IT_SUPER_SHOTGUN		= 2;
@@ -327,6 +326,7 @@ float	IT_INVISIBILITY			= 524288;
 float	IT_INVULNERABILITY		= 1048576;
 float	IT_SUIT					= 2097152;
 float	IT_QUAD					= 4194304;
+
 
 // point content values
 
@@ -709,12 +709,46 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
+.float weapons;
+
+enumflags 
+{
+	W_SHOTGUN,
+	W_SUPER_SHOTGUN,
+	W_NAILGUN,
+	W_SUPER_NAILGUN,
+	W_GRENADE_LAUNCHER,
+	W_ROCKET_LAUNCHER,
+	W_LIGHTNING,
+	W_EXTRA_WEAPON,
+	W_SHELLS,
+	W_NAILS,
+	W_ROCKETS,
+	W_CELLS,
+	W_AXE,
+	W_ARMOR1,
+	W_ARMOR2,
+	W_ARMOR3,
+	W_SUPERHEALTH,
+	W_KEY1,
+	W_KEY2,
+	W_INVISIBILITY,
+	W_INVULNERABILITY,
+	W_SUIT,
+	W_QUAD,
+	W_23,
+	W_24
+};
+
+.float keys;
+
+enumflags
+{
+	NO_KEY,SILVER_KEY,GOLD_KEY
+};
+
 .float multidamage_flag;
 .float multidamage;
-
-float damage_total;
-float damage_pass;
-
 
 .float reload_time;
 .float ax_reload_time;
@@ -733,18 +767,24 @@ float lerp(float a, float b, float f)
     return a * (1.0 - f) + (b * f);
 }
 
-#define STAT_SHOTGUN_LEVEL 32
-#define STAT_SPIKES_LEVEL 33
-#define STAT_AXE_LEVEL 34
-#define STAT_EXPLOSIVES_LEVEL 35
+enum 
+{
+	STAT_SHOTGUN_LEVEL = 32,
+	STAT_SPIKES_LEVEL,
+	STAT_AXE_LEVEL,
+	STAT_EXPLOSIVES_LEVEL,
+	STAT_ARMORTYPE,
+	STAT_ARMORFLAG,
+	STAT_ARMORLEVEL,
+	STAT_JACKET_LEVEL,
+	STAT_COMBAT_LEVEL,
+	STAT_BODY_LEVEL,
+	STAT_CLASSIC_LEVEL,
+	STAT_ARMOR_LEVEL,
+	STAT_ARMOR_FLAG,
+	STAT_WEAPONS,
+};
 
-#define STAT_ARMORTYPE 36
-#define STAT_ARMORFLAG 37
-#define STAT_ARMORLEVEL 38
-
-#define STAT_JACKET_LEVEL 39
-#define STAT_COMBAT_LEVEL 40
-#define STAT_BODY_LEVEL 41
 
 .vector start_dir;
 .float fly_error[6];

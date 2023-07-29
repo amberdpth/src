@@ -356,6 +356,11 @@ void() worldspawn =
 	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
 	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
 	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
+	clientstat(STAT_CLASSIC_LEVEL, EV_FLOAT,classic_armor_wearing_skill);
+
+	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
+	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
+	clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
 }
 
 void() RestoreGame =
@@ -368,6 +373,11 @@ void() RestoreGame =
 	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
 	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
 	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
+	clientstat(STAT_CLASSIC_LEVEL, EV_FLOAT,classic_armor_wearing_skill);
+
+	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
+	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
+	clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
 
 }
 
@@ -382,18 +392,7 @@ void() StartFrame =
 
 };
 
-/*
-==============================================================================
-
-BODY QUE
-
-==============================================================================
-*/
-
 entity	bodyque_head;
-
-// just here so spawn functions don't complain after the world
-// creates bodyques
 void() bodyque = {};
 
 void() InitBodyQue =

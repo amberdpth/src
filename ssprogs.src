@@ -12,11 +12,18 @@ combat.qc
 items.qc
 items_armors.qc
 weapons.qc
+weapon_summary.qc // switching, attack
 
 passing_bullets.qc
 
 world.qc
+
 client.qc
+change_level.qc // level transitions
+put_client.qc // spawn, respawn
+player_pre_think.qc // before input commands
+player_post_think.qc // after input commands, stats calculation
+obituary.qc
 player.qc
 monsters.qc
 doors.qc

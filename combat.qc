@@ -125,9 +125,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (attacker.super_damage_finished > time)
 		damage = damage * 4;
 
-	if (attacker.flags & FL_CLIENT)
-		damage_pass += (damage_total ? damage : 0);
-
 	save = ceil(targ.armortype*damage);
 
 	targ.armorvalue = (targ.armorvalue ? targ.armorvalue - save : 0.0);
