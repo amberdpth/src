@@ -391,7 +391,9 @@ void() BecomeExplosion =
 
 void() T_MissileTouch =
 {
-	local float damg;
+	float damg;
+
+	entity oself;
 
 	if (other == self.owner)
 		// don't explode on owner
@@ -412,11 +414,12 @@ void() T_MissileTouch =
 			damg = damg * (0.5 + 0.5 * (self.explosive_skills / 100));
 
 		T_Damage (other, self, self.owner, damg );
-
-		entity oself = self;
+		
+		oself = self;
 		self = self.owner;
 		skillup_explosives();
 		self = oself;
+
 	}
 
 	damg = damg + lerp(0, 40, self.explosive_skills / 100); // extra radius depending on rockets skill

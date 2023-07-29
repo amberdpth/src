@@ -742,9 +742,9 @@ float lerp(float a, float b, float f)
 #define STAT_ARMORFLAG 37
 #define STAT_ARMORLEVEL 38
 
-#define STAT_JACKET_SKILL 39
-#define STAT_COMBAT_SKILL 40
-#define STAT_BODY_SKILL 41
+#define STAT_JACKET_LEVEL 39
+#define STAT_COMBAT_LEVEL 40
+#define STAT_BODY_LEVEL 41
 
 .vector start_dir;
 .float fly_error[6];

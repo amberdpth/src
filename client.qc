@@ -1174,16 +1174,7 @@ void() InitPlayerParams =
 
 void() CheckSKills =
 {
-	self.axe_skills = bound(0, self.axe_skills, 100);
-	self.shotgun_skills = bound(0, self.shotgun_skills, 100);
-	self.spike_skills = bound(0, self.spike_skills, 100);
-	self.explosive_skills = bound(0, self.explosive_skills, 100);
-
-	self.jacket_armor_wearing_skill = bound(0, self.jacket_armor_wearing_skill, 100);
-
 	self.explosives_protection = lerp(0, 0.15, self.explosive_skills / 100);
-
-
 }
 
 void() CheckArmors =
@@ -1263,6 +1254,7 @@ void() CheckMaxSpeed =
 
 	float jacket_maxspeed_fraction = 0;
 	float combat_maxspeed_fraction = 0;
+	float body_maxspeed_fraction = 0;
 
 	if (self.armor_flag == JACKET_ARMOR_FLAG)
 	{
@@ -1275,11 +1267,17 @@ void() CheckMaxSpeed =
 	}
 	else if (self.armor_flag == COMBAT_ARMOR_FLAG)
 	{
-		combat maxspeed_fraction += self.combat_armor_wearing_skill / 100;
-		combat maxspeed_fraction = combat maxspeed_fraction * 0.33 + (self.health / self.max_health) * 0.67;
-		combat maxspeed_fraction = bound(0,combat_maxspeed_fraction,1);
+		combat_maxspeed_fraction += self.combat_armor_wearing_skill / 100;
+		combat_maxspeed_fraction = combat_maxspeed_fraction * 0.33 + (self.health / self.max_health) * 0.67;
+		combat_maxspeed_fraction = bound(0,combat_maxspeed_fraction,1);
 
-		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, combat maxspeed_fraction);
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, combat_maxspeed_fraction);
+	}
+	else if (self.armor_flag == BODY_ARMOR_FLAG)
+	{
+		body_maxspeed_fraction += self.body_armor_wearing_skill / 100;
+
+		self.maxspeed = self.maxspeed + lerp(self.armor_min_speed, self.armor_max_speed, body_maxspeed_fraction);
 	}
 }
 
@@ -1298,6 +1296,15 @@ void() CheckWeaponStats =
 		case JACKET_ARMOR_FLAG:
 			self.ax_reload_time = lerp(self.ax_reload_time * 0.9, self.ax_reload_time * 0.6, self.jacket_armor_wearing_skill / 100);
 			self.sg_reload_time = lerp(self.sg_reload_time * 0.96, self.sg_reload_time * 0.76, self.jacket_armor_wearing_skill / 100);
+			break;
+		case COMBAT_ARMOR_FLAG:
+			self.ssg_reload_time = lerp(self.ssg_reload_time * 0.94, self.ssg_reload_time * 0.78, self.combat_armor_wearing_skill / 100);
+			self.ng_reload_time = lerp(self.ng_reload_time * 0.8, self.ng_reload_time * 0.7, self.combat_armor_wearing_skill / 100);
+			self.gl_reload_time = lerp(self.gl_reload_time * 0.9, self.gl_reload_time * 0.6, self.combat_armor_wearing_skill / 100);
+			break;
+		case BODY_ARMOR_FLAG:
+			self.ssg_reload_time = lerp(self.ssg_reload_time * 0.8, self.ssg_reload_time * 0.65, self.body_armor_wearing_skill / 100);
+			self.sng_reload_time = lerp(self.sng_reload_time * 0.7, self.sng_reload_time * 0.54, self.body_armor_wearing_skill / 100);
 			break;
 	}
 }

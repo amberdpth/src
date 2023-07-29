@@ -8,9 +8,9 @@
 #define STAT_ARMORFLAG 37
 #define STAT_ARMORLEVEL 38
 
-#define STAT_JACKET_SKILL 39
-#define STAT_COMBAT_SKILL 40
-#define STAT_BODY_SKILL 41
+#define STAT_JACKET_LEVEL 39
+#define STAT_COMBAT_LEVEL 40
+#define STAT_BODY_LEVEL 41
 
 void(float apilevel, string enginename, float engineversion) CSQC_Init =
 {
@@ -19,9 +19,9 @@ void(float apilevel, string enginename, float engineversion) CSQC_Init =
 
 void(float w, float h) DrawStats =
 {
-    drawstring('32 264', strcat("jacket armor wearing: ", ftos(floor(getstatf(STAT_JACKET_SKILL)))), '8 8', '1 1 1', 1, 0);
-    drawstring('32 272', strcat("combat armor wearing: ", ftos(floor(getstatf(STAT_COMBAT_SKILL)))), '8 8', '1 1 1', 1, 0);
-    drawstring('32 280', strcat("body armor wearing: ", ftos(floor(getstatf(STAT_BODY_SKILL)))), '8 8', '1 1 1', 1, 0);
+    drawstring('32 264', strcat("jacket armor wearing: ", ftos(floor(getstatf(STAT_JACKET_LEVEL)))), '8 8', '1 1 1', 1, 0);
+    drawstring('32 272', strcat("combat armor wearing: ", ftos(floor(getstatf(STAT_COMBAT_LEVEL)))), '8 8', '1 1 1', 1, 0);
+    drawstring('32 280', strcat("body armor wearing: ", ftos(floor(getstatf(STAT_BODY_LEVEL)))), '8 8', '1 1 1', 1, 0);
     drawstring('32 292', strcat("axe:",ftos(floor(getstatf(STAT_AXE_LEVEL)))), '8 8', '1 1 1', 1, 0);
     drawstring('32 300', strcat("shotguns: ", ftos(floor(getstatf(STAT_SHOTGUN_LEVEL)))), '8 8', '1 1 1', 1, 0);
     drawstring('32 308', strcat("spikes: ", ftos(floor(getstatf(STAT_SPIKES_LEVEL)))), '8 8', '1 1 1', 1, 0);

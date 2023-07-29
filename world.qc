@@ -353,6 +353,9 @@ void() worldspawn =
 	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
 	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
 	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
+	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
+	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
+	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
 }
 
 void() RestoreGame =
@@ -362,6 +365,9 @@ void() RestoreGame =
 	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
 	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
 	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
+	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
+	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
+	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
 
 }
 

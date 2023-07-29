@@ -26,38 +26,38 @@ float() calc_accuracy =
 }
 
 void() skillup_axe = {
-    self.axe_skills = self.axe_skills + RATE_AXE * calc_accuracy();
+    self.axe_skills = bound(0, self.axe_skills + RATE_AXE * calc_accuracy(), 100);
 };
 
 void() skillup_shotgun = {
-    self.shotgun_skills = self.shotgun_skills + RATE_SHOTGUN * calc_accuracy();
+    self.shotgun_skills = bound(0, self.shotgun_skills + RATE_SHOTGUN * calc_accuracy(), 100);
 };
 
 void() skillup_spikes = {
-    self.spike_skills = self.spike_skills + RATE_SPIKES * calc_accuracy();
+    self.spike_skills = bound(0, self.spike_skills + RATE_SPIKES * calc_accuracy(), 100);
 };
 
 void() skillup_explosives = 
 {
-    self.explosive_skills = self.explosive_skills + RATE_EXPLOSIVE * calc_accuracy();
+    self.explosive_skills = bound(0, self.explosive_skills + RATE_EXPLOSIVE * calc_accuracy(), 100);
 };
 
 void(float mult) skillup_jacket_armor_wearing = 
 {
-    self.jacket_armor_wearing_skill = self.jacket_armor_wearing_skill + RATE_JACKET_ARMOR_SKILL * mult;
+    self.jacket_armor_wearing_skill = bound(0, self.jacket_armor_wearing_skill + RATE_JACKET_ARMOR_SKILL * mult, 100);
 };
 
 void(float mult) skillup_combat_armor_wearing =
 {
-    self.combat_armor_wearing_skill = self.combat_armor_wearing_skill + RATE_COMBAT_ARMOR_SKILL * mult;
+    self.combat_armor_wearing_skill = bound(0, self.combat_armor_wearing_skill + RATE_COMBAT_ARMOR_SKILL * mult, 100);
 };
 
 void(float mult) skillup_body_armor_wearing =
 {
-    self.body_armor_wearing_skill = self.body_armor_wearing_skill + RATE_BODY_ARMOR_SKILL * mult;
+    self.body_armor_wearing_skill = bound(0, self.body_armor_wearing_skill + RATE_BODY_ARMOR_SKILL * mult, 100);
 };
 
 void(float mult) skillup_classic_armor_wearing =
 {
-    self.classic_armor_wearing_skill = self.classic_armor_wearing_skill + RATE_CLASSIC_ARMOR_SKILL * mult;
+    self.classic_armor_wearing_skill = bound(0, self.classic_armor_wearing_skill + RATE_CLASSIC_ARMOR_SKILL * mult, 100);
 };

@@ -138,6 +138,24 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		targ.dmg_take = targ.dmg_take + take;
 		targ.dmg_save = targ.dmg_save + save;
 		targ.dmg_inflictor = inflictor;
+
+		oldself = self;
+		self = targ;
+
+		switch (self.armor_flag)
+		{
+			case JACKET_ARMOR_FLAG:
+				skillup_jacket_armor_wearing(1 - self.armortype);
+				break;
+			case COMBAT_ARMOR_FLAG:
+				skillup_combat_armor_wearing(1 - self.armortype);
+				break;
+			case BODY_ARMOR_FLAG:
+				skillup_body_armor_wearing(1 - self.armortype);
+				break;
+		}
+
+		self = oldself;
 	}
 
 	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK) )
@@ -233,10 +251,8 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 
 				if (points > 0)
 				{
-					if (head == attacker)
-						points = points * lerp(1, 0, attacker.explosives_protection); // self damage
-					else
-						points = points * lerp(1, 0.5, attacker.explosives_protection); // enemy damage
+
+					points = points * lerp(1, 0.5, head.explosives_protection); // enemy damage
 
 					if (CanDamage (head, inflictor))
 						points = points * 1.1;
@@ -253,14 +269,6 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						mis = self;
 						self = attacker;
 						skillup_explosives();
-						self = mis;
-					}
-					// only combat armor skill rise up with splash damage
-					if ((head.flags & FL_CLIENT) && (head.armor_flag == COMBAT_ARMOR_FLAG))
-					{
-						mis = self;
-						self = head;
-						skillup_combat_armor_wearing(points / damage);
 						self = mis;
 					}
 				}
