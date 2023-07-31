@@ -1,11 +1,51 @@
+string(entity o) get_armorname =
+{
+	if (o.armor_flag == JACKET_ARMOR_FLAG)
+		return strcat("jacket ", ftos(o.armor_level+1), " level");
+	else if (o.armor_flag == COMBAT_ARMOR_FLAG)
+		return strcat("combat armor ", ftos(o.armor_level+1), " level");
+	else if (o.armor_flag == BODY_ARMOR_FLAG)
+		return strcat("body armor ", ftos(o.armor_level+1), " level");
+	else
+		return strcat("classic armor ", ftos(o.armor_level+1), " level");
+}
+
 void() armor_touch =
 {
 	if (other.health <= 0)
 		return;
 	if (other.classname != "player")
 		return;
+	
+	string message;
 
-    other.armor_flag = self.armor_flag;
+	if (!other.button4)
+	{
+		if (other.armor_flag)
+			message = strcat("switch ", get_armorname(other), " to ", get_armorname(self));
+		else
+			message = strcat("pick ", get_armorname(self));
+		
+		centerprint(other, message);
+		return;
+	}
+
+	if (other.armor_flag) // one of mults depending on over all armor skills
+	{
+		float shards_multiplier = (
+			other.jacket_armor_wearing_skill 
+			+ other.combat_armor_wearing_skill 
+			+ other.body_armor_wearing_skill
+			+ other.classic_armor_wearing_skill) / 400;
+	
+		float received_shards = ceil(other.armorvalue * (shards_multiplier + (1 - other.armortype)) * 0.5); // protection pass + skill
+		other.shards = other.shards + received_shards;
+		other.armorvalue = 0; // remove shards from player's armor
+
+		sprint(other, sprintf("you got armor shards from pervious armor (%d)",received_shards),"\n");
+	}
+
+	other.armor_flag = self.armor_flag;
     other.armor_level = self.armor_level;
 
 	self.solid = SOLID_NOT;
@@ -13,6 +53,10 @@ void() armor_touch =
 
 	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
+
+
+	message = strcat("you got ", get_armorname(self));
+	centerprint(other, message);
 
 	activator = other;
 	// fire all targets / killtargets
@@ -24,40 +68,47 @@ void() item_armor_jacket =
     float r = rint(random(3));
 	float r_armor = rint(random(3));
 
+	precache_model("progs/armor_jacket.mdl");
+	precache_model("progs/armor_body.mdl");
+	precache_model("progs/armor_combat.mdl");
+	precache_model("progs/armor_default.mdl");
+
     float levels[] = { 0,1,2,3 };
 	
     self.touch = armor_touch;
 
-	switch(r_armor)
+	switch(self.classname)
 	{
-		case 0:
-			precache_model("progs/armor_jacket.mdl");
+		case "item_armor1":
 			setmodel(self, "progs/armor_jacket.mdl");
 			self.skin = r;
 			self.armor_flag = JACKET_ARMOR_FLAG;
 			self.armor_level = levels[r];
 			break;
-		case 1:
-			precache_model("progs/armor_combat.mdl");
+		case "item_armor2":
 			setmodel(self, "progs/armor_combat.mdl");
 			self.skin = r;
 			self.armor_flag = COMBAT_ARMOR_FLAG;
 			self.armor_level = levels[r];
 			break;
-		case 2:
-			precache_model("progs/armor_body.mdl");
-			setmodel(self, "progs/armor_body.mdl");
-			self.skin = r;
-			self.armor_flag = BODY_ARMOR_FLAG;
-			self.armor_level = levels[r];
-			break;
-		case 3:
-			precache_model("progs/armor_default.mdl");
-			setmodel(self, "progs/armor_default.mdl");
-			self.skin = r;
-			self.armor_flag = CLASSIC_ARMOR_FLAG;
-			self.armor_level = levels[r];
-			break;
+		case "item_armorInv":
+		switch(r_armor)
+		{
+			case 0: case 1: case 2:
+				setmodel(self, "progs/armor_body.mdl");
+				self.skin = r;
+				self.armor_flag = BODY_ARMOR_FLAG;
+				self.armor_level = levels[r];
+				break;
+			case 3:
+				setmodel(self, "progs/armor_default.mdl");
+				self.skin = r;
+				self.armor_flag = CLASSIC_ARMOR_FLAG;
+				self.armor_level = levels[r];
+				break;
+
+		}
+
 	}
 
 
@@ -112,12 +163,8 @@ void() armorshard_touch =
 		return;
 	if (other.classname != "player")
 		return;
-	if (!other.armor_flag)
-		return;
 
-	float value = ceil(10 - 10 * other.armortype);
-	other.armorvalue = other.armorvalue + value;
-	sprint(other, "you got armor shard\n");
+	other.shards = other.shards + 1;
 	remove(self);
 }
 

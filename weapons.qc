@@ -46,6 +46,10 @@ void() W_Precache =
 	precache_sound ("weapons/grenade.wav");	// grenade launcher
 	precache_sound ("weapons/bounce.wav");		// grenade bounce
 	precache_sound ("weapons/shotgn2.wav");	// super shotgun
+	precache_sound ("shambler/smack.wav");
+	precache_sound ("hook/chain1.wav");
+	precache_sound ("hook/chain2.wav");
+	precache_sound ("hook/retract.wav");
 };
 
 float() crandom =
@@ -303,14 +307,17 @@ void() W_FireShotgun =
 	float shotcount = 7;
 	float spread_h;
 
-	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skills / 100);
+	if (self.currentammo < 1)
+		return;
+
+	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skill / 100);
 
 	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
 
 	self.punchangle_x = -2;
 
-	vector error_v = v_up * random(-lerp(0.06, 0.0012, self.shotgun_skills / 100), lerp(0.06, 0.0012, self.shotgun_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.06, 0.0012, self.shotgun_skills / 100), lerp(0.06, 0.0012, self.shotgun_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.06, 0.0012, self.shotgun_skill / 100), lerp(0.06, 0.0012, self.shotgun_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.06, 0.0012, self.shotgun_skill / 100), lerp(0.06, 0.0012, self.shotgun_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
@@ -335,16 +342,16 @@ void() W_FireSuperShotgun =
 	vector dir;
 	float shotcount = 14;
 
-	float spread_h = lerp(0.3, 0.012, self.shotgun_skills / 100);
-	float spread_v = lerp(0.1, 0.05, self.shotgun_skills / 100);
+	float spread_h = lerp(0.3, 0.012, self.shotgun_skill / 100);
+	float spread_v = lerp(0.1, 0.05, self.shotgun_skill / 100);
 
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
 
 	self.punchangle_x = -4;
 
 	
-	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
@@ -370,15 +377,15 @@ void() W_FireTripleShotgun =
 
 	float spread_h;
 
-	float spread_v = spread_h = lerp(0.1, 0.06, self.shotgun_skills / 100);
+	float spread_v = spread_h = lerp(0.3, 0.06, self.shotgun_skill / 100);
 
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
 
 	self.punchangle_x = -6;
 
 	
-	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skills / 100), lerp(0.08, 0.0023, self.shotgun_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	self.currentammo = self.ammo_shells = self.ammo_shells - 3;
@@ -432,7 +439,7 @@ void() T_MissileTouch =
 	if (other.health)
 	{
 		if (other.classname == "monster_shambler")
-			damg = damg * (0.5 + 0.5 * (self.explosive_skills / 100));
+			damg = damg * (0.5 + 0.5 * (self.explosive_skill / 100));
 
 		T_Damage (other, self, self.owner, damg );
 		
@@ -443,7 +450,7 @@ void() T_MissileTouch =
 
 	}
 
-	damg = damg + lerp(0, 40, self.explosive_skills / 100); // extra radius depending on rockets skill
+	damg = damg + lerp(0, 40, self.explosive_skill / 100); // extra radius depending on rockets skill
 
 	T_RadiusDamage (self, self.owner, damg, other);
 
@@ -511,8 +518,8 @@ void() W_FireRocket =
 	// set missile speed
 	makevectors (self.v_angle);
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	missile.velocity = dir;
@@ -645,7 +652,7 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	float damage = 100 + lerp(0, 60, self.explosive_skills / 100);
+	float damage = 100 + lerp(0, 60, self.explosive_skill / 100);
 
 	T_RadiusDamage (self, self.owner, damage, world);
 
@@ -695,8 +702,8 @@ void() W_FireGrenade =
 	// set missile speed
 	makevectors (self.v_angle);
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skills / 100), lerp(0.045, 0.0023, self.explosive_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	missile.velocity = dir * 585;
@@ -761,8 +768,8 @@ void() W_FireSuperSpikes =
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
 	dir = v_forward + error_h + error_v;
 	
 	launch_spike (self.origin + '0 0 16', dir);
@@ -781,8 +788,8 @@ void(float ox) W_FireSpikes =
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skills / 100), lerp(0.045, 0.0023, self.spike_skills / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
@@ -805,7 +812,7 @@ void() spike_touch =
 		return;
 	}
 
-	float damage = floor(lerp(0, 10, self.owner.spike_skills / 100)) + 8;
+	float damage = floor(lerp(0, 10, self.owner.spike_skill / 100)) + 8;
 	// hit something that bleeds
 	if (other.takedamage)
 	{
@@ -854,7 +861,7 @@ void() superspike_touch =
 		return;
 	}
 
-	float damage = floor(lerp(0, 10, self.owner.spike_skills / 100)) + 10;
+	float damage = floor(lerp(0, 10, self.owner.spike_skill / 100)) + 10;
 
 	// hit something that bleeds
 	if (other.takedamage)

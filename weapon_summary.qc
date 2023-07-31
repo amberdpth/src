@@ -276,6 +276,54 @@ void() CycleWeaponReverseCommand =
 	}
 };
 
+void() UseShards =
+{
+	string message;
+
+	if (self.shards <= 0)
+	{
+		sprint(self, "you dont have shards.\n");
+		return;
+	}
+	if (!self.armor_flag)
+	{
+		sprint(self, "you dont have armor\n");
+		return;
+	}
+	if (self.armorvalue >= self.max_armorvalue)
+	{
+		sprint(self, "armor stack is full.\n");
+		return;
+	}
+
+
+	self.armorvalue = self.armorvalue + 1;
+	self.shards = self.shards - 1;
+	message = strcat( sprintf("%d/%d", self.armorvalue, self.max_armorvalue), "upgraded armor with shard.");
+	message = strcat( message, ftos(ceil(self.armortype * 100)), "% protection ");
+	message = strcat( message, sprintf("%d shards left.", self.shards));
+	message = strcat( message, "\n");
+
+	switch (self.armor_flag)
+	{
+		case JACKET_ARMOR_FLAG:
+			skillup_jacket_armor_wearing(self.armortype);
+			break;
+		case COMBAT_ARMOR_FLAG:
+			skillup_combat_armor_wearing(self.armortype);
+			break;
+		case BODY_ARMOR_FLAG:
+			skillup_body_armor_wearing(self.armortype);
+			break;
+		case CLASSIC_ARMOR_FLAG:
+			skillup_classic_armor_wearing(self.armortype);
+			break;
+	}
+
+	sprint(self,message);
+	stuffcmd(self,"bf\n");
+}
+
 void() ImpulseCommands =
 {
 	if (self.impulse >= 1 && self.impulse <= 9)
@@ -285,12 +333,120 @@ void() ImpulseCommands =
 		CycleWeaponCommand ();
 	if (self.impulse == 12)
 		CycleWeaponReverseCommand ();
+	if (self.impulse == 13)
+		UseShards();
 
 	self.impulse = 0;
 };
 
+enumflags
+{
+	FND_VIAL,
+	FND_SHARD,
+	FND_SHELLS,
+	FND_NAILS,
+	FND_ROCKETS,
+	FND_CELLS,
+};
+
+float SOLDIER_FND_POOL = FND_VIAL|FND_SHARD|FND_SHELLS;
+float OGRE_FND_POOL = FND_VIAL|FND_SHARD|FND_ROCKETS;
+float FND_FULL_PULL = FND_VIAL|FND_SHARD|FND_SHELLS|FND_NAILS|FND_ROCKETS|FND_CELLS;
+
+.float searched;
+.float searching_bodies;
+
+string(entity body) get_dead_name =
+{
+	if (body.classname == "monster_soldier") return "grunt";
+
+	return "body";
+}
+
+void(entity body,float fnd_flags, string dead_body_name) find_item =
+{
+	float *consumables[6];
+
+	consumables[0] = &self.vials;
+	consumables[1] = &self.shards;
+	consumables[2] = &self.ammo_shells;
+	consumables[3] = &self.ammo_nails;
+	consumables[4] = &self.ammo_rockets;
+	consumables[5] = &self.ammo_cells;
+
+	string found_name[] =
+	{
+		"health vial",
+		"armor shard",
+		"shotgun shell",
+		"spike",
+		"rocket",
+		"battery cell"
+	};
+
+	float min[] = { 0, 0, 3, 0, 0, 0 };
+	float max[] = { 6, 10, 30, 25, 10, 20 };
+
+	float i;
+	float value;
+	float found_something = 0;
+	string message;
+
+	for (i = 0; i < 6; i++)
+	{
+		if ( fnd_flags & (1<<i))
+		{
+			value = rint ( random ( lerp (min[i], max[i], self.searching_skill / 100 ) ) );
+			if (value)
+			{
+				*consumables[i] = *consumables[i] + value;
+				found_something = TRUE;
+
+				message = strcat( sprintf ( "you found %d ", value ) , found_name[i], ( value > 1 ? "s" : "" ) );
+				message = strcat( message, " from dead ", dead_body_name,"\n");
+				sprint(self, message);
+			}
+		}
+	}
+
+	if (!found_something)
+		sprint(self, "found nothing from dead", dead_body_name, "\n");
+
+}
+
+void() SearchingDeadBodies =
+{
+	entity body = findradius(self.origin, 64);
+
+	float itms = rint(random(lerp(1, 20, self.searching_skill / 100)));
+	float i = 0;
+
+
+	while(body)
+	{
+		if (!body.searched)
+		{
+			if (body.classname == "monster_army")
+				find_item(body, SOLDIER_FND_POOL,"grunt");
+			if (body.classname == "monster_ogre")
+				find_item(body, OGRE_FND_POOL,"ogre");
+			
+			body.searched = 1;
+		}
+
+
+
+		body = body.chain;
+	}
+
+	self.searching_bodies = time + 1;
+}
+
 void() W_WeaponFrame =
 {
+
+	CheckGrapHook ();
+
 	if (time < self.attack_finished)
 		return;
 
@@ -301,4 +457,10 @@ void() W_WeaponFrame =
 	{
 		W_Attack ();
 	}
+
+	if (time < self.searching_bodies)
+		return;
+
+	if (self.button6)
+		SearchingDeadBodies();
 };

@@ -5,6 +5,7 @@ pr_dumpplatform
 (Use the -help arg for a list of available args)
 */
 #pragma noref 1
+#pragma target fte
 //#pragma flag enable logicops
 #pragma warning error Q101 /*too many parms. The vanilla qcc didn't validate properly, hence why fteqcc normally treats it as a warning.*/
 #pragma warning error Q105 /*too few parms. The vanilla qcc didn't validate properly, hence why fteqcc normally treats it as a warning.*/

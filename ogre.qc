@@ -123,9 +123,14 @@ void() OgreFireGrenade =
 	// set missile speed
 	makevectors (self.angles);
 
+	
+
 	missile.velocity = normalize(self.enemy.origin - self.origin);
-	missile.velocity = missile.velocity * 600;
-	missile.velocity_z = 200;
+
+	vector fire_ang = vectoangles(missile.velocity);
+
+	missile.velocity = missile.velocity * 600 + v_up * 180;
+	missile.velocity[2] = missile.velocity[2] + v_up[2] * 60;
 
 	missile.avelocity = '300 300 300';
 

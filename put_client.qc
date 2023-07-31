@@ -116,10 +116,10 @@ void() SetChangeParms =
 	parm8 = self.weapon;
 	parm9 = self.armortype;
 	
-	parm20 = self.base_axe_skills;
-	parm21 = self.base_shotgun_skills;
-	parm22 = self.base_spike_skills;
-	parm23 = self.base_explosive_skills;
+	parm20 = self.base_axe_skill;
+	parm21 = self.base_shotgun_skill;
+	parm22 = self.base_spike_skill;
+	parm23 = self.base_explosive_skill;
 
 	parm24 = self.base_jacket_armor_wearing_skill;
 	parm25 = self.base_combat_armor_wearing_skill;
@@ -129,31 +129,37 @@ void() SetChangeParms =
 	parm40 = self.armor_flag;
 	parm41 = self.armor_level;
 
+	parm10 = self.shards;
+	parm11 = self.vials;
+
 };
 
 void() DecodeLevelParms =
 {
 	if (world.model == "maps/start.bsp")
 	{
-		self.weapons = W_AXE | W_SHOTGUN | W_TRIPLE_SHOTGUN;
+		self.weapons = W_AXE | W_SHOTGUN;
 		self.weapon = W_AXE;
+		self.ammo_shells = 25;
 		return;
 	}
 
-	 self.weapons = parm1;
-	 self.health = parm2;
-	 self.armorvalue = parm3;
-	 self.ammo_shells = parm4;
-	 self.ammo_nails = parm5;
-	 self.ammo_rockets = parm6;
-	 self.ammo_cells = parm7;
-	 self.weapon = parm8;
-	 self.armortype = parm9;
+	self.weapons = parm1;
+	self.health = parm2;
+	self.armorvalue = parm3;
+	self.ammo_shells = parm4;
+	self.ammo_nails = parm5;
+	self.ammo_rockets = parm6;
+	self.ammo_cells = parm7;
+	self.weapon = parm8;
+	self.armortype = parm9;
+	self.shards = parm10;
+	self.vials = parm11;
 	
-	self.base_axe_skills = parm20;
-	self.base_shotgun_skills = parm21;
-	self.base_spike_skills = parm22;
-	self.base_explosive_skills = parm23;
+	self.base_axe_skill = parm20;
+	self.base_shotgun_skill = parm21;
+	self.base_spike_skill = parm22;
+	self.base_explosive_skill = parm23;
 
 	self.base_jacket_armor_wearing_skill = parm24;
 	self.base_combat_armor_wearing_skill = parm25;

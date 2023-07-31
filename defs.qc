@@ -713,6 +713,7 @@ float(entity targ, entity inflictor) CanDamage;
 
 enumflags 
 {
+	W_AXE,
 	W_SHOTGUN,
 	W_SUPER_SHOTGUN,
 	W_TRIPLE_SHOTGUN,
@@ -726,7 +727,6 @@ enumflags
 	W_NAILS,
 	W_ROCKETS,
 	W_CELLS,
-	W_AXE,
 	W_ARMOR1,
 	W_ARMOR2,
 	W_ARMOR3,
@@ -739,7 +739,11 @@ enumflags
 	W_QUAD,
 };
 
+
+
 .float keys;
+.float shards;
+.float vials;
 
 enumflags
 {

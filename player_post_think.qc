@@ -3,7 +3,7 @@ void() InitPlayerParams =
 	self.explosives_protection = 0;
 	self.maxspeed = 320;
 
-	self.maxspeed = (self.health < 100 ? lerp(self.maxspeed * 0.88, self.maxspeed, self.health / 100) : self.maxspeed);
+	//self.maxspeed = (self.health < 100 ? lerp(self.maxspeed * 0.88, self.maxspeed, self.health / 100) : self.maxspeed);
 }
 
 void() CheckSKills =
@@ -13,10 +13,13 @@ void() CheckSKills =
 	self.body_armor_wearing_skill = self.base_body_armor_wearing_skill;
 	self.classic_armor_wearing_skill = self.base_classic_armor_wearing_skill;
 
-	self.axe_skills = self.base_axe_skills;
-	self.shotgun_skills = self.base_shotgun_skills;
-	self.spike_skills = self.base_spike_skills;
-	self.explosive_skills = self.base_explosive_skills;
+	self.axe_skill = self.base_axe_skill;
+	self.shotgun_skill = self.base_shotgun_skill;
+	self.spike_skill = self.base_spike_skill;
+	self.explosive_skill = self.base_explosive_skill;
+
+	self.searching_skill = self.base_searching_skill;
+	self.agility_skill = self.base_agility_skill;
 }
 
 void() CheckArmors =
@@ -27,8 +30,8 @@ void() CheckArmors =
 
 	if (self.armor_flag == JACKET_ARMOR_FLAG)
 	{
-		self.shotgun_skills = bound(0, self.shotgun_skills + lerp(1, 50, self.jacket_armor_wearing_skill / 100), 100);
-		self.axe_skills = bound(0, self.axe_skills + lerp(1, 65, self.jacket_armor_wearing_skill / 100), 100);
+		self.shotgun_skill = bound(0, self.shotgun_skill + lerp(1, 50, self.jacket_armor_wearing_skill / 100), 100);
+		self.axe_skill = bound(0, self.axe_skill + lerp(1, 65, self.jacket_armor_wearing_skill / 100), 100);
 
 		self.armor_min_protect = jacket_min_protect[self.armor_level];
 		self.armor_max_protect = jacket_max_protect[self.armor_level];
@@ -50,9 +53,9 @@ void() CheckArmors =
 	}
 	else if (self.armor_flag == COMBAT_ARMOR_FLAG)
 	{
-		self.shotgun_skills = bound(0, self.shotgun_skills + lerp(5, 40, self.combat_armor_wearing_skill / 100), 100);
-		self.spike_skills = bound(0, self.spike_skills + lerp(10, 35, self.combat_armor_wearing_skill / 100), 100);
-		self.explosive_skills = bound(0, self.explosive_skills + lerp(1, 10, self.combat_armor_wearing_skill / 100), 100);
+		self.shotgun_skill = bound(0, self.shotgun_skill + lerp(5, 40, self.combat_armor_wearing_skill / 100), 100);
+		self.spike_skill = bound(0, self.spike_skill + lerp(10, 35, self.combat_armor_wearing_skill / 100), 100);
+		self.explosive_skill = bound(0, self.explosive_skill + lerp(1, 10, self.combat_armor_wearing_skill / 100), 100);
 
 		self.armor_min_protect = combat_min_protect[self.armor_level];
 		self.armor_max_protect = combat_max_protect[self.armor_level];
@@ -74,8 +77,8 @@ void() CheckArmors =
 	else if (self.armor_flag == BODY_ARMOR_FLAG)
 	{
 
-		self.shotgun_skills = bound(0, self.shotgun_skills + lerp(10, 20, self.body_armor_wearing_skill / 100), 100);
-		self.explosive_skills = bound(0, self.explosive_skills + lerp(5, 30, self.body_armor_wearing_skill / 100), 100);
+		self.shotgun_skill = bound(0, self.shotgun_skill + lerp(10, 20, self.body_armor_wearing_skill / 100), 100);
+		self.explosive_skill = bound(0, self.explosive_skill + lerp(5, 30, self.body_armor_wearing_skill / 100), 100);
 
 		self.armor_min_protect = body_min_protect[self.armor_level];
 		self.armor_max_protect = body_max_protect[self.armor_level];
@@ -93,8 +96,8 @@ void() CheckArmors =
 	}
 	else if (self.armor_flag == CLASSIC_ARMOR_FLAG)
 	{
-		self.axe_skills = bound(0, self.axe_skills + lerp(1, 80, self.classic_armor_wearing_skill / 100), 100);
-		self.explosive_skills = bound(0,self.explosive_skills + lerp(1, 50, self.classic_armor_wearing_skill / 100), 100);
+		self.axe_skill = bound(0, self.axe_skill + lerp(1, 80, self.classic_armor_wearing_skill / 100), 100);
+		self.explosive_skill = bound(0,self.explosive_skill + lerp(1, 50, self.classic_armor_wearing_skill / 100), 100);
 
 		self.armor_min_protect = classic_min_protect[self.armor_level];
 		self.armor_max_protect = classic_max_protect[self.armor_level];
@@ -112,17 +115,17 @@ void() CheckArmors =
 
 void() CheckStats =
 {
-	self.ax_reload_time = lerp(0.5, 0.2, self.axe_skills / 100);
-	self.sg_reload_time = lerp(0.64, 0.42, self.shotgun_skills / 100);
-	self.ssg_reload_time = lerp(0.68, 0.41, self.shotgun_skills / 100);
-	self.tsg_reload_time = lerp(0.71, 0.44, self.shotgun_skills / 100);
-	self.ng_reload_time = lerp(0.0923, 0.048, self.spike_skills / 100);
-	self.sng_reload_time = lerp(0.111, 0.06, self.spike_skills / 100);
-	self.gl_reload_time = lerp(0.8, 0.35, self.explosive_skills / 100);
-	self.rl_reload_time = lerp(0.7,0.39, self.explosive_skills / 100);
+	self.ax_reload_time = lerp(0.5, 0.2, self.axe_skill / 100);
+	self.sg_reload_time = lerp(0.64, 0.42, self.shotgun_skill / 100);
+	self.ssg_reload_time = lerp(0.68, 0.41, self.shotgun_skill / 100);
+	self.tsg_reload_time = lerp(0.71, 0.44, self.shotgun_skill / 100);
+	self.ng_reload_time = lerp(0.0923, 0.048, self.spike_skill / 100);
+	self.sng_reload_time = lerp(0.111, 0.06, self.spike_skill / 100);
+	self.gl_reload_time = lerp(0.8, 0.35, self.explosive_skill / 100);
+	self.rl_reload_time = lerp(0.7,0.39, self.explosive_skill / 100);
 
 
-	self.explosives_protection = lerp(0, 0.9, self.explosive_skills / 100);
+	self.explosives_protection = lerp(0, 0.9, self.explosive_skill / 100);
 }
 
 void() CheckPowerups =

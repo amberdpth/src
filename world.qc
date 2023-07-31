@@ -299,6 +299,9 @@ void() worldspawn =
 	precache_model ("progs/spike.mdl");
 	precache_model ("progs/s_spike.mdl");
 
+	precache_model ("progs/hook.mdl");
+	precache_model ("progs/chain.mdl");
+
 	precache_model ("progs/backpack.mdl");
 	precache_model ("progs/armor_shard.mdl");
 
@@ -349,50 +352,18 @@ void() worldspawn =
 	// 63 testing
 	lightstyle(63, "a");
 
-	clientstat(STAT_AXE_LEVEL,EV_FLOAT,axe_skills);
-	clientstat(STAT_SHOTGUN_LEVEL,EV_FLOAT,shotgun_skills);
-	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
-	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
-	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
-	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
-	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
-	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
-	clientstat(STAT_CLASSIC_LEVEL, EV_FLOAT,classic_armor_wearing_skill);
-
-	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
-	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
-
-	clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
-	clientstat(STAT_KEYS,EV_FLOAT,keys);
+	init_clientstats();
 }
 
 void() RestoreGame =
 {
-	clientstat(STAT_AXE_LEVEL,EV_FLOAT,axe_skills);
-	clientstat(STAT_SHOTGUN_LEVEL,EV_FLOAT,shotgun_skills);
-	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT,spike_skills);
-	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT,explosive_skills);
-	clientstat(STAT_ARMORTYPE,EV_FLOAT,armortype);
-	clientstat(STAT_JACKET_LEVEL,EV_FLOAT,jacket_armor_wearing_skill);
-	clientstat(STAT_COMBAT_LEVEL,EV_FLOAT,combat_armor_wearing_skill);
-	clientstat(STAT_BODY_LEVEL,EV_FLOAT,body_armor_wearing_skill);
-	clientstat(STAT_CLASSIC_LEVEL, EV_FLOAT,classic_armor_wearing_skill);
-
-	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
-	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);
-
-	//clientstat(STAT_WEAPONS,EV_FLOAT,weapons);
-	clientstat(STAT_KEYS,EV_FLOAT,keys);
-
+	init_clientstats();
 }
 
 void() StartFrame =
 {
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
-
-
-
 	framecount = framecount + 1;
 
 };

@@ -222,7 +222,7 @@ void() monster_tarbaby =
 	setmodel (self, "progs/tarbaby.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 80;
+	self.health = 1;
 
 	self.th_stand = tbaby_stand1;
 	self.th_walk = tbaby_walk1;

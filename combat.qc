@@ -94,6 +94,7 @@ void(entity targ, entity attacker) Killed =
 	// bump the monster counter
 	if (self.flags & FL_MONSTER)
 	{
+		self.flags = self.flags | FL_FINDABLE_NONSOLID;
 		killed_monsters = killed_monsters + 1;
 		WriteByte (MSG_ALL, SVC_KILLEDMONSTER);
 	}
@@ -142,13 +143,16 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		switch (self.armor_flag)
 		{
 			case JACKET_ARMOR_FLAG:
-				skillup_jacket_armor_wearing(1 - self.armortype);
+				skillup_jacket_armor_wearing(self.armortype);
 				break;
 			case COMBAT_ARMOR_FLAG:
-				skillup_combat_armor_wearing(1 - self.armortype);
+				skillup_combat_armor_wearing(self.armortype);
 				break;
 			case BODY_ARMOR_FLAG:
-				skillup_body_armor_wearing(1 - self.armortype);
+				skillup_body_armor_wearing(self.armortype);
+				break;
+			case CLASSIC_ARMOR_FLAG:
+				skillup_classic_armor_wearing(self.armortype);
 				break;
 		}
 
@@ -252,7 +256,7 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						points = points * 1;
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skills / 100) : 0.25);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skill / 100) : 0.25);
 						points = points * passing_damage;
 					}
 						

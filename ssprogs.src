@@ -4,7 +4,6 @@
 
 fteextensions.qc
 defs.qc
-stats_shared.qc
 subs.qc
 skills.qc
 fight.qc
@@ -12,11 +11,15 @@ ai.qc
 combat.qc
 items.qc
 items_armors.qc
+items_weapons.qc
+
+hook.qc
 weapons.qc
 weapon_summary.qc // switching, attack
 
 passing_bullets.qc
 
+stats_shared.qc
 world.qc
 
 client.qc
@@ -49,3 +52,4 @@ fish.qc			// registered
 shalrath.qc		// registered
 enforcer.qc		// registered
 oldone.qc		// registered
+
