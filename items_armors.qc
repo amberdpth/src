@@ -32,11 +32,7 @@ void() armor_touch =
 
 	if (other.armor_flag) // one of mults depending on over all armor skills
 	{
-		float shards_multiplier = (
-			other.jacket_armor_wearing_skill 
-			+ other.combat_armor_wearing_skill 
-			+ other.body_armor_wearing_skill
-			+ other.classic_armor_wearing_skill) / 400;
+		float shards_multiplier = skill_fraction(other.armor_wearing_skill);
 	
 		float received_shards = ceil(other.armorvalue * (shards_multiplier + (1 - other.armortype)) * 0.5); // protection pass + skill
 		other.shards = other.shards + received_shards;

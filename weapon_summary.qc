@@ -290,35 +290,27 @@ void() UseShards =
 		sprint(self, "you dont have armor\n");
 		return;
 	}
-	if (self.armorvalue >= self.max_armorvalue)
-	{
-		sprint(self, "armor stack is full.\n");
-		return;
-	}
+
+	float val = 0;
+	
+	if (self.shards <= 1000)
+		val = 100;
+	if (self.shards <= 100)
+		val = 10;
+	if (self.shards <= 10)
+		val = 1;
+	
 
 
-	self.armorvalue = self.armorvalue + 1;
-	self.shards = self.shards - 1;
+
+	self.armorvalue = self.armorvalue + val;
+	self.shards = self.shards - val;
 	message = strcat( sprintf("%d/%d", self.armorvalue, self.max_armorvalue), "upgraded armor with shard.");
 	message = strcat( message, ftos(ceil(self.armortype * 100)), "% protection ");
 	message = strcat( message, sprintf("%d shards left.", self.shards));
 	message = strcat( message, "\n");
 
-	switch (self.armor_flag)
-	{
-		case JACKET_ARMOR_FLAG:
-			skillup_jacket_armor_wearing(self.armortype);
-			break;
-		case COMBAT_ARMOR_FLAG:
-			skillup_combat_armor_wearing(self.armortype);
-			break;
-		case BODY_ARMOR_FLAG:
-			skillup_body_armor_wearing(self.armortype);
-			break;
-		case CLASSIC_ARMOR_FLAG:
-			skillup_classic_armor_wearing(self.armortype);
-			break;
-	}
+	skill_up( &self.base_armor_wearing_skill, RATE_ARMOR_SKILL, 0.7);
 
 	sprint(self,message);
 	stuffcmd(self,"bf\n");

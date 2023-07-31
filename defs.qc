@@ -790,37 +790,10 @@ float lerp(float a, float b, float f)
 // JACKET
 
 #define JACKET_ARMOR_FLAG 1
-
-float jacket_min_protect[] = { 0.12, 0.17, 0.2, 0.22 };
-float jacket_max_protect[] = {0.28, 0.32, 0.34, 0.37 };
-float jacket_min_speed[] = { 20, 26, 29, 32 };
-float jacket_max_speed[] = { 42, 49, 51, 56 };
-float jacket_min_value[] = { 60, 65, 70, 75 };
-float jacket_max_value[] = { 100, 105, 115, 120 };
-
 #define COMBAT_ARMOR_FLAG 2
-
-float combat_min_protect[] = { 0.23, 0.26, 0.28, 0.32 };
-float combat_max_protect[] = {0.48, 0.50, 0.54, 0.66 };
-float combat_min_speed[] = { -20, -6, 12, 16 };
-float combat_max_speed[] = { -16, 0, 18, 24 };
-float combat_min_value[] = { 80, 95, 115, 120 };
-float combat_max_value[] = { 120, 120, 145, 165 };
-
 #define BODY_ARMOR_FLAG 3
-
-float body_min_protect[] = { 0.36, 0.42, 0.48, 0.58 };
-float body_max_protect[] = {0.71, 0.78, 0.87, 0.98 };
-float body_min_speed[] = { -30, -12, 2, 7 };
-float body_max_speed[] = { -10, -2, 8, 12 };
-float body_min_value[] = { 115, 125, 150, 185 };
-float body_max_value[] = { 190, 200, 225, 250 };
-
 #define CLASSIC_ARMOR_FLAG 4
 
-float classic_min_protect[] = { 0.36, 0.42, 0.48, 0.58 };
-float classic_max_protect[] = {0.71, 0.78, 0.87, 0.98 };
-float classic_min_speed[] = { -30, -12, 2, 7 };
-float classic_max_speed[] = { -10, -2, 8, 12 };
-float classic_min_value[] = { 115, 125, 150, 185 };
-float classic_max_value[] = { 190, 200, 225, 250 };
+float max_armorvalues[] = { 0, 50, 100, 150, 200 };
+float extra_armorvalues[] = { 0, 5, 7, 9, 15};
+float armortypes[] = { 0, 0.09, 0.12, 0.15, 0.18 };

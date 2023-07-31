@@ -80,7 +80,7 @@ void() W_FireAxe =
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
 		T_Damage (trace_ent, self, self, 20);
-		skillup_axe();
+		skill_up( &self.base_axe_skill, RATE_AXE, 1.0);
 	}
 	else
 	{	// hit wall
@@ -228,6 +228,10 @@ BULLETS
 TraceAttack
 ================
 */
+
+float trace_fraction_mult;
+float trace_hits;
+
 void(float damage, vector dir) TraceAttack =
 {
 	local vector vel, org;
@@ -272,12 +276,16 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
+	trace_fraction_mult = 0;
+	trace_hits = 0;
+
 	ClearMultiDamage ();
 	while (shotcount > 0)
 	{
 		direction = dir + crandom()*spread_x*v_right + crandom()*spread_y*v_up;
 
 		traceline (src, src + direction*2048, FALSE, self);
+
 		if (trace_fraction != 1.0)
 			TraceAttack (4, direction);
 
@@ -289,7 +297,10 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	while(e)
 	{
 		T_Damage(e, self, self, e.multidamage);
-		skillup_shotgun();
+
+		//trace_fraction_mult /= trace_hits;
+
+		skill_up( &self.base_shotgun_skill, RATE_SHOTGUN, 1.0 );
 		e.multidamage = 0;
 		e.multidamage_flag = FALSE;
 		e = findflags(e,multidamage_flag,TRUE);
@@ -422,8 +433,6 @@ void() T_MissileTouch =
 {
 	float damg;
 
-	entity oself;
-
 	if (other == self.owner)
 		// don't explode on owner
 		return;
@@ -438,19 +447,11 @@ void() T_MissileTouch =
 
 	if (other.health)
 	{
-		if (other.classname == "monster_shambler")
-			damg = damg * (0.5 + 0.5 * (self.explosive_skill / 100));
-
 		T_Damage (other, self, self.owner, damg );
-		
-		oself = self;
-		self = self.owner;
-		skillup_explosives();
-		self = oself;
-
+		skill_up( &self.owner.base_explosive_skill, RATE_EXPLOSIVE, 1.5); // 1.5x exp for direct hit
 	}
 
-	damg = damg + lerp(0, 40, self.explosive_skill / 100); // extra radius depending on rockets skill
+	damg = damg + lerp(0, 40, skill_fraction(self.owner.explosive_skill)); // extra radius depending on explo skill
 
 	T_RadiusDamage (self, self.owner, damg, other);
 
@@ -820,12 +821,7 @@ void() spike_touch =
 		T_Damage (other, self, self.owner, damage);
 
 		if (self.owner.flags & FL_CLIENT)
-		{
-			entity oself = self;
-			self = self.owner;
-			skillup_spikes();
-			self = oself;
-		}
+			skill_up( &self.owner.base_spike_skill, RATE_SPIKES, 1.0);
 	}
 	else
 	{
@@ -869,11 +865,7 @@ void() superspike_touch =
 		
 		spawn_touchblood (damage);
 		T_Damage (other, self, self.owner, damage);
-
-		entity oself = self;
-		self = self.owner;
-		skillup_spikes ();
-		self = oself;
+		skill_up( &self.owner.base_spike_skill, RATE_SPIKES, 1.0);
 	}
 	else
 	{

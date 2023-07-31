@@ -121,10 +121,10 @@ void() SetChangeParms =
 	parm22 = self.base_spike_skill;
 	parm23 = self.base_explosive_skill;
 
-	parm24 = self.base_jacket_armor_wearing_skill;
-	parm25 = self.base_combat_armor_wearing_skill;
-	parm26 = self.base_body_armor_wearing_skill;
-	parm27 = self.base_classic_armor_wearing_skill;
+	parm24 = self.base_armor_wearing_skill;
+
+	parm28 = self.base_searching_skill;
+	parm29 = self.base_agility_skill;
 
 	parm40 = self.armor_flag;
 	parm41 = self.armor_level;
@@ -161,10 +161,11 @@ void() DecodeLevelParms =
 	self.base_spike_skill = parm22;
 	self.base_explosive_skill = parm23;
 
-	self.base_jacket_armor_wearing_skill = parm24;
-	self.base_combat_armor_wearing_skill = parm25;
-	self.base_body_armor_wearing_skill = parm26;
-	self.base_classic_armor_wearing_skill = parm27;
+	self.base_armor_wearing_skill = parm24;
+
+	self.base_searching_skill = parm28;
+	self.base_agility_skill = parm29;
+
 
 	self.armor_flag = parm40;
 	self.armor_level = parm41;

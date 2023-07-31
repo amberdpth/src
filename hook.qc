@@ -175,13 +175,9 @@ void () MaintainLinks =
 //--------------------------------------------------------------------
 void () HookBehavior =
 {
-    local vector chainvec;		// chain vector
-	local vector velpart;		// player's velocity component moving to or away from hook
-	local float chainlen;		// length of extended chain
-	local float framestep;		// grow or shrink step per frame
-	local float f1, f2;		// restrainment forces
+    vector chainvec;		// chain vector
+	float chainlen;
 		      
-	// decide when to disconnect hook
 	if (  (!(self.owner.hook & HOOK_ON)) ||		// if hook has been retracted
 		(self.owner.teleport_time > time) || 	// if player goes through teleport
 		(self.owner.view_ofs == '0 0 0') ||		// if intermission or finale

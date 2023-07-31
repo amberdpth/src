@@ -140,21 +140,8 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		oldself = self;
 		self = targ;
 
-		switch (self.armor_flag)
-		{
-			case JACKET_ARMOR_FLAG:
-				skillup_jacket_armor_wearing(self.armortype);
-				break;
-			case COMBAT_ARMOR_FLAG:
-				skillup_combat_armor_wearing(self.armortype);
-				break;
-			case BODY_ARMOR_FLAG:
-				skillup_body_armor_wearing(self.armortype);
-				break;
-			case CLASSIC_ARMOR_FLAG:
-				skillup_classic_armor_wearing(self.armortype);
-				break;
-		}
+		if (self.armor_flag)
+			skill_up( &self.base_armor_wearing_skill, RATE_ARMOR_SKILL, self.armortype);
 
 		self = oldself;
 	}
@@ -228,8 +215,9 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 	float 	points;
 	entity	head;
 	vector	org;
-	entity mis;
 	float passing_damage;
+
+	entity skill_reciever = world;
 
 	if (damage <= 0)
 		return;
@@ -256,19 +244,18 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						points = points * 1;
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, attacker.explosive_skill / 100) : 0.25);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_skill)) : 0.14);
 						points = points * passing_damage;
 					}
 						
 					T_Damage (head, inflictor, attacker, points);
 
 					if (attacker.flags & FL_CLIENT)
-					{
-						mis = self;
-						self = attacker;
-						skillup_explosives();
-						self = mis;
-					}
+						skill_reciever = attacker;
+					if (head.flags & FL_CLIENT)
+						skill_reciever = head;
+					if (skill_reciever.flags & FL_CLIENT)
+						skill_up (&skill_reciever.explosive_skill, RATE_EXPLOSIVE, (head == attacker ? 0.25 : 1.0 ) );
 				}
 			}
 		}

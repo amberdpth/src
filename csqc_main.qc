@@ -1,5 +1,17 @@
 float has_armor;
 float showinfo;
+float step_index;
+
+float() init_step_index = 
+{
+    step_index = 1;
+    return step_index;
+};
+float(float in) shift_step_index =
+{
+    step_index = step_index + in;
+    return step_index;
+}
 
 string cl_weapon_list[] = 
 {
@@ -58,6 +70,10 @@ string() get_armor_level =
     return strcat(ftos(flag+1), " level");
 }
 
+#define STATS_FONT_SIZE '8 8'
+#define STATS_FONT_COLOR '1 1 1'
+#define STATS_FONT_HEADER_COLOR '1 0.9 0.5'
+
 void(float w, float h) DrawStats =
 {
     vector pos = '32 32';
@@ -65,40 +81,38 @@ void(float w, float h) DrawStats =
     string currentammo_str = ftos(getstatf(STAT_AMMO));
     float currentammo_strl = strlen(currentammo_str) * 8;
 
-    drawstring([w / 2, h / 2] - [(currentammo_strl / 2),0] + [0, 128], currentammo_str,'8 8', '1 1 1', 1, 0);
+    drawstring([w / 2, h / 2] - [(currentammo_strl / 2),0] + [0, 128], currentammo_str,STATS_FONT_SIZE, '1 1 1', 1, 0);
 
     if (!showinfo)
         return;
     
-    drawstring(pos, "Skills", '8 8', '1 0.9 0.5', 1, 0);
+    drawstring(pos, "Skills", STATS_FONT_SIZE, STATS_FONT_HEADER_COLOR, 1, 0);
 
-    drawstring(pos + step, strcat("jacket wearing: ", ftos(floor(getstatf(STAT_JACKET_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 2, strcat("combat wearing: ", ftos(floor(getstatf(STAT_COMBAT_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 3, strcat("body wearing: ", ftos(floor(getstatf(STAT_BODY_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 4, strcat("classic wearing:", ftos(floor(getstatf(STAT_CLASSIC_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    
-    drawstring(pos + step * 5, strcat("axe fight:",ftos(floor(getstatf(STAT_AXE_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 6, strcat("shotguns: ", ftos(floor(getstatf(STAT_SHOTGUN_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 7, strcat("spikes: ", ftos(floor(getstatf(STAT_SPIKES_LEVEL)))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 8, strcat("explosives:", ftos(floor(getstatf(STAT_EXPLOSIVES_LEVEL)))), '8 8', '1 1 1', 1, 0);
+    drawstring(pos + step * init_step_index(), strcat("armor wearing: ", ftos(floor(getstatf(STAT_ARMOR_WEARING_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("axe fight:",ftos(floor(getstatf(STAT_AXE_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("shotguns: ", ftos(floor(getstatf(STAT_SHOTGUN_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("spikes: ", ftos(floor(getstatf(STAT_SPIKES_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("explosives:", ftos(floor(getstatf(STAT_EXPLOSIVES_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("searching: ", ftos(floor(getstatf(STAT_SEARCHING_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("agility: ", ftos(floor(getstatf(STAT_AGILITY_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
 
-    drawstring(pos + step * 10, strcat("health:", ftos(floor(getstatf(STAT_HEALTH)))), '8 8', '1 1 1', 1, 0);
-    
-    drawstring(pos + step * 12, strcat("armor:", get_armor_name(), ":" ,get_armor_level()), '8 8', '1 1 1', 1, 0);
+    drawstring(pos + step * shift_step_index(2), strcat("health:", ftos(floor(getstatf(STAT_HEALTH)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("armor:", get_armor_name(), ":" ,get_armor_level()), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+
     if (has_armor)
-        drawstring(pos + step * 13, strcat("armor protection:", ftos(floor(100 * getstatf(STAT_ARMORTYPE))),"% (",ftos(floor(getstatf(STAT_ARMOR)))," shards)"), '8 8', '1 1 1', 1, 0);
+        drawstring(pos + step * shift_step_index(1), strcat("armor protection:", ftos(floor(100 * getstatf(STAT_ARMORTYPE))),"% (",ftos(floor(getstatf(STAT_ARMOR)))," shards)"), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
 
-    drawstring(pos + step * 15, "Ammo", '8 8', '1 0.9 0.5', 1, 0);
+    drawstring(pos + step * shift_step_index(2), "Ammo", STATS_FONT_SIZE, STATS_FONT_HEADER_COLOR, 1, 0);
 
-    drawstring(pos + step * 16, strcat("shells:", ftos(getstatf(STAT_SHELLS))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 17, strcat("spikes:", ftos(getstatf(STAT_NAILS))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 18, strcat("grenades:", ftos(getstatf(STAT_ROCKETS))), '8 8', '1 1 1', 1, 0);
-    drawstring(pos + step * 19, strcat("cells:", ftos(getstatf(STAT_CELLS))), '8 8', '1 1 1', 1, 0);    
+    drawstring(pos + step * shift_step_index(1), strcat("shells:", ftos(getstatf(STAT_SHELLS))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("spikes:", ftos(getstatf(STAT_NAILS))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("grenades:", ftos(getstatf(STAT_ROCKETS))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("cells:", ftos(getstatf(STAT_CELLS))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);    
 
-    drawstring(pos + step * 21, "Weapons", '8 8', '1 0.9 0.5', 1, 0);
+    drawstring(pos + step * shift_step_index(2), "Weapons", STATS_FONT_SIZE, STATS_FONT_HEADER_COLOR, 1, 0);
 
     float i = 0;
-    float j = 21;
+    float j = step_index;
     vector active_wep_color;
 
     for (i = 0; i < 24;i++)
@@ -106,8 +120,8 @@ void(float w, float h) DrawStats =
         if (getstatf(STAT_WEAPONS) & (1<<i))
         {
             j = j + 1;
-            active_wep_color = (1<<i) == getstatf(STAT_ACTIVEWEAPON) ? [0.6,1,0.6] : [1,1,1];
-            drawstring(pos + step * j, cl_weapon_list[i+1], '8 8', active_wep_color, 1, 0);       
+            active_wep_color = (1<<i) == getstatf(STAT_ACTIVEWEAPON) ? '0.6 1 0.6' : '1 1 1';
+            drawstring(pos + step * j, cl_weapon_list[i+1], STATS_FONT_SIZE, active_wep_color, 1, 0);
         }
     }
 
