@@ -158,6 +158,55 @@ void() CheckWeaponReload =
 	if (self.weapon == W_AXE)
 	{
 		self.axe_reload_time = base_axe_reload_time;
+
+		// melee xp process weapon reload
+
+		xp_update_param (
+			&self.axe_reload_time,
+			base_melee_xp_axe_reload_time_min,
+			base_melee_xp_axe_reload_time_max,
+			self.melee_xp
+		);
+
+		// agility process weapon reload
+
+		xp_update_param (
+			&self.axe_reload_time,
+			base_agility_xp_axe_reload_time_min,
+			base_agility_xp_axe_reload_time_max,
+			self.agility_xp
+		);
+
+		// agility process runspeed with axe
+
+		xp_update_param (
+			&self.maxspeed,
+			base_agility_xp_axe_runspeed_min,
+			base_agility_xp_axe_runspeed_max,
+			self.agility_xp
+		);
+
+		// melee xp process runspeed with axe
+
+		xp_update_param (
+			&self.maxspeed,
+			base_melee_xp_axe_runspeed_min,
+			base_melee_xp_axe_runspeed_max,
+			self.melee_xp
+		);
+
+		frac_update_param (
+			&self.axe_reload_time,
+			base_armortype_axe_reload_time_min,
+			base_armortype_axe_reload_time_max,
+			self.armortype
+		);
+	}
+	else if (self.weapon == W_SHOTGUN)
+	{
+		self.sg_reload_time = base_shotgun_reload_time;
+
+		// here would be updating 
 	}
 
 }

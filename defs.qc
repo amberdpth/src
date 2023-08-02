@@ -753,16 +753,7 @@ enumflags
 .float multidamage_flag;
 .float multidamage;
 
-.float reload_time;
-.float axe_reload_time;
-.float sg_reload_time;
-.float ssg_reload_time;
-.float tsg_reload_time;
-.float ng_reload_time;
-.float sng_reload_time;
-.float gl_reload_time;
-.float rl_reload_time;
-.float lg_reload_time;
+
 
 
 float lerp(float a, float b, float f)

@@ -39,13 +39,27 @@ float base_agility_xp_runspeed_min = -31;
 float base_agility_xp_runspeed_max = 50;
 float base_agility_xp_jumpforce_min = -40;
 float base_agility_xp_jumpforce_max = 55;
+float base_agility_xp_axe_reload_time_min = 0.03;
+float base_agility_xp_axe_reload_time_max = - 0.08;
 
-float base_melee_xp_weapon_axe_reload_time = 360;
+float base_melee_xp_axe_reload_time_min = 0.12;
+float base_melee_xp_axe_reload_time_max = - 0.14;
 float base_agility_xp_weapon_shotgun_reload_time = 310;
 
+// player's weapon reload time 
 
-// health penalty
+.float reload_time; // current
+.float axe_reload_time;
+.float sg_reload_time;
+.float ssg_reload_time;
+.float tsg_reload_time;
+.float ng_reload_time;
+.float sng_reload_time;
+.float gl_reload_time;
+.float rl_reload_time;
+.float lg_reload_time;
 
+// default weapon reload time
 
 float base_axe_reload_time = 0.500;
 float base_shotgun_reload_time = 0.650;
@@ -55,6 +69,27 @@ float base_nailgun_reload_time = 0.125;
 float base_super_nailgun_reload_time = 0.139;
 float base_grenade_launcher_reload_time = 0.690;
 float base_rocket_launcher_reload_time = 0.740;
+
+// weapon and runspeed with xp
+
+float base_agility_xp_axe_runspeed_min = -10;
+float base_agility_xp_axe_runspeed_max = 30;
+float base_melee_xp_axe_runspeed_min = -5;
+float base_melee_xp_axe_runspeed_max = 25;
+float base_agility_xp_shotgun_runspeed_min = -15;
+float base_agility_xp_shotgun_runspeed_max = 25;
+float base_agility_xp_super_shotgun_runspeed_min = -20;
+float base_agility_xp_super_shotgun_runspeed_max = 21;
+float base_agility_xp_triple_shotgun_runspeed_min = -27;
+float base_agility_xp_triple_shotgun_runspeed_max = 18;
+float base_agility_xp_nailgun_runspeed_min = -18;
+float base_agility_xp_nailgun_runspeed_max = 4;
+float base_agility_xp_super_nailgun_runspeed_min = -21;
+float base_agility_xp_super_nailgun_runspeed_max = 2;
+float base_agility_xp_grenade_launcher_runspeed_min = -20;
+float base_agility_xp_grenade_launcher_runspeed_max = 8;
+float base_agility_xp_rocket_launcher_runspeed_min = -18;
+float base_agility_xp_rocket_launcher_runspeed_max = 10;
 
 // armor constants
 
@@ -100,6 +135,8 @@ float base_classic_searching_xp_max = 15;
 
 float base_armortype_jumpforce_min = 0;
 float base_armortype_jumpforce_max = -15;
+float base_armortype_axe_reload_time_min = 0;
+float base_armortype_axe_reload_time_max = 0.062;
 
 // accuracy and spread
 
