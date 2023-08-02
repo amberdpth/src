@@ -88,13 +88,12 @@ void(float w, float h) DrawStats =
     
     drawstring(pos, "Skills", STATS_FONT_SIZE, STATS_FONT_HEADER_COLOR, 1, 0);
 
-    drawstring(pos + step * init_step_index(), strcat("armor wearing: ", ftos(floor(getstatf(STAT_ARMOR_WEARING_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("axe fight:",ftos(floor(getstatf(STAT_AXE_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("shotguns: ", ftos(floor(getstatf(STAT_SHOTGUN_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("spikes: ", ftos(floor(getstatf(STAT_SPIKES_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("explosives:", ftos(floor(getstatf(STAT_EXPLOSIVES_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("searching: ", ftos(floor(getstatf(STAT_SEARCHING_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
-    drawstring(pos + step * shift_step_index(1), strcat("agility: ", ftos(floor(getstatf(STAT_AGILITY_LEVEL)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * init_step_index(), strcat("armor wearing: ", ftos(floor(getstatf(STAT_ARMOR_WEARING_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("melee fight:",ftos(floor(getstatf(STAT_MELEE_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("accuracy: ", ftos(floor(getstatf(STAT_ACCURACY_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("explosives:", ftos(floor(getstatf(STAT_EXPLOSIVES_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("searching: ", ftos(floor(getstatf(STAT_SEARCHING_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
+    drawstring(pos + step * shift_step_index(1), strcat("agility: ", ftos(floor(getstatf(STAT_AGILITY_XP)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
 
     drawstring(pos + step * shift_step_index(2), strcat("health:", ftos(floor(getstatf(STAT_HEALTH)))), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);
     drawstring(pos + step * shift_step_index(1), strcat("armor:", get_armor_name(), ":" ,get_armor_level()), STATS_FONT_SIZE, STATS_FONT_COLOR, 1, 0);

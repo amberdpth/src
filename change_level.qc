@@ -38,18 +38,6 @@ string maplist[] =
 	"sodahalls.bsp",
 	"suzy1024.bsp",
 	"thuby01.bsp",
-	"unused_bmfbr.bsp",
-	"unused_burnham.bsp",
-	"unused_cunnah.bsp",
-	"unused_doompope.bsp",
-	"unused_greenwood.bsp",
-	"unused_konig.bsp",
-	"unused_mars.bsp",
-	"unused_mh.bsp",
-	"unused_mihu.bsp",
-	"unused_rhoq.bsp",
-	"unused_skorly.bsp",
-	"unused_zigi.bsp",
 };
 
 entity() FindIntermission =

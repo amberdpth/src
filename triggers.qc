@@ -494,7 +494,7 @@ trigger_setskill
 ==============================================================================
 */
 
-void() trigger_skill_touch =
+void() trigger_xp_touch =
 {
 	if (other.classname != "player")
 		return;
@@ -509,7 +509,7 @@ Only used on start map.
 void() trigger_setskill =
 {
 	InitTrigger ();
-	self.touch = trigger_skill_touch;
+	self.touch = trigger_xp_touch;
 };
 
 

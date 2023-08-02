@@ -1,13 +1,12 @@
 enum 
 {
 	// skills
-	STAT_SHOTGUN_LEVEL = 32,
-	STAT_SPIKES_LEVEL,
-	STAT_AXE_LEVEL,
-	STAT_EXPLOSIVES_LEVEL,
-	STAT_ARMOR_WEARING_LEVEL,
-	STAT_SEARCHING_LEVEL,
-	STAT_AGILITY_LEVEL,
+	STAT_MELEE_XP = 32,
+	STAT_ACCURACY_XP,
+	STAT_EXPLOSIVES_XP,
+	STAT_ARMOR_WEARING_XP,
+	STAT_SEARCHING_XP,
+	STAT_AGILITY_XP,
 	// items 
 	STAT_ARMORTYPE,
 	STAT_ARMORFLAG,
@@ -24,13 +23,12 @@ enum
 
 void() init_clientstats =
 {
-	clientstat(STAT_AXE_LEVEL,EV_FLOAT, axe_skill);
-	clientstat(STAT_SHOTGUN_LEVEL,EV_FLOAT, shotgun_skill);
-	clientstat(STAT_SPIKES_LEVEL,EV_FLOAT, spike_skill);
-	clientstat(STAT_EXPLOSIVES_LEVEL,EV_FLOAT, explosive_skill);
-	clientstat(STAT_ARMOR_WEARING_LEVEL, EV_FLOAT, armor_wearing_skill);
-	clientstat(STAT_SEARCHING_LEVEL, EV_FLOAT, searching_skill);
-	clientstat(STAT_AGILITY_LEVEL, EV_FLOAT, agility_skill);
+	clientstat(STAT_MELEE_XP,EV_FLOAT, melee_xp);
+	clientstat(STAT_ACCURACY_XP,EV_FLOAT, accuracy_xp);
+	clientstat(STAT_EXPLOSIVES_XP,EV_FLOAT, explosive_xp);
+	clientstat(STAT_ARMOR_WEARING_XP, EV_FLOAT, armor_wearing_xp);
+	clientstat(STAT_SEARCHING_XP, EV_FLOAT, searching_xp);
+	clientstat(STAT_AGILITY_XP, EV_FLOAT, agility_xp);
 
 	clientstat(STAT_ARMOR_FLAG,EV_FLOAT,armor_flag);
 	clientstat(STAT_ARMOR_LEVEL,EV_FLOAT,armor_level);

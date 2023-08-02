@@ -99,7 +99,7 @@ void() W_Attack =
             sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
             r = random();
 
-            self.reload_time = self.ax_reload_time;
+            self.reload_time = self.axe_reload_time;
 
             if (r < 0.25)
                 player_axe1 ();
@@ -276,46 +276,6 @@ void() CycleWeaponReverseCommand =
 	}
 };
 
-void() UseShards =
-{
-	string message;
-
-	if (self.shards <= 0)
-	{
-		sprint(self, "you dont have shards.\n");
-		return;
-	}
-	if (!self.armor_flag)
-	{
-		sprint(self, "you dont have armor\n");
-		return;
-	}
-
-	float val = 0;
-	
-	if (self.shards <= 1000)
-		val = 100;
-	if (self.shards <= 100)
-		val = 10;
-	if (self.shards <= 10)
-		val = 1;
-	
-
-
-
-	self.armorvalue = self.armorvalue + val;
-	self.shards = self.shards - val;
-	message = strcat( sprintf("%d/%d", self.armorvalue, self.max_armorvalue), "upgraded armor with shard.");
-	message = strcat( message, ftos(ceil(self.armortype * 100)), "% protection ");
-	message = strcat( message, sprintf("%d shards left.", self.shards));
-	message = strcat( message, "\n");
-
-	skill_up( &self.base_armor_wearing_skill, RATE_ARMOR_SKILL, 0.7);
-
-	sprint(self,message);
-	stuffcmd(self,"bf\n");
-}
-
 void() ImpulseCommands =
 {
 	if (self.impulse >= 1 && self.impulse <= 9)
@@ -325,8 +285,6 @@ void() ImpulseCommands =
 		CycleWeaponCommand ();
 	if (self.impulse == 12)
 		CycleWeaponReverseCommand ();
-	if (self.impulse == 13)
-		UseShards();
 
 	self.impulse = 0;
 };
@@ -388,7 +346,7 @@ void(entity body,float fnd_flags, string dead_body_name) find_item =
 	{
 		if ( fnd_flags & (1<<i))
 		{
-			value = rint ( random ( lerp (min[i], max[i], self.searching_skill / 100 ) ) );
+			value = rint ( random ( lerp (min[i], max[i], self.searching_xp / 100 ) ) );
 			if (value)
 			{
 				*consumables[i] = *consumables[i] + value;
@@ -410,7 +368,7 @@ void() SearchingDeadBodies =
 {
 	entity body = findradius(self.origin, 64);
 
-	float itms = rint(random(lerp(1, 20, self.searching_skill / 100)));
+	float itms = rint(random(lerp(1, 20, self.searching_xp / 100)));
 	float i = 0;
 
 

@@ -41,7 +41,26 @@ void() PlayerJump =
 	self.button2 = 0;
 	// player jumping sound
 	sound (self, CHAN_BODY, "player/plyrjmp8.wav", 1, ATTN_NORM);
-	self.velocity_z = self.velocity_z + 270;
+
+	self.jump_force = base_jump_force;
+
+	xp_update_param (
+		&self.jump_force,
+		base_agility_xp_jumpforce_min,
+		base_agility_xp_jumpforce_max,
+		self.agility_xp
+	);
+
+	frac_update_param (
+		&self.jump_force,
+		base_armortype_jumpforce_min,
+		base_armortype_jumpforce_max,
+		self.armortype
+	);
+
+	self.velocity_z = self.velocity_z + self.jump_force;
+
+	xp_up( &self.raw_agility_xp, RATE_AGILITY_XP, 1.0);
 };
 
 void() WaterMove =

@@ -67,11 +67,11 @@ void () DropHook =
 	chainvec = self.origin - (self.owner.origin + '0 0 16');
 	chainlen = vlen (chainvec);
 
-	float ownvlen = vlen (self.owner.velocity);
+	float hook_speed = lerp(0, 360, skill_fraction(self.owner.agility_xp));
 
-	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * 333, 0.3);
-	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * 333, 0.3);
-	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * 1333, 0.3);
+	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * hook_speed, 0.3);
+	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * hook_speed, 0.3);
+	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * hook_speed * 4, 0.3);
 
 	// removes hook and chain
 	linkptr = self;
@@ -194,11 +194,11 @@ void () HookBehavior =
     chainvec = self.origin - (self.owner.origin + '0 0 16');
 	chainlen = vlen (chainvec);
 
-	float ownvlen = vlen (self.owner.velocity);
+	float hook_speed = lerp(650, 900, skill_fraction(self.owner.agility_xp));
 
-	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * 900, 0.1);
-	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * 900, 0.1);
-	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * 600, 0.1);
+	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * hook_speed, 0.1);
+	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * hook_speed, 0.1);
+	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * hook_speed * 0.66, 0.1);
 
 	//prevents sticking on the ground caused by built in friction routines
 	if (self.owner.velocity_z > (cvar("sv_gravity") / 20))

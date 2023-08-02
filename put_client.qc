@@ -115,22 +115,19 @@ void() SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype;
+	parm10 = self.shards;
+	parm11 = self.vials;
 	
-	parm20 = self.base_axe_skill;
-	parm21 = self.base_shotgun_skill;
-	parm22 = self.base_spike_skill;
-	parm23 = self.base_explosive_skill;
-
-	parm24 = self.base_armor_wearing_skill;
-
-	parm28 = self.base_searching_skill;
-	parm29 = self.base_agility_skill;
+	parm20 = self.raw_melee_xp;
+	parm21 = self.raw_accuracy_xp;
+	parm22 = self.raw_explosive_xp;
+	parm23 = self.raw_armor_wearing_xp;
+	parm24 = self.raw_searching_xp;
+	parm25 = self.raw_agility_xp;
 
 	parm40 = self.armor_flag;
 	parm41 = self.armor_level;
 
-	parm10 = self.shards;
-	parm11 = self.vials;
 
 };
 
@@ -156,27 +153,20 @@ void() DecodeLevelParms =
 	self.shards = parm10;
 	self.vials = parm11;
 	
-	self.base_axe_skill = parm20;
-	self.base_shotgun_skill = parm21;
-	self.base_spike_skill = parm22;
-	self.base_explosive_skill = parm23;
-
-	self.base_armor_wearing_skill = parm24;
-
-	self.base_searching_skill = parm28;
-	self.base_agility_skill = parm29;
-
+	self.raw_melee_xp = parm20;
+	self.raw_accuracy_xp = parm21;
+	self.raw_explosive_xp = parm22;
+	self.raw_armor_wearing_xp = parm23;
+	self.raw_searching_xp = parm24;
+	self.raw_agility_xp = parm25;
 
 	self.armor_flag = parm40;
 	self.armor_level = parm41;
-
-
-
 };
 
 void() PutClientInServer =
 {
-	local	entity spot;
+	entity spot;
 
 	DecodeLevelParms ();
 

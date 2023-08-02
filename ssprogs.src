@@ -4,6 +4,7 @@
 
 fteextensions.qc
 defs.qc
+defs_progress.qc
 subs.qc
 skills.qc
 fight.qc

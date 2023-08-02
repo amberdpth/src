@@ -112,10 +112,10 @@ void(entity targ, entity attacker) Killed =
 
 void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 {
-	local	vector	dir;
-	local	entity	oldself;
-	local	float	save;
-	local	float	take;
+	vector	dir;
+	entity	oldself;
+	float	save;
+	float	take;
 
 	if (!targ.takedamage)
 		return;
@@ -126,10 +126,26 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (attacker.super_damage_finished > time)
 		damage = damage * 4;
 
-	save = ceil(targ.armortype*damage);
+	// armors
 
-	targ.armorvalue = (targ.armorvalue ? targ.armorvalue - save : 0.0);
+	save = ceil(targ.armortype*damage);
+	targ.armorvalue = targ.armorvalue - save;
 	take = ceil(damage-save);
+
+	if (targ.armorvalue <= 0)
+	{
+		take = take + (-targ.armorvalue);
+		if (targ.armor_flag)
+		{
+			targ.armor_flag = 0;
+			targ.armor_level = 0;
+			targ.armortype = 0;
+			targ.armorvalue = 0;
+			targ.max_armorvalue = 0;
+			sprint(targ, " your armor has been destroyed \n");
+		}
+	}
+	
 
 	if (targ.flags & FL_CLIENT)
 	{
@@ -141,7 +157,10 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		self = targ;
 
 		if (self.armor_flag)
-			skill_up( &self.base_armor_wearing_skill, RATE_ARMOR_SKILL, self.armortype);
+			xp_up ( 
+				&self.raw_armor_wearing_xp, 
+				RATE_ARMOR_XP, 
+				self.armortype);
 
 		self = oldself;
 	}
@@ -244,7 +263,7 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						points = points * 1;
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_skill)) : 0.14);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_xp)) : 0.14);
 						points = points * passing_damage;
 					}
 						
@@ -255,7 +274,10 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 					if (head.flags & FL_CLIENT)
 						skill_reciever = head;
 					if (skill_reciever.flags & FL_CLIENT)
-						skill_up (&skill_reciever.explosive_skill, RATE_EXPLOSIVE, (head == attacker ? 0.25 : 1.0 ) );
+						xp_up (
+							&skill_reciever.explosive_xp,
+							RATE_EXPLOSIVE_XP,
+							(head == attacker ? 0.25 : 1.0 ));
 				}
 			}
 		}

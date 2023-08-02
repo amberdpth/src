@@ -754,7 +754,7 @@ enumflags
 .float multidamage;
 
 .float reload_time;
-.float ax_reload_time;
+.float axe_reload_time;
 .float sg_reload_time;
 .float ssg_reload_time;
 .float tsg_reload_time;
@@ -764,7 +764,6 @@ enumflags
 .float rl_reload_time;
 .float lg_reload_time;
 
-.float explosives_protection;
 
 float lerp(float a, float b, float f)
 {
@@ -789,11 +788,7 @@ float lerp(float a, float b, float f)
 
 // JACKET
 
-#define JACKET_ARMOR_FLAG 1
-#define COMBAT_ARMOR_FLAG 2
-#define BODY_ARMOR_FLAG 3
-#define CLASSIC_ARMOR_FLAG 4
-
-float max_armorvalues[] = { 0, 50, 100, 150, 200 };
-float extra_armorvalues[] = { 0, 5, 7, 9, 15};
-float armortypes[] = { 0, 0.09, 0.12, 0.15, 0.18 };
+#define ARMOR_FLAG_JACKET 1
+#define ARMOR_FLAG_COMBAT 2
+#define ARMOR_FLAG_BODY 3
+#define ARMOR_FLAG_CLASSIC 4

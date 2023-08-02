@@ -1,89 +1,167 @@
-.float base_speed;
-
 void() InitPlayerParams =
 {
-	self.explosives_protection = 0;
-	self.base_speed = 320;
-
-	//self.maxspeed = (self.health < 100 ? lerp(self.maxspeed * 0.88, self.maxspeed, self.health / 100) : self.maxspeed);
+	
 }
 
 void() CheckSKills =
 {
-	self.armor_wearing_skill = self.base_armor_wearing_skill;
-
-	self.axe_skill = self.base_axe_skill;
-	self.shotgun_skill = self.base_shotgun_skill;
-	self.spike_skill = self.base_spike_skill;
-	self.explosive_skill = self.base_explosive_skill;
-
-	self.searching_skill = self.base_searching_skill;
-	self.agility_skill = self.base_agility_skill;
+	self.armor_wearing_xp = self.raw_armor_wearing_xp;
+	self.melee_xp = self.raw_melee_xp;
+	self.accuracy_xp = self.raw_accuracy_xp;
+	self.explosive_xp = self.raw_explosive_xp;
+	self.searching_xp = self.raw_searching_xp;
+	self.agility_xp = self.raw_agility_xp;
 }
-
-
 
 void() CheckArmors =
 {
+	float multiplier_armor_level = self.armor_level + 1;
+
 	if (!self.armor_flag)
 		return;
 
 	switch(self.armor_flag)
 	{
-		case JACKET_ARMOR_FLAG:
-			update_skill ( &self.axe_skill, 5, 30, self.armor_wearing_skill );
-			update_skill ( &self.agility_skill, 10, 80, self.armor_wearing_skill );
-			update_skill ( &self.shotgun_skill, 1, 65, self.armor_wearing_skill );
+		case ARMOR_FLAG_JACKET:
+			self.max_armorvalue = base_jacket_max_value * multiplier_armor_level;
+			self.armortype = base_jacket_armortype * multiplier_armor_level;
+			xp_update_xp ( 
+				&self.melee_xp, 
+				base_jacket_melee_xp_min, 
+				base_jacket_melee_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.agility_xp, 
+				base_jacket_agility_xp_min, 
+				base_jacket_agility_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.accuracy_xp, 
+				base_jacket_accuracy_xp_min, 
+				base_jacket_accuracy_xp_max, 
+				self.armor_wearing_xp 
+			);
 			break;
-		case COMBAT_ARMOR_FLAG:
-			update_skill ( &self.axe_skill, 1, 25, self.armor_wearing_skill );
-			update_skill ( &self.agility_skill, 5, 45, self.armor_wearing_skill );
-			update_skill ( &self.explosive_skill, 10, 50, self.armor_wearing_skill );
-			update_skill ( &self.spike_skill, 25, 60, self.armor_wearing_skill );
+		case ARMOR_FLAG_COMBAT:
+			self.max_armorvalue = base_combat_max_value * multiplier_armor_level;
+			self.armortype = base_combat_armortype * multiplier_armor_level;
+			xp_update_xp ( 
+				&self.melee_xp, 
+				base_combat_melee_xp_min, 
+				base_combat_melee_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.agility_xp, 
+				base_combat_agility_xp_min, 
+				base_combat_agility_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.explosive_xp, 
+				base_combat_explosive_xp_min, 
+				base_combat_explosive_xp_max, 
+				self.armor_wearing_xp 
+			);
 			break;
-		case BODY_ARMOR_FLAG:
-			update_skill ( &self.axe_skill, 35, 90, self.armor_wearing_skill );
-			update_skill ( &self.shotgun_skill, 10, 25, self.armor_wearing_skill );
-			update_skill ( &self.agility_skill, -25, 0, self.armor_wearing_skill );
-			update_skill ( &self.explosive_skill, 40, 100, self.armor_wearing_skill );
+		case ARMOR_FLAG_BODY:
+			self.max_armorvalue = base_body_max_value * multiplier_armor_level;
+			self.armortype = base_body_armortype * multiplier_armor_level;
+			xp_update_xp ( 
+				&self.melee_xp, 
+				base_body_melee_xp_min, 
+				base_body_melee_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.accuracy_xp, 
+				base_body_accuracy_xp_min, 
+				base_body_accuracy_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.explosive_xp, 
+				base_body_explosive_xp_min, 
+				base_body_explosive_xp_max, 
+				self.armor_wearing_xp 
+			);
 			break;
-		case CLASSIC_ARMOR_FLAG:
-			update_skill ( &self.axe_skill, 60, 100, self.armor_wearing_skill );
-			update_skill ( &self.shotgun_skill, 35, 45, self.armor_wearing_skill );
-			update_skill ( &self.agility_skill, 0, 15, self.armor_wearing_skill );
-			update_skill ( &self.explosive_skill, 0, 100, self.armor_wearing_skill );
-			update_skill ( &self.searching_skill, 0, 77, self.armor_wearing_skill );
-			update_skill ( &self.spike_skill, 40, 80, self.armor_wearing_skill );
+		case ARMOR_FLAG_CLASSIC:
+			self.max_armorvalue = base_classic_max_value * multiplier_armor_level;
+			self.armortype = base_classic_armortype * multiplier_armor_level;
+			xp_update_xp ( 
+				&self.melee_xp, 
+				base_classic_melee_xp_min, 
+				base_classic_melee_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.accuracy_xp, 
+				base_classic_accuracy_xp_min, 
+				base_classic_accuracy_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.agility_xp, 
+				base_classic_agility_xp_min, 
+				base_classic_agility_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.explosive_xp, 
+				base_classic_explosive_xp_min, 
+				base_classic_explosive_xp_max, 
+				self.armor_wearing_xp 
+			);
+			xp_update_xp ( 
+				&self.searching_xp, 
+				base_classic_searching_xp_min, 
+				base_classic_searching_xp_max, 
+				self.armor_wearing_xp 
+			);
+			break;
 	}
-	
-	//self.shotgun_skill = bound(0, self.shotgun_skill + lerp(1, 50, skill_fraction(self.armor_wearing_skill)), 100);
-	
 
-	float maxvalue_wearing_skill_effect = lerp( 0.76, 1.15, skill_fraction(self.armor_wearing_skill));
-	float armortype_wearing_skill_effect = lerp(0.81, 1.2, skill_fraction(self.armor_wearing_skill));
+	// armortype ups by armor wearing xp
 
-	self.max_armorvalue = max_armorvalues[self.armor_flag] + extra_armorvalues[self.armor_level] * maxvalue_wearing_skill_effect;
+	xp_update_param (
+		&self.armortype, 
+		base_armor_wearing_xp_armortype_min,
+		base_armor_wearing_xp_armortype_max,
+		self.armor_wearing_xp
+	);
 
-	float value_frac = self.armorvalue / self.max_armorvalue;
-
-	self.armortype = bound(0, armortypes[self.armor_flag] * self.armor_level + lerp(0, armortypes[self.armor_flag], value_frac), 1.0);
+	cap_param( &self.armortype, 1.0 );
+	cap_param( &self.armorvalue, self.max_armorvalue );
 }
 
-
-void() CheckStats =
+void() CheckRunSpeed =
 {
-	self.ax_reload_time = lerp(0.5, 0.2, skill_fraction(self.axe_skill));
-	self.sg_reload_time = lerp(0.64, 0.42, skill_fraction(self.shotgun_skill));
-	self.ssg_reload_time = lerp(0.68, 0.41, skill_fraction(self.shotgun_skill));
-	self.tsg_reload_time = lerp(0.71, 0.44, skill_fraction(self.shotgun_skill));
-	self.ng_reload_time = lerp(0.0923, 0.048, skill_fraction(self.spike_skill));
-	self.sng_reload_time = lerp(0.111, 0.06, skill_fraction(self.spike_skill));
-	self.gl_reload_time = lerp(0.8, 0.35, skill_fraction(self.explosive_skill));
-	self.rl_reload_time = lerp(0.7,0.39, skill_fraction(self.explosive_skill));
 
+	// RUN SPEED
 
-	self.explosives_protection = lerp(0, 0.9, skill_fraction(self.explosive_skill));
+	self.maxspeed = base_run_speed;
+
+	xp_update_param (
+		&self.maxspeed,
+		base_agility_xp_runspeed_min,
+		base_agility_xp_runspeed_max,
+		self.agility_xp
+	);
+};
+
+void() CheckWeaponReload =
+{
+
+	if (self.weapon == W_AXE)
+	{
+		self.axe_reload_time = base_axe_reload_time;
+	}
+
 }
+
 
 void() CheckPowerups =
 {
@@ -251,8 +329,8 @@ void() PlayerPostThink =
 	InitPlayerParams();
 	CheckSKills();
 	CheckArmors();
-	CheckStats();
-		
+	CheckRunSpeed();
+	CheckWeaponReload();
 	W_WeaponFrame ();
 
 	// check to see if player landed and play landing sound
@@ -262,13 +340,14 @@ void() PlayerPostThink =
 			sound (self, CHAN_BODY, "player/h2ojump.wav", 1, ATTN_NORM);
 		else if (self.jump_flag < -650)
 		{
-			T_Damage (self, world, world, 5);
+			T_Damage (self, world, world, lerp(25, 0, skill_fraction(self.agility_xp)));
 			sound (self, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM);
 			self.deathtype = "falling";
 		}
 		else
 			sound (self, CHAN_VOICE, "player/land.wav", 1, ATTN_NORM);
 
+		xp_up( &self.raw_agility_xp, RATE_AGILITY_XP, 0.4);
 		self.jump_flag = 0;
 	}
 

@@ -80,7 +80,11 @@ void() W_FireAxe =
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
 		T_Damage (trace_ent, self, self, 20);
-		skill_up( &self.base_axe_skill, RATE_AXE, 1.0);
+
+		xp_up (
+			&self.raw_melee_xp,
+			RATE_MELEE_XP,
+			1.0);
 	}
 	else
 	{	// hit wall
@@ -229,8 +233,6 @@ TraceAttack
 ================
 */
 
-float trace_fraction_mult;
-float trace_hits;
 
 void(float damage, vector dir) TraceAttack =
 {
@@ -276,8 +278,6 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	src = self.origin + v_forward*10;
 	src_z = self.absmin_z + self.size_z * 0.7;
 
-	trace_fraction_mult = 0;
-	trace_hits = 0;
 
 	ClearMultiDamage ();
 	while (shotcount > 0)
@@ -298,9 +298,6 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	{
 		T_Damage(e, self, self, e.multidamage);
 
-		//trace_fraction_mult /= trace_hits;
-
-		skill_up( &self.base_shotgun_skill, RATE_SHOTGUN, 1.0 );
 		e.multidamage = 0;
 		e.multidamage_flag = FALSE;
 		e = findflags(e,multidamage_flag,TRUE);
@@ -316,24 +313,47 @@ void() W_FireShotgun =
 {
 	vector dir;
 	float shotcount = 7;
-	float spread_h;
+	float spread_hv; // one barrell
+	vector error_h, error_v;
 
 	if (self.currentammo < 1)
 		return;
 
-	float spread_v = spread_h = lerp(0.06, 0.033, self.shotgun_skill / 100);
+	spread_hv = lerp(
+		base_shotgun_spread_hv_min, 
+		base_shotgun_spread_hv_max, 
+		skill_fraction(self.accuracy_xp));
 
-	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
 
-	self.punchangle_x = -2;
+	error_h = v_right * random (
+		-lerp (
+			base_shotgun_error_hv_min,
+			base_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)), 
+		lerp (
+			base_shotgun_error_hv_min,
+			base_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
 
-	vector error_v = v_up * random(-lerp(0.06, 0.0012, self.shotgun_skill / 100), lerp(0.06, 0.0012, self.shotgun_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.06, 0.0012, self.shotgun_skill / 100), lerp(0.06, 0.0012, self.shotgun_skill / 100) );
+	error_v = v_up * random (
+		-lerp (
+			base_shotgun_error_hv_min,
+			base_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)), 
+		lerp (
+			base_shotgun_error_hv_min,
+			base_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
+
+
+
 	dir = v_forward + error_h + error_v;
 
-	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
 	
-	FireBullets (shotcount, dir, [spread_h, spread_v]);
+	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
+	self.punchangle_x = -2;
+	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
+	FireBullets (shotcount, dir, [spread_hv, spread_hv]);
 };
 
 
@@ -352,19 +372,43 @@ void() W_FireSuperShotgun =
 
 	vector dir;
 	float shotcount = 14;
+	float spread_h, spread_v;
+	vector error_h, error_v;
 
-	float spread_h = lerp(0.3, 0.012, self.shotgun_skill / 100);
-	float spread_v = lerp(0.1, 0.05, self.shotgun_skill / 100);
+	spread_h = lerp ( 
+		base_super_shotgun_spread_h_min,
+		base_super_shotgun_spread_h_max,
+		skill_fraction(self.accuracy_xp));
+	spread_v = lerp (
+		base_super_shotgun_spread_v_min,
+		base_super_shotgun_spread_v_max,
+		skill_fraction(self.accuracy_xp));
 
-	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+	error_h = v_right * random ( 
+		-lerp(
+			base_super_shotgun_error_hv_min,
+			base_super_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_super_shotgun_error_hv_min,
+			base_super_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
 
-	self.punchangle_x = -4;
-
+	error_v = v_up * random ( 
+		-lerp(
+			base_super_shotgun_error_hv_min,
+			base_super_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_super_shotgun_error_hv_min,
+			base_super_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
 	
-	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
+	
+	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+	self.punchangle_x = -4;
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
@@ -385,22 +429,40 @@ void() W_FireTripleShotgun =
 
 	vector dir;
 	float shotcount = 21;
+	float spread_hv;
+	vector error_h, error_v;
 
-	float spread_h;
+	spread_hv = lerp ( 
+		base_triple_shotgun_spread_hv_min,
+		base_triple_shotgun_error_hv_max,
+		skill_fraction(self.accuracy_xp));
 
-	float spread_v = spread_h = lerp(0.3, 0.06, self.shotgun_skill / 100);
+	error_h = v_right * random (
+		-lerp (
+			base_triple_shotgun_error_hv_min,
+			base_triple_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)), 
+		lerp (
+			base_triple_shotgun_error_hv_min,
+			base_triple_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
 
-	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+	error_v = v_up * random (
+		-lerp (
+			base_triple_shotgun_error_hv_min,
+			base_triple_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)), 
+		lerp (
+			base_triple_shotgun_error_hv_min,
+			base_triple_shotgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
 
-	self.punchangle_x = -6;
-
-	
-	vector error_v = v_up * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.08, 0.0023, self.shotgun_skill / 100), lerp(0.08, 0.0023, self.shotgun_skill / 100) );
 	dir = v_forward + error_h + error_v;
 
+	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+	self.punchangle_x = -6;
 	self.currentammo = self.ammo_shells = self.ammo_shells - 3;
-	FireBullets (shotcount, dir, [spread_h, spread_v]);
+	FireBullets (shotcount, dir, [spread_hv, spread_hv]);
 };
 
 
@@ -448,10 +510,10 @@ void() T_MissileTouch =
 	if (other.health)
 	{
 		T_Damage (other, self, self.owner, damg );
-		skill_up( &self.owner.base_explosive_skill, RATE_EXPLOSIVE, 1.5); // 1.5x exp for direct hit
+		xp_up( &self.owner.raw_explosive_xp, RATE_EXPLOSIVE_XP, 1.5); // 1.5x exp for direct hit
 	}
 
-	damg = damg + lerp(0, 40, skill_fraction(self.owner.explosive_skill)); // extra radius depending on explo skill
+	damg = damg + lerp(0, 40, skill_fraction(self.owner.explosive_xp)); // extra radius depending on explo skill
 
 	T_RadiusDamage (self, self.owner, damg, other);
 
@@ -519,8 +581,8 @@ void() W_FireRocket =
 	// set missile speed
 	makevectors (self.v_angle);
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
 	dir = v_forward + error_h + error_v;
 
 	missile.velocity = dir;
@@ -653,7 +715,7 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	float damage = 100 + lerp(0, 60, self.explosive_skill / 100);
+	float damage = 100 + lerp(0, 60, self.explosive_xp / 100);
 
 	T_RadiusDamage (self, self.owner, damage, world);
 
@@ -703,8 +765,8 @@ void() W_FireGrenade =
 	// set missile speed
 	makevectors (self.v_angle);
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_skill / 100), lerp(0.045, 0.0023, self.explosive_skill / 100) );
+	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
+	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
 	dir = v_forward + error_h + error_v;
 
 	missile.velocity = dir * 585;
@@ -762,15 +824,34 @@ void(vector org, vector dir) launch_spike =
 
 void() W_FireSuperSpikes =
 {
-	local vector dir;
+	vector dir;
+	vector error_h, error_v;
 
 	makevectors (self.v_angle);
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
+	error_h = v_right * random ( 
+		-lerp (
+			base_super_nailgun_error_hv_min,
+			base_super_nailgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_super_nailgun_error_hv_min,
+			base_super_nailgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
+
+	error_v = v_up * random ( 
+		-lerp (
+			base_super_nailgun_error_hv_min,
+			base_super_nailgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_super_nailgun_error_hv_min,
+			base_super_nailgun_error_hv_max,
+			skill_fraction(self.accuracy_xp)));
+	
 	dir = v_forward + error_h + error_v;
 	
 	launch_spike (self.origin + '0 0 16', dir);
@@ -782,15 +863,36 @@ void() W_FireSuperSpikes =
 
 void(float ox) W_FireSpikes =
 {
-	local vector dir;
+	vector dir;
+
+	vector error_h, error_v;
 
 	makevectors (self.v_angle);
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.spike_skill / 100), lerp(0.045, 0.0023, self.spike_skill / 100) );
+	error_h = v_right * random ( 
+		-lerp (
+			base_nailgun_error_h_min,
+			base_nailgun_error_h_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_nailgun_error_h_min,
+			base_nailgun_error_h_max,
+			skill_fraction(self.accuracy_xp)));
+
+	error_v = v_up * random ( 
+		-lerp (
+			base_nailgun_error_v_min,
+			base_nailgun_error_v_max,
+			skill_fraction(self.accuracy_xp)),
+		lerp (
+			base_nailgun_error_v_min,
+			base_nailgun_error_v_max,
+			skill_fraction(self.accuracy_xp)));
+
+
 	dir = v_forward + error_h + error_v;
 
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
@@ -813,15 +915,12 @@ void() spike_touch =
 		return;
 	}
 
-	float damage = floor(lerp(0, 10, self.owner.spike_skill / 100)) + 8;
+	float damage = 8;
 	// hit something that bleeds
 	if (other.takedamage)
 	{
 		spawn_touchblood (damage);
 		T_Damage (other, self, self.owner, damage);
-
-		if (self.owner.flags & FL_CLIENT)
-			skill_up( &self.owner.base_spike_skill, RATE_SPIKES, 1.0);
 	}
 	else
 	{
@@ -857,15 +956,13 @@ void() superspike_touch =
 		return;
 	}
 
-	float damage = floor(lerp(0, 10, self.owner.spike_skill / 100)) + 10;
+	float damage = 16;
 
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		
 		spawn_touchblood (damage);
 		T_Damage (other, self, self.owner, damage);
-		skill_up( &self.owner.base_spike_skill, RATE_SPIKES, 1.0);
 	}
 	else
 	{

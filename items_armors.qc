@@ -1,10 +1,10 @@
 string(entity o) get_armorname =
 {
-	if (o.armor_flag == JACKET_ARMOR_FLAG)
+	if (o.armor_flag == ARMOR_FLAG_JACKET)
 		return strcat("jacket ", ftos(o.armor_level+1), " level");
-	else if (o.armor_flag == COMBAT_ARMOR_FLAG)
+	else if (o.armor_flag == ARMOR_FLAG_COMBAT)
 		return strcat("combat armor ", ftos(o.armor_level+1), " level");
-	else if (o.armor_flag == BODY_ARMOR_FLAG)
+	else if (o.armor_flag == ARMOR_FLAG_BODY)
 		return strcat("body armor ", ftos(o.armor_level+1), " level");
 	else
 		return strcat("classic armor ", ftos(o.armor_level+1), " level");
@@ -32,7 +32,7 @@ void() armor_touch =
 
 	if (other.armor_flag) // one of mults depending on over all armor skills
 	{
-		float shards_multiplier = skill_fraction(other.armor_wearing_skill);
+		float shards_multiplier = skill_fraction(other.armor_wearing_xp);
 	
 		float received_shards = ceil(other.armorvalue * (shards_multiplier + (1 - other.armortype)) * 0.5); // protection pass + skill
 		other.shards = other.shards + received_shards;
@@ -43,7 +43,7 @@ void() armor_touch =
 
 	other.armor_flag = self.armor_flag;
     other.armor_level = self.armor_level;
-
+	other.armorvalue = 999;
 	self.solid = SOLID_NOT;
 	self.model = string_null;
 
@@ -78,13 +78,13 @@ void() item_armor_jacket =
 		case "item_armor1":
 			setmodel(self, "progs/armor_jacket.mdl");
 			self.skin = r;
-			self.armor_flag = JACKET_ARMOR_FLAG;
+			self.armor_flag = ARMOR_FLAG_JACKET;
 			self.armor_level = levels[r];
 			break;
 		case "item_armor2":
 			setmodel(self, "progs/armor_combat.mdl");
 			self.skin = r;
-			self.armor_flag = COMBAT_ARMOR_FLAG;
+			self.armor_flag = ARMOR_FLAG_COMBAT;
 			self.armor_level = levels[r];
 			break;
 		case "item_armorInv":
@@ -93,13 +93,13 @@ void() item_armor_jacket =
 			case 0: case 1: case 2:
 				setmodel(self, "progs/armor_body.mdl");
 				self.skin = r;
-				self.armor_flag = BODY_ARMOR_FLAG;
+				self.armor_flag = ARMOR_FLAG_BODY;
 				self.armor_level = levels[r];
 				break;
 			case 3:
 				setmodel(self, "progs/armor_default.mdl");
 				self.skin = r;
-				self.armor_flag = CLASSIC_ARMOR_FLAG;
+				self.armor_flag = ARMOR_FLAG_CLASSIC;
 				self.armor_level = levels[r];
 				break;
 
@@ -159,8 +159,10 @@ void() armorshard_touch =
 		return;
 	if (other.classname != "player")
 		return;
+	if (other.armorvalue > other.max_armorvalue)
+		return;
 
-	other.shards = other.shards + 1;
+	other.armorvalue = other.armorvalue > other.max_armorvalue ? other.max_armorvalue : (other.armorvalue + floor(lerp(1,10,skill_fraction(other.armorvalue))));
 	remove(self);
 }
 
