@@ -67,9 +67,27 @@ void() W_FireAxe =
 	local vector source;
 	local vector org;
 
+	float damage;
+
+	float hit_dist = base_axe_hit_dist;
+
+	xp_update_param (
+		&hit_dist,
+		base_melee_xp_axe_hitdist_min,
+		base_melee_xp_axe_hitdist_max,
+		self.melee_xp
+	);
+
+	frac_update_param (
+		&hit_dist,
+		base_armortype_hitdist_min,
+		base_armortype_hitdist_max,
+		self.armortype
+	);
+
 	makevectors (self.v_angle);
 	source = self.origin + '0 0 16';
-	traceline (source, source + v_forward*64, FALSE, self);
+	traceline (source, source + v_forward*hit_dist, FALSE, self);
 	if (trace_fraction == 1.0)
 		return;
 
@@ -77,14 +95,47 @@ void() W_FireAxe =
 
 	if (trace_ent.takedamage)
 	{
-		trace_ent.axhitme = 1;
-		SpawnBlood (org, '0 0 0', 20);
-		T_Damage (trace_ent, self, self, 20);
+		damage = base_axe_damage;
 
-		xp_up (
-			&self.raw_melee_xp,
-			RATE_MELEE_XP,
-			1.0);
+		xp_update_param
+		(
+			&damage,
+			base_agility_xp_axe_damage_min,
+			base_agility_xp_axe_damage_max,
+			self.agility_xp
+		);
+
+		xp_update_param (
+			&damage,
+			base_melee_xp_axe_damage_min,
+			base_melee_xp_axe_damage_max,
+			self.melee_xp
+		);
+/* 
+сделать тоже самое для шамблера только использовать agility_xp,
+для hellknight использовать проворность : сила : холодное оружие 2:3:1
+
+*/
+		if (trace_ent.classname == "monster_knight")
+		{
+			if (trace_ent.in_charge)
+			{
+				xp_update_param (
+					&damage,
+					base_melee_xp_axe_damage_charging_knight_min,
+					base_melee_xp_axe_damage_charging_knight_max,
+					self.melee_xp 
+				);
+
+				dprint(ftos(damage),"dmg knight got hit in charging\n");
+			}
+		}
+
+		trace_ent.axhitme = 1;
+		SpawnBlood (org, '0 0 0', damage);
+		T_Damage (trace_ent, self, self, damage);
+
+		xp_up (&self.raw_melee_xp,RATE_MELEE_XP, 1.0);
 	}
 	else
 	{	// hit wall

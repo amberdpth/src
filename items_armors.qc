@@ -43,7 +43,9 @@ void() armor_touch =
 
 	other.armor_flag = self.armor_flag;
     other.armor_level = self.armor_level;
-	other.armorvalue = 999;
+	
+	other.got_armor = TRUE;
+	
 	self.solid = SOLID_NOT;
 	self.model = string_null;
 
@@ -153,49 +155,3 @@ void() item_armorInv =
     */
 };
 
-void() armorshard_touch =
-{
-	if (other.health <= 0)
-		return;
-	if (other.classname != "player")
-		return;
-	if (other.armorvalue > other.max_armorvalue)
-		return;
-
-	other.armorvalue = other.armorvalue > other.max_armorvalue ? other.max_armorvalue : (other.armorvalue + floor(lerp(1,10,skill_fraction(other.armorvalue))));
-	remove(self);
-}
-
-void() ArmorShard =
-{
-	entity item;
-
-	item = spawn();
-
-	item.origin = self.origin - '0 0 24';
-
-	item.velocity_z = 300;
-	item.velocity[0] = -100 + random(200);
-	item.velocity[1] = -100 + random(200);
-
-	item.flags = FL_ITEM;
-	item.solid = SOLID_TRIGGER;
-	item.movetype = MOVETYPE_TOSS;
-	setmodel(item, "progs/armor_shard.mdl");
-	setsize(item, '-8 -8 -8', '8 8 8');
-	item.touch = armorshard_touch;
-
-	item.nextthink = time + 60;
-	item.think = SUB_Remove;
-}
-
-void(float min,float max) drop_armorshard =
-{
-	float shards = rint(random(min,max));
-
-	while (shards)
-	{
-		ArmorShard();
-		shards--;
-	}
-}

@@ -1,4 +1,4 @@
-float base_run_speed = 320;
+float base_maxspeed = 320;
 float base_jump_force = 270;
 float base_gravity = 1.0;
 
@@ -37,14 +37,19 @@ float base_armor_wearing_xp_armortype_min = -0.07;
 float base_armor_wearing_xp_armortype_max = 0.13;
 float base_agility_xp_runspeed_min = -31;
 float base_agility_xp_runspeed_max = 50;
-float base_agility_xp_jumpforce_min = -40;
-float base_agility_xp_jumpforce_max = 55;
+float base_agility_xp_jump_force_min = -40;
+float base_agility_xp_jump_force_max = 55;
 float base_agility_xp_axe_reload_time_min = 0.03;
 float base_agility_xp_axe_reload_time_max = - 0.08;
 
 float base_melee_xp_axe_reload_time_min = 0.12;
 float base_melee_xp_axe_reload_time_max = - 0.14;
-float base_agility_xp_weapon_shotgun_reload_time = 310;
+float base_agility_xp_shotgun_reload_time_min = 0.012;
+float base_agility_xp_shotgun_reload_time_max = - 0.1;
+float base_agility_xp_super_shotgun_reload_time_min = 0.015;
+float base_agility_xp_super_shotgun_reload_time_max = - 0.08;
+float base_agility_xp_triple_shotgun_reload_time_min = 0.02;
+float base_agility_xp_triple_shotgun_reload_time_max = - 0.012;
 
 // player's weapon reload time 
 
@@ -110,6 +115,8 @@ float base_combat_agility_xp_min = 8;
 float base_combat_agility_xp_max = 45;
 float base_combat_explosive_xp_min = 15;
 float base_combat_explosive_xp_max = 38;
+float base_combat_agility_xp_to_accuracy_min = 0; // от проворности игрока зависит его меткость
+float base_combat_agility_xp_to_accuracy_max = 20;
 
 float base_body_max_value = 45;
 float base_body_armortype = 0.19;
@@ -165,6 +172,22 @@ float base_nailgun_error_v_max = 0.002;
 float base_super_nailgun_error_hv_min = 0.044;
 float base_super_nailgun_error_hv_max = 0.0045;
 
+// axe damage and hit distance
+
+float base_axe_damage = 20;
+float base_agility_xp_axe_damage_min = -4;
+float base_agility_xp_axe_damage_max = 15;
+float base_melee_xp_axe_damage_min = -5;
+float base_melee_xp_axe_damage_max = 40;
+float base_melee_xp_axe_damage_charging_knight_min = 5;
+float base_melee_xp_axe_damage_charging_knight_max = 25;
+
+float base_axe_hit_dist = 64;
+float base_melee_xp_axe_hitdist_min = -8;
+float base_melee_xp_axe_hitdist_max = 32;
+float base_armortype_hitdist_min = 16;
+float base_armortype_hitdist_max = -2; // reversed as heavy armortype is -> 1.0
+
 float(float skill_input) skill_fraction = {
     return skill_input / 100;
 }
@@ -208,3 +231,6 @@ void(float *base_xp, float rate, float multiplier) xp_up =
     if (*base_xp > 100)
         *base_xp = 100;
 }
+
+.float got_armor;
+.float in_charge;

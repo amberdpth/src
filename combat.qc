@@ -65,7 +65,6 @@ float(entity targ, entity inflictor) CanDamage =
 	return FALSE;
 };
 
-void(float min, float max) drop_armorshard;
 
 void(entity targ, entity attacker) Killed =
 {
@@ -73,8 +72,6 @@ void(entity targ, entity attacker) Killed =
 
 	oself = self;
 	self = targ;
-
-	drop_armorshard(1,3);
 
 	self.solid = SOLID_NOT;
 
@@ -263,7 +260,7 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						points = points * 1;
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_xp)) : 0.14);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_xp)) : 0.25);
 						points = points * passing_damage;
 					}
 						
@@ -275,7 +272,7 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						skill_reciever = head;
 					if (skill_reciever.flags & FL_CLIENT)
 						xp_up (
-							&skill_reciever.explosive_xp,
+							&skill_reciever.raw_explosive_xp,
 							RATE_EXPLOSIVE_XP,
 							(head == attacker ? 0.25 : 1.0 ));
 				}

@@ -176,6 +176,8 @@ void(float d) ai_charge =
 	ai_face ();
 	// done in C code...
 	movetogoal (d);
+
+	
 };
 
 void() ai_charge_side =
@@ -202,6 +204,32 @@ ai_melee
 
 =============
 */
+
+float() ai_melee_damage =
+{
+	float damg = random(); // random for non player
+
+	if (self.enemy.flags & FL_CLIENT)
+	{
+		damg = 1 - skill_fraction(self.enemy.melee_xp);
+		damg = (1 - skill_fraction(self.enemy.agility_xp)) * 2 + damg;
+		damg /= 3;
+
+		if (self.enemy.weapon == W_AXE)
+		{
+			damg = damg + 1 - skill_fraction(self.enemy.melee_xp);
+			damg /= 2;
+		}
+
+		xp_up(&self.enemy.raw_melee_xp, RATE_MELEE_XP, damg);
+
+	}
+
+	
+
+	return (damg * 0.5 + damg * 0.5 * random()) * 10;
+}
+
 void() ai_melee =
 {
 	local vector delta;
@@ -216,7 +244,7 @@ void() ai_melee =
 	if (vlen(delta) > 60)
 		return;
 
-	ldmg = (random() + random() + random()) * 3;
+	ldmg = ai_melee_damage();
 	T_Damage (self.enemy, self, self, ldmg);
 };
 
@@ -237,7 +265,7 @@ void() ai_melee_side =
 		return;
 	if (!CanDamage (self.enemy, self))
 		return;
-	ldmg = (random() + random() + random()) * 3;
+	ldmg = ai_melee_damage();
 	T_Damage (self.enemy, self, self, ldmg);
 };
 

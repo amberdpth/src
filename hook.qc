@@ -67,11 +67,15 @@ void () DropHook =
 	chainvec = self.origin - (self.owner.origin + '0 0 16');
 	chainlen = vlen (chainvec);
 
-	float hook_speed = lerp(0, 360, skill_fraction(self.owner.agility_xp));
+	float hook_speed = lerp(0, 1200, skill_fraction(self.owner.agility_xp));
 
-	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * hook_speed, 0.3);
-	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * hook_speed, 0.3);
-	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * hook_speed * 4, 0.3);
+	makevectors(self.owner.v_angle);
+
+	vector free_new_vec = ( v_forward + [ 0, 0, v_up[2] ] ) * hook_speed;
+
+	self.owner.velocity[0] = lerp(self.owner.velocity[0],free_new_vec[0], 0.3);
+	self.owner.velocity[1] = lerp(self.owner.velocity[1],free_new_vec[1], 0.3);
+	self.owner.velocity[2] = lerp(self.owner.velocity[2],free_new_vec[2], 0.3);
 
 	// removes hook and chain
 	linkptr = self;
@@ -191,14 +195,20 @@ void () HookBehavior =
 	// gives hook same velocity as the entity it is stuck in
 	self.velocity = self.enemy.velocity;
 
-    chainvec = self.origin - (self.owner.origin + '0 0 16');
+    chainvec = normalize(self.origin - (self.owner.origin + '0 0 16'));
 	chainlen = vlen (chainvec);
 
-	float hook_speed = lerp(650, 900, skill_fraction(self.owner.agility_xp));
+	float hook_speed = lerp(457, 600, skill_fraction(self.owner.agility_xp));
 
-	self.owner.velocity[0] = lerp(self.owner.velocity[0],normalize(chainvec)[0] * hook_speed, 0.1);
-	self.owner.velocity[1] = lerp(self.owner.velocity[1],normalize(chainvec)[1] * hook_speed, 0.1);
-	self.owner.velocity[2] = lerp(self.owner.velocity[2],normalize(chainvec)[2] * hook_speed * 0.66, 0.1);
+	vector chain_ang = vectoangles(chainvec);
+	makevectors(chain_ang);
+
+	vector chain_new_vec = (chainvec + [v_forward[0], v_forward[1], 0.33 * v_up[2]]) * hook_speed;
+
+	self.owner.velocity[0] = lerp(self.owner.velocity[0],chain_new_vec[0], 0.06);
+	self.owner.velocity[1] = lerp(self.owner.velocity[1],chain_new_vec[1], 0.06);
+	self.owner.velocity[2] = lerp(self.owner.velocity[2],chain_new_vec[2], 0.06);
+
 
 	//prevents sticking on the ground caused by built in friction routines
 	if (self.owner.velocity_z > (cvar("sv_gravity") / 20))

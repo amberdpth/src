@@ -1,130 +1,173 @@
-void() InitPlayerParams =
+void() CheckSKillModifers  =
 {
-	
-}
+	self.maxspeed = base_maxspeed;
+	self.jump_force = base_jump_force;
 
-void() CheckSKills =
-{
 	self.armor_wearing_xp = self.raw_armor_wearing_xp;
 	self.melee_xp = self.raw_melee_xp;
 	self.accuracy_xp = self.raw_accuracy_xp;
 	self.explosive_xp = self.raw_explosive_xp;
 	self.searching_xp = self.raw_searching_xp;
 	self.agility_xp = self.raw_agility_xp;
+
+	xp_update_param (
+		&self.maxspeed,
+		base_agility_xp_runspeed_min,
+		base_agility_xp_runspeed_max,
+		self.agility_xp
+	);
+
+	xp_update_param (
+		&self.jump_force,
+		base_agility_xp_jump_force_min,
+		base_agility_xp_jump_force_max,
+		self.agility_xp
+	);
 }
 
-void() CheckArmors =
+void() CheckArmorModifers =
 {
-	float multiplier_armor_level = self.armor_level + 1;
-
+	
 	if (!self.armor_flag)
 		return;
+
+	float multiplier_armor_level = self.armor_level + 1;
 
 	switch(self.armor_flag)
 	{
 		case ARMOR_FLAG_JACKET:
+
 			self.max_armorvalue = base_jacket_max_value * multiplier_armor_level;
 			self.armortype = base_jacket_armortype * multiplier_armor_level;
+
 			xp_update_xp ( 
 				&self.melee_xp, 
 				base_jacket_melee_xp_min, 
 				base_jacket_melee_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.agility_xp, 
 				base_jacket_agility_xp_min, 
 				base_jacket_agility_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.accuracy_xp, 
 				base_jacket_accuracy_xp_min, 
 				base_jacket_accuracy_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			break;
+
 		case ARMOR_FLAG_COMBAT:
+
 			self.max_armorvalue = base_combat_max_value * multiplier_armor_level;
 			self.armortype = base_combat_armortype * multiplier_armor_level;
+
 			xp_update_xp ( 
 				&self.melee_xp, 
 				base_combat_melee_xp_min, 
 				base_combat_melee_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.agility_xp, 
 				base_combat_agility_xp_min, 
 				base_combat_agility_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.explosive_xp, 
 				base_combat_explosive_xp_min, 
 				base_combat_explosive_xp_max, 
 				self.armor_wearing_xp 
 			);
+
+			xp_update_xp (
+				&self.accuracy_xp,
+				base_combat_agility_xp_to_accuracy_min,
+				base_combat_agility_xp_to_accuracy_max,
+				self.agility_xp
+			);
+
 			break;
+
 		case ARMOR_FLAG_BODY:
+
 			self.max_armorvalue = base_body_max_value * multiplier_armor_level;
 			self.armortype = base_body_armortype * multiplier_armor_level;
+
 			xp_update_xp ( 
 				&self.melee_xp, 
 				base_body_melee_xp_min, 
 				base_body_melee_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.accuracy_xp, 
 				base_body_accuracy_xp_min, 
 				base_body_accuracy_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.explosive_xp, 
 				base_body_explosive_xp_min, 
 				base_body_explosive_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			break;
+
 		case ARMOR_FLAG_CLASSIC:
+
 			self.max_armorvalue = base_classic_max_value * multiplier_armor_level;
 			self.armortype = base_classic_armortype * multiplier_armor_level;
+
 			xp_update_xp ( 
 				&self.melee_xp, 
 				base_classic_melee_xp_min, 
 				base_classic_melee_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.accuracy_xp, 
 				base_classic_accuracy_xp_min, 
 				base_classic_accuracy_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.agility_xp, 
 				base_classic_agility_xp_min, 
 				base_classic_agility_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.explosive_xp, 
 				base_classic_explosive_xp_min, 
 				base_classic_explosive_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			xp_update_xp ( 
 				&self.searching_xp, 
 				base_classic_searching_xp_min, 
 				base_classic_searching_xp_max, 
 				self.armor_wearing_xp 
 			);
+
 			break;
 	}
-
-	// armortype ups by armor wearing xp
 
 	xp_update_param (
 		&self.armortype, 
@@ -133,82 +176,176 @@ void() CheckArmors =
 		self.armor_wearing_xp
 	);
 
+	frac_update_param (
+		&self.jump_force,
+		base_armortype_jumpforce_min,
+		base_armortype_jumpforce_max,
+		self.armortype
+	);
+
+
+
+	if (self.got_armor)
+	{
+		self.armorvalue = self.max_armorvalue;
+		self.got_armor = FALSE;
+	}
+
 	cap_param( &self.armortype, 1.0 );
 	cap_param( &self.armorvalue, self.max_armorvalue );
 }
 
-void() CheckRunSpeed =
+void() CheckWeaponModifers =
 {
 
-	// RUN SPEED
-
-	self.maxspeed = base_run_speed;
-
-	xp_update_param (
-		&self.maxspeed,
-		base_agility_xp_runspeed_min,
-		base_agility_xp_runspeed_max,
-		self.agility_xp
-	);
-};
-
-void() CheckWeaponReload =
-{
-
-	if (self.weapon == W_AXE)
+	switch (self.weapon)
 	{
-		self.axe_reload_time = base_axe_reload_time;
+		case W_AXE:
 
-		// melee xp process weapon reload
+			self.axe_reload_time = base_axe_reload_time;
 
-		xp_update_param (
-			&self.axe_reload_time,
-			base_melee_xp_axe_reload_time_min,
-			base_melee_xp_axe_reload_time_max,
-			self.melee_xp
-		);
+			xp_update_param (
+				&self.axe_reload_time,
+				base_melee_xp_axe_reload_time_min,
+				base_melee_xp_axe_reload_time_max,
+				self.melee_xp
+			);
 
-		// agility process weapon reload
+			xp_update_param (
+				&self.axe_reload_time,
+				base_agility_xp_axe_reload_time_min,
+				base_agility_xp_axe_reload_time_max,
+				self.agility_xp
+			);
 
-		xp_update_param (
-			&self.axe_reload_time,
-			base_agility_xp_axe_reload_time_min,
-			base_agility_xp_axe_reload_time_max,
-			self.agility_xp
-		);
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_axe_runspeed_min,
+				base_agility_xp_axe_runspeed_max,
+				self.agility_xp
+			);
 
-		// agility process runspeed with axe
+			xp_update_param (
+				&self.maxspeed,
+				base_melee_xp_axe_runspeed_min,
+				base_melee_xp_axe_runspeed_max,
+				self.melee_xp
+			);
 
-		xp_update_param (
-			&self.maxspeed,
-			base_agility_xp_axe_runspeed_min,
-			base_agility_xp_axe_runspeed_max,
-			self.agility_xp
-		);
+			frac_update_param (
+				&self.axe_reload_time,
+				base_armortype_axe_reload_time_min,
+				base_armortype_axe_reload_time_max,
+				self.armortype
+			);
 
-		// melee xp process runspeed with axe
+			break;
 
-		xp_update_param (
-			&self.maxspeed,
-			base_melee_xp_axe_runspeed_min,
-			base_melee_xp_axe_runspeed_max,
-			self.melee_xp
-		);
+		case W_SHOTGUN:
 
-		frac_update_param (
-			&self.axe_reload_time,
-			base_armortype_axe_reload_time_min,
-			base_armortype_axe_reload_time_max,
-			self.armortype
-		);
+			self.sg_reload_time = base_shotgun_reload_time;
+
+			xp_update_param (
+				&self.sg_reload_time,
+				base_agility_xp_shotgun_reload_time_min,
+				base_agility_xp_shotgun_reload_time_max,
+				self.agility_xp
+			);
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_shotgun_runspeed_min,
+				base_agility_xp_shotgun_runspeed_max,
+				self.agility_xp
+			);
+
+			break;
+
+		case W_SUPER_SHOTGUN:
+
+			self.ssg_reload_time = base_super_shotgun_reload_time;
+
+			xp_update_param (
+				&self.sg_reload_time,
+				base_agility_xp_super_shotgun_reload_time_min,
+				base_agility_xp_super_shotgun_reload_time_max,
+				self.agility_xp
+			);
+			
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_super_shotgun_runspeed_min,
+				base_agility_xp_super_shotgun_runspeed_max,
+				self.agility_xp
+			);
+			break;
+
+		case W_TRIPLE_SHOTGUN:
+
+			self.tsg_reload_time = base_triple_shotgun_reload_time;
+
+			xp_update_param (
+				&self.reload_time,
+				base_agility_xp_triple_shotgun_reload_time_min,
+				base_agility_xp_triple_shotgun_reload_time_max,
+				self.agility_xp
+			);
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_triple_shotgun_runspeed_min,
+				base_agility_xp_triple_shotgun_runspeed_max,
+				self.agility_xp
+			);
+
+			break;
+
+		case W_NAILGUN:
+
+			self.ng_reload_time = base_nailgun_reload_time;
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_nailgun_runspeed_min,
+				base_agility_xp_nailgun_runspeed_max,
+				self.agility_xp
+			);
+			break;
+
+		case W_SUPER_NAILGUN:
+
+			self.sng_reload_time = base_super_nailgun_reload_time;
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_super_nailgun_runspeed_min,
+				base_agility_xp_super_nailgun_runspeed_max,
+				self.agility_xp
+			);
+			break;
+
+		case W_GRENADE_LAUNCHER:
+
+			self.gl_reload_time = base_grenade_launcher_reload_time;
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_grenade_launcher_runspeed_min,
+				base_agility_xp_grenade_launcher_runspeed_max,
+				self.agility_xp
+			);
+
+		case W_ROCKET_LAUNCHER:
+			
+			self.rl_reload_time = base_rocket_launcher_reload_time;
+
+			xp_update_param (
+				&self.maxspeed,
+				base_agility_xp_rocket_launcher_runspeed_min,
+				base_agility_xp_rocket_launcher_runspeed_max,
+				self.agility_xp
+			);
 	}
-	else if (self.weapon == W_SHOTGUN)
-	{
-		self.sg_reload_time = base_shotgun_reload_time;
-
-		// here would be updating 
-	}
-
 }
 
 
@@ -375,11 +512,9 @@ void() PlayerPostThink =
 	if (self.deadflag)
 		return;
 
-	InitPlayerParams();
-	CheckSKills();
-	CheckArmors();
-	CheckRunSpeed();
-	CheckWeaponReload();
+	CheckSKillModifers();
+	CheckArmorModifers();
+	CheckWeaponModifers();
 	W_WeaponFrame ();
 
 	// check to see if player landed and play landing sound

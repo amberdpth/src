@@ -636,7 +636,7 @@ void(vector o, vector d, float color, float count) particle = #48;// start a par
 void() ChangeYaw = #49;						// turn towards self.ideal_yaw
 											// at self.yaw_speed
 // #50 was removed
-vector(vector v) vectoangles			= #51;
+//vector(vector v) vectoangles			= #51;
 
 //
 // direct client message generation
