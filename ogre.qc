@@ -102,11 +102,9 @@ void() OgreGrenadeTouch =
 		self.avelocity = '0 0 0';
 };
 
-/*
-================
-OgreFireGrenade
-================
-*/
+
+
+
 void() OgreFireGrenade =
 {
 	local entity missile;
@@ -125,7 +123,9 @@ void() OgreFireGrenade =
 
 	
 
-	missile.velocity = normalize(self.enemy.origin - self.origin);
+	//missile.velocity = normalize(self.enemy.origin - self.origin);
+
+	missile.velocity = calculate_dir_to_moving_target(self.enemy, 600);
 
 	vector fire_ang = vectoangles(missile.velocity);
 

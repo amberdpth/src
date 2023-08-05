@@ -285,6 +285,8 @@ void() ImpulseCommands =
 		CycleWeaponCommand ();
 	if (self.impulse == 12)
 		CycleWeaponReverseCommand ();
+	if (self.impulse == 20)
+		ShowPlayerStats();
 
 	self.impulse = 0;
 };
@@ -390,6 +392,7 @@ void() SearchingDeadBodies =
 	}
 
 	self.searching_bodies = time + 1;
+	W_SetCurrentAmmo();
 }
 
 void() W_WeaponFrame =

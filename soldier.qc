@@ -63,6 +63,68 @@ SOLDIER CODE
 
 void() army_fire;
 
+void() army_firerocket =
+{
+	entity missile;
+	vector dir;
+
+	sound (self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM);
+
+	missile = spawn ();
+	missile.owner = self;
+	missile.movetype = MOVETYPE_FLYMISSILE;
+	missile.solid = SOLID_BBOX;
+	missile.classname = "missile";
+
+
+	dir = calculate_dir_to_moving_target(self.enemy, 1000);
+
+	missile.velocity = dir;
+	missile.start_dir = dir;
+	missile.velocity = missile.velocity * 1000;
+	missile.angles = vectoangles(missile.velocity);
+
+	missile.fly_error[0] = random(-64, 64);
+	missile.fly_error[1] = random(-64, 64);
+	missile.fly_error[2] = random(-64, 64);
+	missile.fly_error[3] = random(-64, 64);
+	missile.fly_error[4] = random(-64, 64);
+	missile.fly_error[5] = random(-64, 64);
+
+	missile.touch = T_MissileTouch;
+
+	// set missile duration
+	missile.nextthink = time;
+	missile.think = missile_think;
+
+	setmodel (missile, "progs/missile.mdl");
+	setsize (missile, '0 0 0', '0 0 0');
+	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+}
+
+void() army_load1 = [ $load1, army_load2 ] {ai_face();};
+void() army_load2 = [ $load2, army_load3 ] {ai_face();};
+void() army_load3 = [ $load3, army_load4 ] {ai_face();};
+void() army_load4 = [ $load4, army_load5 ] {ai_face();};
+void() army_load5 = [ $load5, army_load6 ] {ai_face();};
+void() army_load6 = [ $load6, army_load7 ] {ai_face();};
+void() army_load7 = [ $load7, army_load8 ] {ai_face();};
+void() army_load8 = [ $load8, army_load9 ] {ai_face();};
+void() army_load9 = [ $load9, army_load10 ] {ai_face();};
+void() army_load10 = [ $load10, army_load11 ] {ai_face();};
+void() army_load11 = [ $load11, army_atk_rocket1 ] {ai_face();};
+void()	army_atk_rocket1	=[	$shoot5,	army_atk_rocket2	]
+{
+	ai_face();
+
+	army_firerocket();
+	self.effects = self.effects | EF_MUZZLEFLASH;
+};
+void()	army_atk_rocket2 = [	$shoot6,	army_atk_rocket3	] {ai_face();};
+void()	army_atk_rocket3 = [	$shoot7,	army_atk_rocket4	] {ai_face();};
+void()	army_atk_rocket4 = [	$shoot8,	army_atk_rocket5	] {ai_face();};
+void()	army_atk_rocket5 = [	$shoot9,	army_run1	] {ai_face();};
+
 void()	army_stand1	=[	$stand1,	army_stand2	] {ai_stand();};
 void()	army_stand2	=[	$stand2,	army_stand3	] {ai_stand();};
 void()	army_stand3	=[	$stand3,	army_stand4	] {ai_stand();};
@@ -314,7 +376,8 @@ void() monster_army =
 	self.th_stand = army_stand1;
 	self.th_walk = army_walk1;
 	self.th_run = army_run1;
-	self.th_missile = army_atk1;
+	//self.th_missile = army_atk1;
+	self.th_missile = army_load1;
 	self.th_pain = army_pain;
 	self.th_die = army_die;
 

@@ -1,7 +1,14 @@
 enum 
 {
 	// skills
-	STAT_MELEE_XP = 32,
+	STAT_RAW_MELEE_XP = 32,
+	STAT_RAW_ACCURACY_XP,
+	STAT_RAW_EXPLOSIVES_XP,
+	STAT_RAW_ARMOR_WEARING_XP,
+	STAT_RAW_SEARCHING_XP,
+	STAT_RAW_AGILITY_XP,
+
+	STAT_MELEE_XP,
 	STAT_ACCURACY_XP,
 	STAT_EXPLOSIVES_XP,
 	STAT_ARMOR_WEARING_XP,
@@ -23,6 +30,13 @@ enum
 
 void() init_clientstats =
 {
+	clientstat(STAT_RAW_MELEE_XP,EV_FLOAT, raw_melee_xp);
+	clientstat(STAT_RAW_ACCURACY_XP,EV_FLOAT, raw_accuracy_xp);
+	clientstat(STAT_RAW_EXPLOSIVES_XP,EV_FLOAT, raw_explosive_xp);
+	clientstat(STAT_RAW_ARMOR_WEARING_XP, EV_FLOAT, raw_armor_wearing_xp);
+	clientstat(STAT_RAW_SEARCHING_XP, EV_FLOAT, raw_searching_xp);
+	clientstat(STAT_RAW_AGILITY_XP, EV_FLOAT, raw_agility_xp);
+
 	clientstat(STAT_MELEE_XP,EV_FLOAT, melee_xp);
 	clientstat(STAT_ACCURACY_XP,EV_FLOAT, accuracy_xp);
 	clientstat(STAT_EXPLOSIVES_XP,EV_FLOAT, explosive_xp);

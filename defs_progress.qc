@@ -4,6 +4,8 @@ float base_gravity = 1.0;
 
 .float jump_force;
 
+.float  xp_points;
+
 // skills 
 
 .float raw_armor_wearing_xp;
@@ -115,7 +117,7 @@ float base_combat_agility_xp_min = 8;
 float base_combat_agility_xp_max = 45;
 float base_combat_explosive_xp_min = 15;
 float base_combat_explosive_xp_max = 38;
-float base_combat_agility_xp_to_accuracy_min = 0; // от проворности игрока зависит его меткость
+float base_combat_agility_xp_to_accuracy_min = 0;
 float base_combat_agility_xp_to_accuracy_max = 20;
 
 float base_body_max_value = 45;
@@ -234,3 +236,11 @@ void(float *base_xp, float rate, float multiplier) xp_up =
 
 .float got_armor;
 .float in_charge;
+
+.float shotgun_mod;
+
+enum{
+    SHOTGUN_MK1,
+    SHOTGUN_MK2,
+    SHOTGUN_MK3
+};

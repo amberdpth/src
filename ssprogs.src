@@ -13,6 +13,7 @@ combat.qc
 items.qc
 items_armors.qc
 items_weapons.qc
+player_stats.qc
 
 hook.qc
 weapons.qc

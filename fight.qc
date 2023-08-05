@@ -205,6 +205,9 @@ ai_melee
 =============
 */
 
+float() mon_scale_by_health =
+{ return 1; };
+
 float() ai_melee_damage =
 {
 	float damg = random(); // random for non player
@@ -225,9 +228,8 @@ float() ai_melee_damage =
 
 	}
 
-	
 
-	return (damg * 0.5 + damg * 0.5 * random()) * 10;
+	return (damg * 0.5 + damg * 0.5 * random()) * 10 * mon_scale_by_health();
 }
 
 void() ai_melee =

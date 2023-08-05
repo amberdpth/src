@@ -79,7 +79,7 @@ void(float offset) hknight_shot =
 	local vector offang;
 	local vector org, vec;
 
-	offang = vectoangles (self.enemy.origin - self.origin);
+	offang = vectoangles (calculate_dir_to_moving_target(self.enemy,300));
 	offang_y = offang_y + offset * 6;
 
 	makevectors (offang);

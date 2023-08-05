@@ -101,7 +101,8 @@ void()	demon1_jump4	=[	$leap4,		demon1_jump5	]
 	self.touch = Demon_JumpTouch;
 	makevectors (self.angles);
 	self.origin_z = self.origin_z + 1;
-	self.velocity = v_forward * 600 + '0 0 250';
+	self.velocity = calculate_dir_to_moving_target(self.enemy, 600) * 600 + v_up * 250;
+	ai_face();
 	if (self.flags & FL_ONGROUND)
 		self.flags = self.flags - FL_ONGROUND;
 };
@@ -271,12 +272,15 @@ float()	CheckDemonJump =
 	local vector dist;
 	local float	d;
 
+/*
+
 	if (self.origin_z + self.mins_z > self.enemy.origin_z + self.enemy.mins_z + 0.75 * self.enemy.size_z)
 		return FALSE;
 
 	if (self.origin_z + self.maxs_z < self.enemy.origin_z + self.enemy.mins_z + 0.25 * self.enemy.size_z)
 		return FALSE;
 
+*/
 	dist = self.enemy.origin - self.origin;
 	dist_z = 0;
 
@@ -332,7 +336,7 @@ void(float side)	Demon_Melee =
 		return;
 
     sound (self, CHAN_WEAPON, "demon/dhit2.wav", 1, ATTN_NORM);
-	ldmg = 10 + 5*random();
+	ldmg = ai_melee_damage();
 	T_Damage (self.enemy, self, self, ldmg);
 
 	makevectors (self.angles);

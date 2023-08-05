@@ -681,3 +681,33 @@ void(float dist) ai_run =
 	// head straight in
 	movetogoal (dist);		// done in C code...
 };
+
+float(vector delta, vector dir, float proj_speed) aim_mod =
+{
+	float a = dotproduct(dir, dir) - proj_speed * proj_speed;
+	float b = 2 * dotproduct(dir, delta);
+	float c = dotproduct(delta, delta);
+
+	float desc = b * b - 4 * a * c;
+
+	if (desc > 0.0)
+		return (2 * c) / (sqrt(desc) - b);
+	
+	return -1;
+}
+
+vector(entity o, float proj_speed) calculate_dir_to_moving_target =
+{
+
+	vector delta = o.origin - self.origin;
+	vector dir = o.velocity - self.velocity;
+
+	float deltatime = aim_mod(delta, dir, proj_speed);
+
+	traceline(self.origin, o.origin + o.velocity * deltatime, TRUE, self);
+
+	if (trace_fraction == 1)
+		return normalize((o.origin + o.velocity * deltatime) - self.origin);
+
+	return normalize(o.origin - self.origin);
+}
