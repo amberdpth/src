@@ -44,6 +44,10 @@ void() PlayerJump =
 
 	self.velocity_z = self.velocity_z + self.jump_force;
 
+	makevectors(self.v_angle);
+
+	self.velocity = self.velocity + v_forward * self.jump_dir_force;
+
 	xp_up( &self.raw_agility_xp, RATE_AGILITY_XP, 1.0);
 };
 

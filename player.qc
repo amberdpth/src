@@ -296,45 +296,54 @@ void()	player_axed4 =	[$axattd4, player_run	]
 
 void() player_nail   =[ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), player_nail  ]
 {
-	
+
+	if (!self.button0)
+	{
+		self.ng_accel_on = FALSE;
+		self.sng_accel_on = FALSE;
+		player_run ();
+		return;
+	}
+
 	if (self.weapon == W_NAILGUN)
 	{
 		if (self.ammo_nails < 1)
 		{
+			self.ng_accel_on = FALSE;
 			player_run ();
 			W_SetCurrentAmmo ();
 			return;
 		}
+
+		self.nailgun_lefty = self.nailgun_lefty ? 0 : 1;
+		self.reload_time = self.ng_reload_time;
 
 		W_FireSpikes(self.nailgun_lefty ? 3.2 : -3.2);
 	}
-	if (self.weapon == W_SUPER_NAILGUN)
+	else if (self.weapon == W_SUPER_NAILGUN)
 	{
-		if (self.ammo_nails < 2)
+		if (self.ammo_big_spikes < 1)
 		{
+			self.sng_accel_on = FALSE;
 			player_run ();
 			W_SetCurrentAmmo ();
 			return;
 		}
 
-		W_FireSuperSpikes();
-	}
+		self.reload_time = self.sng_reload_time;
 
-	if (!self.button0)
-	{
-		player_run ();
-		return;
+		W_FireSuperSpikes();
 	}
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
 	self.weaponframe = self.weaponframe + 1;
 
-	self.nailgun_lefty = self.nailgun_lefty ? 0 : 1;
 
 	if (self.weaponframe == 9)
 		self.weaponframe = 1;
 
+	
 	self.attack_finished = self.nextthink = time + self.reload_time;
 };
 

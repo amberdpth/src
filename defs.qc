@@ -752,7 +752,7 @@ enumflags
 
 .float multidamage_flag;
 .float multidamage;
-
+.float pain_threshold;
 
 
 
@@ -783,3 +783,6 @@ float lerp(float a, float b, float f)
 #define ARMOR_FLAG_COMBAT 2
 #define ARMOR_FLAG_BODY 3
 #define ARMOR_FLAG_CLASSIC 4
+
+.float ammo_big_spikes;
+.float ammo_grenades;

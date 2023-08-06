@@ -123,20 +123,20 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (attacker.super_damage_finished > time)
 		damage = damage * 4;
 
-	// armors
+	
+	save = ceil ( targ.armortype * damage );
+	take = ceil ( damage - save );
 
-	save = ceil(targ.armortype*damage);
 	targ.armorvalue = targ.armorvalue - save;
-	take = ceil(damage-save);
 
 	if (targ.armorvalue <= 0)
 	{
-		take = take + (-targ.armorvalue);
+		targ.armortype = 0;
+
 		if (targ.armor_flag)
 		{
 			targ.armor_flag = 0;
 			targ.armor_level = 0;
-			targ.armortype = 0;
 			targ.armorvalue = 0;
 			targ.max_armorvalue = 0;
 			sprint(targ, " your armor has been destroyed \n");
@@ -213,8 +213,6 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (self.th_pain)
 	{
 		self.th_pain(attacker, take);
-		if (skill == 3)
-			self.pain_finished = time + 5;
 	}
 
 	self = oldself;
@@ -234,6 +232,8 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 	float passing_damage;
 
 	entity skill_reciever = world;
+
+	float summary_multiplier = 1;
 
 	if (damage <= 0)
 		return;
@@ -274,7 +274,9 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 						xp_up (
 							&skill_reciever.raw_explosive_xp,
 							RATE_EXPLOSIVE_XP,
-							(head == attacker ? 0.25 : 1.0 ));
+							(head == attacker ? 0.25 : 1.0 ) * summary_multiplier);
+
+					summary_multiplier = summary_multiplier * 1.12;
 				}
 			}
 		}

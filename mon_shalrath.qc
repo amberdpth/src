@@ -180,18 +180,22 @@ void() ShalHome =
 {
 	local vector dir, vtemp;
 
-	vtemp = self.enemy.origin + '0 0 10';
+	vtemp = calculate_dir_to_moving_target(self.enemy, 250);
+
 	if (self.enemy.health < 1)
 	{
 		remove(self);
 		return;
 	}
-	dir = normalize(vtemp - self.origin);
-	if (skill == 3)
-		self.velocity = dir * 350;
-	else
-		self.velocity = dir * 250;
-	self.nextthink = time + 0.2;
+	dir = normalize(self.velocity);
+
+	dir[0] = lerp( dir[0], vtemp[0], 0.16);
+	dir[1] = lerp( dir[1], vtemp[1], 0.16);
+	dir[2] = lerp( dir[2], vtemp[2], 0.16);
+
+
+	self.velocity = dir * 400;
+	self.nextthink = time + 0.03;
 	self.think = ShalHome;
 };
 

@@ -6,20 +6,20 @@ fteextensions.qc
 defs.qc
 defs_progress.qc
 subs.qc
-skills.qc
 fight.qc
 ai.qc
 combat.qc
 items.qc
+items_weapons_mods.qc
+items_ammo.qc
 items_armors.qc
 items_weapons.qc
 player_stats.qc
 
 hook.qc
+weapons_passing_bullets.qc
 weapons.qc
 weapon_summary.qc // switching, attack
-
-passing_bullets.qc
 
 stats_shared.qc
 world.qc
@@ -38,20 +38,19 @@ triggers.qc
 plats.qc
 misc.qc
 
-ogre.qc
-demon.qc
-shambler.qc
-knight.qc
-soldier.qc
-wizard.qc
-dog.qc
-zombie.qc
-boss.qc
-
-tarbaby.qc		// registered
-hknight.qc		// registered
-fish.qc			// registered
-shalrath.qc		// registered
-enforcer.qc		// registered
-oldone.qc		// registered
+mon_ogre.qc
+mon_demon.qc
+mon_shambler.qc
+mon_knight.qc
+mon_soldier.qc
+mon_wizard.qc
+mon_dog.qc
+mon_zombie.qc
+mon_boss.qc
+mon_tarbaby.qc	
+mon_hknight.qc	
+mon_fish.qc
+mon_shalrath.qc
+mon_enforcer.qc
+mon_oldone.qc
 

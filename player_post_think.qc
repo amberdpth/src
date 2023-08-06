@@ -2,6 +2,8 @@ void() CheckSKillModifers  =
 {
 	self.maxspeed = base_maxspeed;
 	self.jump_force = base_jump_force;
+	self.jump_dir_force = base_jump_dir_force;
+	self.gravity = base_gravity;
 
 	self.armor_wearing_xp = self.raw_armor_wearing_xp;
 	self.melee_xp = self.raw_melee_xp;
@@ -22,6 +24,20 @@ void() CheckSKillModifers  =
 		base_agility_xp_jump_force_min,
 		base_agility_xp_jump_force_max,
 		self.agility_xp
+	);
+
+	xp_update_param (
+		&self.jump_dir_force,
+		base_agility_xp_jump_dir_force_min,
+		base_agility_xp_jump_dir_force_max,
+		self.jump_dir_force
+	);
+
+	xp_update_param (
+		&self.gravity,
+		base_agility_xp_gravity_min,
+		base_agility_xp_gravity_max,
+		self.gravity
 	);
 }
 
@@ -197,6 +213,31 @@ void() CheckArmorModifers =
 
 void() CheckWeaponModifers =
 {
+	//
+	//
+
+	if (self.w_mod_a & MOD_NG_ACCELERATOR)
+	{
+		self.nailgun_accel = lerp(
+			self.nailgun_accel,
+			self.ng_accel_on ? base_ng_accel_module_fast : base_ng_accel_module_slow,
+			self.ng_reload_time
+		);
+	}
+	else
+		self.nailgun_accel = 1;
+
+	if (self.w_mod_a & MOD_SNG_ACCELERATOR)
+	{
+
+		self.super_nailgun_accel = lerp(
+			self.super_nailgun_accel,
+			self.sng_accel_on ? base_sng_accel_module_fast : base_sng_accel_module_slow,
+			self.sng_reload_time
+		);
+	}
+	else
+		self.super_nailgun_accel = 1;
 
 	switch (self.weapon)
 	{
@@ -303,6 +344,10 @@ void() CheckWeaponModifers =
 		case W_NAILGUN:
 
 			self.ng_reload_time = base_nailgun_reload_time;
+			self.ng_reload_time = self.ng_reload_time * self.nailgun_accel;
+
+
+			dprint(sprintf("%f ng_relod_time %f ng_accel\n", self.ng_reload_time, self.nailgun_accel));
 
 			xp_update_param (
 				&self.maxspeed,
@@ -310,11 +355,15 @@ void() CheckWeaponModifers =
 				base_agility_xp_nailgun_runspeed_max,
 				self.agility_xp
 			);
+
 			break;
 
 		case W_SUPER_NAILGUN:
 
 			self.sng_reload_time = base_super_nailgun_reload_time;
+			self.sng_reload_time = self.sng_reload_time * self.super_nailgun_accel;
+
+			dprint(sprintf("%f sng_relod_time %f sng_accel\n", self.sng_reload_time, self.super_nailgun_accel));
 
 			xp_update_param (
 				&self.maxspeed,
@@ -322,6 +371,7 @@ void() CheckWeaponModifers =
 				base_agility_xp_super_nailgun_runspeed_max,
 				self.agility_xp
 			);
+
 			break;
 
 		case W_GRENADE_LAUNCHER:

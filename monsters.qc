@@ -1,4 +1,7 @@
-void() CalculateMonsterStats = {};
+void() CalculateMonsterStats = 
+{
+	
+};
 
 void() monster_use =
 {
@@ -91,7 +94,6 @@ void() walkmonster_start_go =
 
 void() walkmonster_start =
 {
-	CalculateMonsterStats();
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = walkmonster_start_go;
 	total_monsters = total_monsters + 1;
@@ -144,7 +146,6 @@ void() flymonster_start_go =
 
 void() flymonster_start =
 {
-	CalculateMonsterStats();
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = flymonster_start_go;
 	total_monsters = total_monsters + 1;
@@ -197,7 +198,6 @@ void() swimmonster_start_go =
 
 void() swimmonster_start =
 {
-	CalculateMonsterStats();
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = swimmonster_start_go;
 	total_monsters = total_monsters + 1;

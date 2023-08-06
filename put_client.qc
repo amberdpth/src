@@ -102,13 +102,18 @@ entity() SelectSpawnPoint =
 	return spot;
 };
 
+
+
 void() SetChangeParms =
 {
 	self.keys = 0;
 
+	parm_string = "{\n";
+
 	parm1 = self.weapons;
 	parm2 = self.health;
 	parm3 = self.armorvalue;
+
 	parm4 = self.ammo_shells;
 	parm5 = self.ammo_nails;
 	parm6 = self.ammo_rockets;
@@ -117,6 +122,7 @@ void() SetChangeParms =
 	parm9 = self.armortype;
 	parm10 = self.shards;
 	parm11 = self.vials;
+	parm12 = self.w_mod_a;
 	
 	parm20 = self.raw_melee_xp;
 	parm21 = self.raw_accuracy_xp;
@@ -128,6 +134,10 @@ void() SetChangeParms =
 	parm40 = self.armor_flag;
 	parm41 = self.armor_level;
 
+	parm42 = self.ammo_big_spikes;
+	parm43 = self.ammo_grenades;
+
+	
 
 };
 
@@ -152,6 +162,7 @@ void() DecodeLevelParms =
 	self.armortype = parm9;
 	self.shards = parm10;
 	self.vials = parm11;
+	self.w_mod_a = parm12;
 	
 	self.raw_melee_xp = parm20;
 	self.raw_accuracy_xp = parm21;
@@ -162,6 +173,8 @@ void() DecodeLevelParms =
 
 	self.armor_flag = parm40;
 	self.armor_level = parm41;
+
+	self.ammo_big_spikes = parm42;
 };
 
 void() PutClientInServer =

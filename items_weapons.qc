@@ -6,13 +6,13 @@ void() weapon_touch =
 	if (self.classname == "weapon_nailgun")
 		other.ammo_nails = other.ammo_nails + 30;
 	else if (self.classname == "weapon_supernailgun")
-		other.ammo_nails = other.ammo_nails + 30;
+		other.ammo_nails = other.ammo_big_spikes + 30;
 	else if (self.classname == "weapon_supershotgun")
 		other.ammo_shells = other.ammo_shells + 5;
 	else if (self.classname == "weapon_rocketlauncher")
 		other.ammo_rockets = other.ammo_rockets + 5;
 	else if (self.classname == "weapon_grenadelauncher")
-		other.ammo_rockets = other.ammo_rockets + 5;
+		other.ammo_grenades = other.ammo_grenades + 5;
 	else if (self.classname == "weapon_lightning")
 		other.ammo_cells = other.ammo_cells + 15;
 
@@ -38,21 +38,29 @@ void() weapon_supershotgun =
 {
 	precache_model ("progs/g_shot.mdl");
     precache_model ("progs/g_shot3.mdl");
+	precache_model ("progs/g_shotgn.mdl");
 
-    float r = rint(random(5));
+    float r = rint(random(10));
 
-    if (r == 5)
-    {
-        setmodel (self, "progs/g_shot3.mdl");
-        self.weapon = W_TRIPLE_SHOTGUN;
-        self.netname = "Triple-barrelled Shotgun";
-    }
-    else
-    {
-        setmodel (self, "progs/g_shot.mdl");
-        self.weapon = W_SUPER_SHOTGUN;
-        self.netname = "Double-barrelled Shotgun";
-    }
+	switch (r)
+	{
+		case 0: case 1: case 2: case 3: case 4:
+			setmodel (self, "progs/g_shotgn.mdl");
+			self.weapon = W_SHOTGUN;
+			self.netname = "shotgun";
+			break;
+		case 5: case 6: case 8:
+			setmodel (self, "progs/g_shot.mdl");
+			self.weapon = W_SUPER_SHOTGUN;
+			self.netname = "double-barrelled shotgun";
+			break;
+		case 9: case 10:
+			setmodel (self, "progs/g_shot3.mdl");
+			self.weapon = W_TRIPLE_SHOTGUN;
+			self.netname = "triple-barrelled shotgun";
+			break;
+	}
+
 
 
 	self.touch = weapon_touch;

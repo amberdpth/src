@@ -20,7 +20,7 @@
 void (entity targ, entity inflictor, entity attacker, float damage) T_Damage;
 void () player_run;
 void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
-void(vector org, vector vel, float damage) SpawnBlood;
+void(vector org, vector vel, float damage, entity o) SpawnBlood;
 
 void()	player_axe1;
 void()	player_axeb1;
@@ -132,10 +132,10 @@ void() W_FireAxe =
 		}
 
 		trace_ent.axhitme = 1;
-		SpawnBlood (org, '0 0 0', damage);
+		SpawnBlood (org, '0 0 0', damage, trace_ent);
 		T_Damage (trace_ent, self, self, damage);
 
-		xp_up (&self.raw_melee_xp,RATE_MELEE_XP, 1.0);
+		xp_up (&self.raw_melee_xp, RATE_MELEE_XP, 1.0);
 	}
 	else
 	{	// hit wall
@@ -147,9 +147,6 @@ void() W_FireAxe =
 		WriteCoord (MSG_BROADCAST, org_z);
 	}
 };
-
-
-//============================================================================
 
 
 vector() wall_velocity =
@@ -165,11 +162,6 @@ vector() wall_velocity =
 };
 
 
-/*
-================
-SpawnMeatSpray
-================
-*/
 void(vector org, vector vel) SpawnMeatSpray =
 {
 	local entity missile;
@@ -195,14 +187,17 @@ void(vector org, vector vel) SpawnMeatSpray =
 	setorigin (missile, org);
 };
 
-/*
-================
-SpawnBlood
-================
-*/
-void(vector org, vector vel, float damage) SpawnBlood =
+
+void(vector org, vector vel, float damage, entity o) SpawnBlood =
 {
-	particle (org, vel*0.1, 73, damage*2);
+	float atype_sparks = ceil(o.armortype ? o.armortype * damage : 0);
+	float atype_blood_pass = ceil(damage - atype_sparks);
+	float atype_sparks_brightness = rint(lerp(103, 110, o.armortype));
+
+	if (o.armorvalue)
+		particle (org, vel*0.1, atype_sparks_brightness, atype_sparks);
+
+	particle (org, vel*0.1, 73, atype_blood_pass);
 };
 
 /*
@@ -210,12 +205,12 @@ void(vector org, vector vel, float damage) SpawnBlood =
 spawn_touchblood
 ================
 */
-void(float damage) spawn_touchblood =
+void(float damage, entity o) spawn_touchblood =
 {
 	local vector vel;
 
 	vel = wall_velocity () * 0.2;
-	SpawnBlood (self.origin + vel*0.01, vel, damage);
+	SpawnBlood (self.origin + vel*0.01, vel, damage, o);
 };
 
 
@@ -289,7 +284,7 @@ void(float damage, vector dir) TraceAttack =
 {
 	local vector vel, org;
 
-	vel = normalize(dir + v_up*crandom() + v_right*crandom());
+	vel = normalize(dir + v_up * random(-1, 1) + v_right * random(-1, 1));
 	vel = vel + 2*trace_plane_normal;
 	vel = vel * 200;
 
@@ -297,7 +292,7 @@ void(float damage, vector dir) TraceAttack =
 
 	if (trace_ent.takedamage)
 	{
-		SpawnBlood (org, vel*0.2, damage);
+		SpawnBlood (org, vel*0.2, damage, trace_ent);
 		trace_ent.multidamage_flag = TRUE;
 		trace_ent.multidamage = trace_ent.multidamage + damage;
 	}
@@ -333,7 +328,7 @@ void(float shotcount, vector dir, vector spread) FireBullets =
 	ClearMultiDamage ();
 	while (shotcount > 0)
 	{
-		direction = dir + crandom()*spread_x*v_right + crandom()*spread_y*v_up;
+		direction = dir + random(-1, 1) * spread[0] * v_right + random(-1, 1) * spread[1] * v_up;
 
 		traceline (src, src + direction*2048, FALSE, self);
 
@@ -362,6 +357,7 @@ W_FireShotgun
 */
 void() W_FireShotgun =
 {
+	float i = 0;
 	vector dir;
 	float shotcount = 7;
 	float spread_hv; // one barrell
@@ -397,6 +393,32 @@ void() W_FireShotgun =
 			skill_fraction(self.accuracy_xp)));
 
 
+	if (self.w_mod_a & MOD_SG_ACC_A1)
+		spread_hv = module_modifer(spread_hv, base_sg_acc_module_a1_spread_low, base_sg_acc_module_a1_spread_high);
+
+	if (self.w_mod_a & MOD_SG_ACC_A2)
+		spread_hv = module_modifer (spread_hv, base_sg_acc_module_a2_spread_low, base_sg_acc_module_a2_spread_high);
+	
+	if (self.w_mod_a & MOD_SG_ACC_B1)
+	{
+		spread_hv = module_modifer (spread_hv, base_sg_acc_module_b1_spread_low, base_sg_acc_module_b1_spread_high);
+		
+		for (i = 0; i <= 2; i++)
+			error_v[i] = module_modifer (error_v[i], base_sg_acc_module_b1_error_low, base_sg_acc_module_b1_error_high);
+		for (i = 0; i <= 2; i++)
+			error_h[i] = module_modifer (error_h[i], base_sg_acc_module_b1_error_low, base_sg_acc_module_b1_error_high);
+	}
+
+	if (self.w_mod_a & MOD_SG_ACC_B2)
+	{
+		spread_hv = module_modifer (spread_hv, base_sg_acc_module_b2_spread_low, base_sg_acc_module_b2_spread_high);
+
+		for (i = 0; i <= 2; i++)
+			error_v[i] = module_modifer (error_v[i], base_sg_acc_module_b2_error_low, base_sg_acc_module_b2_error_high);
+		for (i = 0; i <= 2; i++)
+			error_h[i] = module_modifer (error_h[i], base_sg_acc_module_b2_error_low, base_sg_acc_module_b2_error_high);
+	}
+
 
 	dir = v_forward + error_h + error_v;
 
@@ -416,11 +438,9 @@ W_FireSuperShotgun
 void() W_FireSuperShotgun =
 {
 	if (self.currentammo < 2)
-	{
-		W_FireShotgun ();
 		return;
-	}
 
+	float i = 0;
 	vector dir;
 	float shotcount = 14;
 	float spread_h, spread_v;
@@ -457,10 +477,39 @@ void() W_FireSuperShotgun =
 	
 	dir = v_forward + error_h + error_v;
 
+	if (self.w_mod_a & MOD_SSG_ACC_A1)
+	{
+		spread_h = module_modifer (spread_h, base_ssg_acc_module_a1_spread_low, base_ssg_acc_module_a1_spread_high);
+		spread_v = module_modifer (spread_v, base_ssg_acc_module_a1_spread_low, base_ssg_acc_module_a1_spread_high);
+		
+		for (i = 0; i <= 2; i++)
+			error_v[i] = module_modifer (error_v[i], base_ssg_acc_module_a1_error_low, base_ssg_acc_module_a1_error_high);
+		for (i = 0; i <= 2; i++)
+			error_h[i] = module_modifer (error_h[i], base_ssg_acc_module_a1_error_low, base_ssg_acc_module_a1_error_high);
+	}
+
+	if (self.w_mod_a & MOD_SSG_ACC_A2)
+	{
+		spread_h = module_modifer (spread_h, base_sg_acc_module_a2_spread_low, base_sg_acc_module_a2_spread_high);
+		spread_v = module_modifer (spread_v, base_sg_acc_module_a2_spread_low, base_sg_acc_module_a2_spread_high);
+
+		for (i = 0; i <= 2; i++)
+			error_v[i] = module_modifer (error_v[i], base_ssg_acc_module_a2_error_low, base_ssg_acc_module_a2_error_high);
+		for (i = 0; i <= 2; i++)
+			error_h[i] = module_modifer (error_h[i], base_ssg_acc_module_a2_error_low, base_ssg_acc_module_a2_error_high);
+	}
+
 	
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
 	self.punchangle_x = -4;
 	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+
+	if (self.w_mod_a & MOD_SSG_PASSING_BULLETS)
+	{
+		FirePassingBullets(shotcount, dir, [spread_h, spread_v]);
+		return;
+	}
+
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
 };
 
@@ -801,7 +850,7 @@ void() W_FireGrenade =
 	entity missile;
 	vector dir;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+	self.currentammo = self.ammo_grenades = self.ammo_grenades - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
@@ -880,8 +929,10 @@ void() W_FireSuperSpikes =
 
 	makevectors (self.v_angle);
 
+	self.sng_accel_on = TRUE;
+
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
-	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	self.currentammo = self.ammo_big_spikes = self.ammo_big_spikes - 1;
 
 	error_h = v_right * random ( 
 		-lerp (
@@ -904,8 +955,24 @@ void() W_FireSuperSpikes =
 			skill_fraction(self.accuracy_xp)));
 	
 	dir = v_forward + error_h + error_v;
+
+	vector muzzle_offset = '0 0 0';
+	float muzzle_offset_mult = 3.2;
+
+	switch(self.weaponframe)
+	{
+		case 1: muzzle_offset = v_up * muzzle_offset_mult + v_right * muzzle_offset_mult; break;
+		case 2: muzzle_offset = - v_right * muzzle_offset_mult; break;
+		case 3: muzzle_offset = v_right * muzzle_offset_mult - v_up * muzzle_offset_mult; break;
+		case 4: muzzle_offset = v_up * muzzle_offset_mult; break;
+		case 5: muzzle_offset = - v_up * muzzle_offset_mult - v_right * muzzle_offset_mult; break;
+		case 6: muzzle_offset = v_right * muzzle_offset_mult; break;
+		case 7: muzzle_offset = v_up * muzzle_offset_mult - v_right * muzzle_offset_mult; break;
+		case 8: muzzle_offset = - v_up * muzzle_offset_mult; break;
+			
+	}
 	
-	launch_spike (self.origin + '0 0 16', dir);
+	launch_spike (self.origin + muzzle_offset, dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis, "progs/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
@@ -919,6 +986,8 @@ void(float ox) W_FireSpikes =
 	vector error_h, error_v;
 
 	makevectors (self.v_angle);
+
+	self.ng_accel_on = TRUE;
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
@@ -970,7 +1039,7 @@ void() spike_touch =
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (damage);
+		spawn_touchblood (damage, other);
 		T_Damage (other, self, self.owner, damage);
 	}
 	else
@@ -1012,7 +1081,7 @@ void() superspike_touch =
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (damage);
+		spawn_touchblood (damage, other);
 		T_Damage (other, self, self.owner, damage);
 	}
 	else

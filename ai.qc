@@ -702,7 +702,7 @@ vector(entity o, float proj_speed) calculate_dir_to_moving_target =
 	vector delta = o.origin - self.origin;
 	vector dir = o.velocity - self.velocity;
 
-	float deltatime = aim_mod(delta, dir, proj_speed);
+	float deltatime = aim_mod(delta, dir, proj_speed) * random(0.6, 1.2);
 
 	traceline(self.origin, o.origin + o.velocity * deltatime, TRUE, self);
 

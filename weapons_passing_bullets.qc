@@ -1,3 +1,5 @@
+void(vector org, vector vel, float damage, entity o) SpawnBlood;
+
 void(float shotcount, vector dir, vector spread) FirePassingBullets =
 {
 	vector direction;
@@ -12,7 +14,7 @@ void(float shotcount, vector dir, vector spread) FirePassingBullets =
 
 	while (shotcount)
 	{
-		direction = dir + crandom() * spread[0] * v_right + crandom() * spread[1] * v_up;
+		direction = dir + random(-1, 1) * spread[0] * v_right + random(-1, 1) * spread[1] * v_up;
 
 		traceline(src, src + direction*2048, 0, self);
 
@@ -23,14 +25,14 @@ void(float shotcount, vector dir, vector spread) FirePassingBullets =
 
 			while(1)
 			{
-				vel = normalize(direction + v_up*crandom() + v_right*crandom());
+				vel = normalize(dir + v_up * random(-1, 1) + v_right * random(-1, 1));
 				vel = vel + 2*trace_plane_normal;
 				vel = vel * 200;
 				org = trace_endpos;
 
 				if (trace_ent.takedamage)
 				{
-					SpawnBlood(org, vel*0.2, damage);
+					SpawnBlood(org, vel*0.2, damage, trace_ent);
 					trace_ent.multidamage_flag = TRUE;
 					trace_ent.multidamage = trace_ent.multidamage + damage;
 					

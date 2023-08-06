@@ -72,7 +72,7 @@ void() army_firerocket =
 
 	missile = spawn ();
 	missile.owner = self;
-	missile.movetype = MOVETYPE_FLYMISSILE;
+	missile.movetype = MOVETYPE_FLY;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "missile";
 
@@ -178,7 +178,20 @@ void()	army_run6	=[	$run6,		army_run7	] {ai_run(15);};
 void()	army_run7	=[	$run7,		army_run8	] {ai_run(10);};
 void()	army_run8	=[	$run8,		army_run1	] {ai_run(8);};
 
-void()	army_atk1	=[	$shoot1,	army_atk2	] {ai_face();};
+void()	army_atk1	=[	$shoot1,	army_atk2	] 
+{
+	float distance = vlen(self.enemy.origin - self.origin);
+
+	traceline(self.origin, self.enemy.origin, TRUE, self);
+	
+	if ((distance > random(350, 450)) && (trace_fraction == 1.0))
+	{
+		army_load1();
+		return;
+	}
+
+	ai_face();
+};
 void()	army_atk2	=[	$shoot2,	army_atk3	] {ai_face();};
 void()	army_atk3	=[	$shoot3,	army_atk4	] {ai_face();};
 void()	army_atk4	=[	$shoot4,	army_atk5	] {ai_face();};
@@ -232,9 +245,14 @@ void()	army_painc13=[	$painc13,	army_run1] {};
 
 void(entity attacker, float damage)	army_pain =
 {
-	local float r;
+	float r;
 
 	if (self.pain_finished > time)
+		self.pain_threshold = 24;
+	else
+		self.pain_threshold = 12;
+
+	if (damage < self.pain_threshold)
 		return;
 
 	r = random();
@@ -284,9 +302,6 @@ void()	army_die1	=[	$death1,	army_die2	] {};
 void()	army_die2	=[	$death2,	army_die3	] {};
 void()	army_die3	=[	$death3,	army_die4	]
 {
-	self.ammo_shells = floor(random(2,10));
-	self.ammo_nails = floor(random(3,7));
-	self.ammo_rockets = floor(random(2));
 	DropBackpack();
 };
 void()	army_die4	=[	$death4,	army_die5	] {};
@@ -301,9 +316,6 @@ void()	army_cdie1	=[	$deathc1,	army_cdie2	] {};
 void()	army_cdie2	=[	$deathc2,	army_cdie3	] {ai_back(5);};
 void()	army_cdie3	=[	$deathc3,	army_cdie4	]
 {
-	self.ammo_shells = floor(random(2,10));
-	self.ammo_nails = floor(random(3,7));
-	self.ammo_rockets = floor(random(2));
 	DropBackpack();
 	ai_back(4);
 };
@@ -371,13 +383,33 @@ void() monster_army =
 	setmodel (self, "progs/soldier.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
+
 	self.health = 30;
+
+	float armor_chance = rint ( random ( 10 ) );
+
+	switch (armor_chance)
+	{
+		case 0:case 1:case 2:case 3:
+			self.armortype = 0;
+			self.armorvalue = 0;
+			break;
+		case 4:case 5: case 6:case 7: case 8:
+			self.armortype = 0.25;
+			self.armorvalue = 25;
+			break;
+		case 9: case 10:
+			self.armortype = 0.5;
+			self.armorvalue = 30;
+			break;
+	}
+
 
 	self.th_stand = army_stand1;
 	self.th_walk = army_walk1;
 	self.th_run = army_run1;
-	//self.th_missile = army_atk1;
-	self.th_missile = army_load1;
+	self.th_missile = army_atk1;
+	
 	self.th_pain = army_pain;
 	self.th_die = army_die;
 

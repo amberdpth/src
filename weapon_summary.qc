@@ -29,13 +29,13 @@ void() W_SetCurrentAmmo =
 	}
 	else if (self.weapon == W_SUPER_NAILGUN)
 	{
-		self.currentammo = self.ammo_nails;
+		self.currentammo = self.ammo_big_spikes;
 		self.weaponmodel = "progs/v_nail2.mdl";
 		self.weaponframe = 0;
 	}
 	else if (self.weapon == W_GRENADE_LAUNCHER)
 	{
-		self.currentammo = self.ammo_rockets;
+		self.currentammo = self.ammo_grenades;
 		self.weaponmodel = "progs/v_rock.mdl";
 		self.weaponframe = 0;
 	}
@@ -404,6 +404,8 @@ void() W_WeaponFrame =
 		return;
 
 	ImpulseCommands ();
+
+	self.weaponframe = cvar("wframe");
 
 	// check for attack
 	if (self.button0)

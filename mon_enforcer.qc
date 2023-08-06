@@ -75,7 +75,7 @@ void() Laser_Touch =
 
 	if (other.health)
 	{
-		SpawnBlood (org, self.velocity*0.2, 15);
+		SpawnBlood (org, self.velocity*0.2, 15, other);
 		T_Damage (other, self, self.owner, 15);
 	}
 	else
@@ -108,7 +108,7 @@ void(vector org, vector vec) LaunchLaser =
 
 	setorigin (newmis, org);
 
-	newmis.velocity = vec * 600;
+	newmis.velocity = vec * 1000;
 	newmis.angles = vectoangles(newmis.velocity);
 
 	newmis.nextthink = time + 5;
@@ -127,7 +127,7 @@ void() enforcer_fire =
 	
 	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
 
-	LaunchLaser(org, self.enemy.origin - self.origin);
+	LaunchLaser(org, calculate_dir_to_moving_target(self.enemy,1000));
 };
 
 //============================================================================
@@ -280,7 +280,6 @@ void()	enf_die1	=[	$death1,	enf_die2	] {};
 void()	enf_die2	=[	$death2,	enf_die3	] {};
 void()	enf_die3	=[	$death3,	enf_die4	]
 {
-	self.ammo_cells = 5;
 	DropBackpack();
 };
 void()	enf_die4	=[	$death4,	enf_die5	] {ai_forward(14);};
@@ -299,7 +298,6 @@ void()	enf_fdie1	=[	$fdeath1,	enf_fdie2	] {};
 void()	enf_fdie2	=[	$fdeath2,	enf_fdie3	] {};
 void()	enf_fdie3	=[	$fdeath3,	enf_fdie4	]
 {
-	self.ammo_cells = 5;
 	DropBackpack();
 };
 void()	enf_fdie4	=[	$fdeath4,	enf_fdie5	] {};
