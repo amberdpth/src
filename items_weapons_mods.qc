@@ -30,10 +30,15 @@ float base_ssg_acc_module_a2_error_high = 0.75;
 .float sng_accel_on;
 
 float base_ng_accel_module_slow = 1;
-float base_ng_accel_module_fast = 0.33;
+float base_ng_accel_module_fast = 0.3;
+float base_ng_accel_step = 0.0062;
+float base_ng_hyperspeed_launcher_module_knockback_mult = 0.14;
 
 float base_sng_accel_module_slow = 1;
-float base_sng_accel_module_fast = 0.21;
+float base_sng_accel_module_fast = 0.45;
+float base_sng_accel_step = 0.0083;
+
+
 
 
 float(float param, float low, float high) module_modifer =
@@ -53,6 +58,7 @@ enumflags
     MOD_TSG_SIX_SHOT,
     MOD_TSG_FAST_RELOAD,
     MOD_NG_ACCELERATOR,
+    MOD_NG_HYPERSPEED_LAUNCHER,
     MOD_SNG_ACCELERATOR
 };
 
@@ -60,6 +66,21 @@ float() rand_half =
 {
     return (random() > 0.5 ? 1 : 0); 
 };
+
+void(float *accel, float on_off, float fast, float slow, float frac, float do_accel) w_accel = 
+{
+    if (!do_accel)
+    {
+        *accel = 1;
+        return;
+    }
+
+    if (*accel == 0.0)
+        *accel = slow;
+
+    *accel = lerp( *accel, (on_off ? fast : slow), (on_off ? 4 * frac : frac));
+}
+
 
 string(float flag) w_mod_name = 
 {
@@ -73,13 +94,15 @@ string(float flag) w_mod_name =
     if (flag == MOD_TSG_SIX_SHOT) return "triple-barrelled shotgun 6-shell shot";
     if (flag == MOD_TSG_FAST_RELOAD) return "triple-barrelled shotgun fast reload";
     if (flag == MOD_NG_ACCELERATOR) return "nailgun accelerator";
+    if (flag == MOD_NG_HYPERSPEED_LAUNCHER) return "nailgun hyperspeed launcher";
     if (flag == MOD_SNG_ACCELERATOR) return "super nailgun accelerator";
+    
     return string_null;
 };
 
 float() get_ng_mod =
 {
-    //if ((rand_half)) return MOD_NG_ACCELERATOR;
+    if ((rand_half)) return MOD_NG_HYPERSPEED_LAUNCHER;
     return MOD_NG_ACCELERATOR;
 }
 
@@ -136,7 +159,7 @@ void() weapon_mod_touch =
         return;
     }
 
-    other.w_mod_a = other.w_mod_a | self.w_mod_a;
+    other.w_mod_a = other.w_mod_a + self.w_mod_a;
 
     sprint(other, "you got ", self.netname,"\n");
 
@@ -161,3 +184,4 @@ void() item_weapon_mod_a =
 
     StartItem();
 }
+

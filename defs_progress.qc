@@ -55,7 +55,6 @@ float base_agility_xp_super_shotgun_reload_time_min = 0.015;
 float base_agility_xp_super_shotgun_reload_time_max = - 0.08;
 float base_agility_xp_triple_shotgun_reload_time_min = 0.02;
 float base_agility_xp_triple_shotgun_reload_time_max = - 0.012;
-
 float base_agility_xp_axe_runspeed_min = -10;
 float base_agility_xp_axe_runspeed_max = 30;
 float base_agility_xp_shotgun_runspeed_min = -15;
@@ -72,11 +71,21 @@ float base_agility_xp_grenade_launcher_runspeed_min = -20;
 float base_agility_xp_grenade_launcher_runspeed_max = 8;
 float base_agility_xp_rocket_launcher_runspeed_min = -18;
 float base_agility_xp_rocket_launcher_runspeed_max = 10;
+float base_agility_xp_axe_damage_min = -4;
+float base_agility_xp_axe_damage_max = 15;
+float base_agility_xp_fire_knockback_min = 1;
+float base_agility_xp_fire_knockback_max = 0.6;
 
 float base_melee_xp_axe_reload_time_min = 0.12;
 float base_melee_xp_axe_reload_time_max = - 0.14;
 float base_melee_xp_axe_runspeed_min = -5;
 float base_melee_xp_axe_runspeed_max = 25;
+float base_melee_xp_axe_damage_min = -5;
+float base_melee_xp_axe_damage_max = 40;
+float base_melee_xp_axe_damage_charging_knight_min = 5;
+float base_melee_xp_axe_damage_charging_knight_max = 25;
+float base_melee_xp_axe_hitdist_min = -8;
+float base_melee_xp_axe_hitdist_max = 32;
 
 // player's weapon reload time 
 
@@ -152,6 +161,8 @@ float base_armortype_jumpforce_min = 0;
 float base_armortype_jumpforce_max = -15;
 float base_armortype_axe_reload_time_min = 0;
 float base_armortype_axe_reload_time_max = 0.062;
+float base_armortype_hitdist_min = 16;
+float base_armortype_hitdist_max = -2;
 
 // accuracy and spread
 
@@ -160,6 +171,8 @@ float base_shotgun_spread_hv_max = 0.033;
 float base_shotgun_error_hv_min = 0.08;
 float base_shotgun_error_hv_max = 0.0002;
 
+float base_shotgun_fire_knockback_mult = 0.11;
+
 float base_super_shotgun_spread_h_min = 0.3;
 float base_super_shotgun_spread_h_max = 0.012;
 float base_super_shotgun_spread_v_min = 0.1;
@@ -167,34 +180,32 @@ float base_super_shotgun_spread_v_max = 0.05;
 float base_super_shotgun_error_hv_min = 0.1;
 float base_super_shotgun_error_hv_max = 0.0028;
 
+float base_super_shotgun_fire_knockback_mult = 0.126;
+
 float base_triple_shotgun_spread_hv_min = 0.3;
 float base_triple_shotgun_spread_hv_max = 0.012;
 float base_triple_shotgun_error_hv_min = 0.12;
 float base_triple_shotgun_error_hv_max = 0.0031;
+
+float base_triple_shotgun_fire_knockback_mult = 0.177;
 
 float base_nailgun_error_h_min = 0.054;
 float base_nailgun_error_h_max = 0.007;
 float base_nailgun_error_v_min = 0.041;
 float base_nailgun_error_v_max = 0.002;
 
+float base_nailgun_fire_knockback_mult = 0.08;
+
 float base_super_nailgun_error_hv_min = 0.044;
 float base_super_nailgun_error_hv_max = 0.0045;
+
+float base_super_nailgun_fire_knockback_mult = 0.16;
 
 // axe damage and hit distance
 
 float base_axe_damage = 20;
-float base_agility_xp_axe_damage_min = -4;
-float base_agility_xp_axe_damage_max = 15;
-float base_melee_xp_axe_damage_min = -5;
-float base_melee_xp_axe_damage_max = 40;
-float base_melee_xp_axe_damage_charging_knight_min = 5;
-float base_melee_xp_axe_damage_charging_knight_max = 25;
-
 float base_axe_hit_dist = 64;
-float base_melee_xp_axe_hitdist_min = -8;
-float base_melee_xp_axe_hitdist_max = 32;
-float base_armortype_hitdist_min = 16;
-float base_armortype_hitdist_max = -2; // reversed as heavy armortype is -> 1.0
+
 
 float(float skill_input) skill_fraction = {
     return skill_input / 100;

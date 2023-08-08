@@ -17,6 +17,7 @@ items_weapons.qc
 player_stats.qc
 
 hook.qc
+weapons_misc.qc
 weapons_passing_bullets.qc
 weapons.qc
 weapon_summary.qc // switching, attack

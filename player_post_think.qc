@@ -213,31 +213,23 @@ void() CheckArmorModifers =
 
 void() CheckWeaponModifers =
 {
-	//
-	//
+	w_accel(
+		&self.nailgun_accel,
+		self.ng_accel_on,
+		base_ng_accel_module_fast,
+		base_ng_accel_module_slow,
+		base_ng_accel_step,
+		(self.w_mod_a & MOD_NG_ACCELERATOR ? TRUE : FALSE)
+	);
 
-	if (self.w_mod_a & MOD_NG_ACCELERATOR)
-	{
-		self.nailgun_accel = lerp(
-			self.nailgun_accel,
-			self.ng_accel_on ? base_ng_accel_module_fast : base_ng_accel_module_slow,
-			self.ng_reload_time
-		);
-	}
-	else
-		self.nailgun_accel = 1;
-
-	if (self.w_mod_a & MOD_SNG_ACCELERATOR)
-	{
-
-		self.super_nailgun_accel = lerp(
-			self.super_nailgun_accel,
-			self.sng_accel_on ? base_sng_accel_module_fast : base_sng_accel_module_slow,
-			self.sng_reload_time
-		);
-	}
-	else
-		self.super_nailgun_accel = 1;
+	w_accel(
+		&self.super_nailgun_accel,
+		self.sng_accel_on,
+		base_sng_accel_module_fast,
+		base_sng_accel_module_slow,
+		base_sng_accel_step,
+		(self.w_mod_a & MOD_SNG_ACCELERATOR ? TRUE : FALSE)
+	);
 
 	switch (self.weapon)
 	{
@@ -346,9 +338,6 @@ void() CheckWeaponModifers =
 			self.ng_reload_time = base_nailgun_reload_time;
 			self.ng_reload_time = self.ng_reload_time * self.nailgun_accel;
 
-
-			dprint(sprintf("%f ng_relod_time %f ng_accel\n", self.ng_reload_time, self.nailgun_accel));
-
 			xp_update_param (
 				&self.maxspeed,
 				base_agility_xp_nailgun_runspeed_min,
@@ -362,8 +351,6 @@ void() CheckWeaponModifers =
 
 			self.sng_reload_time = base_super_nailgun_reload_time;
 			self.sng_reload_time = self.sng_reload_time * self.super_nailgun_accel;
-
-			dprint(sprintf("%f sng_relod_time %f sng_accel\n", self.sng_reload_time, self.super_nailgun_accel));
 
 			xp_update_param (
 				&self.maxspeed,

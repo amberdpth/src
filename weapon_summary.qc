@@ -1,3 +1,13 @@
+void()	player_axe1;
+void()	player_axeb1;
+void()	player_axec1;
+void()	player_axed1;
+void()	player_shot1;
+void()	player_nail;
+void()	player_snail;
+void()	player_light1;
+void()	player_rocket1;
+
 void() W_SetCurrentAmmo =
 {
 	if (self.weapon == W_AXE)
@@ -134,7 +144,7 @@ void() W_Attack =
 
         case W_SUPER_NAILGUN:
             self.reload_time = self.sng_reload_time;
-            player_nail ();
+            player_snail ();
             break;
 
         case W_GRENADE_LAUNCHER:
@@ -394,6 +404,7 @@ void() SearchingDeadBodies =
 	self.searching_bodies = time + 1;
 	W_SetCurrentAmmo();
 }
+
 
 void() W_WeaponFrame =
 {

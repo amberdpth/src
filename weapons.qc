@@ -22,14 +22,7 @@ void () player_run;
 void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
 void(vector org, vector vel, float damage, entity o) SpawnBlood;
 
-void()	player_axe1;
-void()	player_axeb1;
-void()	player_axec1;
-void()	player_axed1;
-void()	player_shot1;
-void()	player_nail;
-void()	player_light1;
-void()	player_rocket1;
+
 
 // called by worldspawn
 void() W_Precache =
@@ -56,6 +49,8 @@ float() crandom =
 {
 	return 2*(random() - 0.5);
 };
+
+
 
 /*
 ================
@@ -427,6 +422,13 @@ void() W_FireShotgun =
 	self.punchangle_x = -2;
 	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
 	FireBullets (shotcount, dir, [spread_hv, spread_hv]);
+
+	fire_knockback (
+		&self.velocity, 
+		dir * 1000, 
+		base_shotgun_fire_knockback_mult,
+		self.armortype
+	);
 };
 
 
@@ -511,6 +513,13 @@ void() W_FireSuperShotgun =
 	}
 
 	FireBullets (shotcount, dir, [spread_h, spread_v]);
+
+	fire_knockback (
+		&self.velocity, 
+		dir * 1000, 
+		base_super_shotgun_fire_knockback_mult,
+		self.armortype
+	);
 };
 
 
@@ -563,6 +572,13 @@ void() W_FireTripleShotgun =
 	self.punchangle_x = -6;
 	self.currentammo = self.ammo_shells = self.ammo_shells - 3;
 	FireBullets (shotcount, dir, [spread_hv, spread_hv]);
+
+	fire_knockback (
+		&self.velocity, 
+		dir * 1000, 
+		base_triple_shotgun_fire_knockback_mult,
+		self.armortype
+	);
 };
 
 
@@ -665,6 +681,7 @@ void() W_FireRocket =
 {
 	entity missile;
 	vector dir;
+	float i = 0;
 
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
@@ -690,12 +707,8 @@ void() W_FireRocket =
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles(missile.velocity);
 
-	missile.fly_error[0] = random(-64, 64);
-	missile.fly_error[1] = random(-64, 64);
-	missile.fly_error[2] = random(-64, 64);
-	missile.fly_error[3] = random(-64, 64);
-	missile.fly_error[4] = random(-64, 64);
-	missile.fly_error[5] = random(-64, 64);
+	for (i = 0; i < 5; i++ )
+		missile.fly_error[i] = random(-64, 64);
 
 	missile.touch = T_MissileTouch;
 
@@ -903,10 +916,11 @@ Used for both the player and the ogre
 ===============
 */
 void(vector org, vector dir) launch_spike =
-{
+{	
+
 	newmis = spawn ();
 	newmis.owner = self;
-	newmis.movetype = MOVETYPE_FLYMISSILE;
+	newmis.movetype = MOVETYPE_TOSS;
 	newmis.solid = SOLID_BBOX;
 
 	newmis.angles = vectoangles(dir);
@@ -919,8 +933,69 @@ void(vector org, vector dir) launch_spike =
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	setorigin (newmis, org);
 
+	if (self.flags & FL_CLIENT)
+	{
+		if (self.w_mod_a & MOD_NG_HYPERSPEED_LAUNCHER)
+		{
+			newmis.gravity = 0.21;
+			newmis.velocity = dir * 1800 + v_up * 62;
+
+			fire_knockback (
+				&self.velocity, 
+				newmis.velocity, 
+				base_ng_hyperspeed_launcher_module_knockback_mult,
+				self.armortype
+			);
+
+			return;
+		}
+
+		newmis.gravity = 0.6;
+		newmis.velocity = dir * 900 + v_up * 100;
+
+		fire_knockback (
+			&self.velocity, 
+			newmis.velocity, 
+			base_nailgun_fire_knockback_mult,
+			self.armortype
+		);
+
+		return;
+	}
+
+
 	newmis.velocity = dir * 1000;
 };
+
+void(vector org, vector dir) launch_super_spike =
+{	
+
+	newmis = spawn ();
+	newmis.owner = self;
+	newmis.movetype = MOVETYPE_TOSS;
+	newmis.solid = SOLID_BBOX;
+
+	newmis.angles = vectoangles(dir);
+
+	newmis.touch = spike_touch;
+	newmis.classname = "spike";
+	newmis.think = SUB_Remove;
+	newmis.nextthink = time + 6;
+	setmodel (newmis, "progs/spike.mdl");
+	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
+	setorigin (newmis, org);
+
+	newmis.gravity = 0.5;
+	newmis.velocity = dir * 868 + v_up * 120;
+
+	fire_knockback (
+		&self.velocity, 
+		newmis.velocity, 
+		base_super_nailgun_fire_knockback_mult,
+		self.armortype
+	);
+}
+
 
 void() W_FireSuperSpikes =
 {
@@ -928,8 +1003,6 @@ void() W_FireSuperSpikes =
 	vector error_h, error_v;
 
 	makevectors (self.v_angle);
-
-	self.sng_accel_on = TRUE;
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_big_spikes = self.ammo_big_spikes - 1;
@@ -972,7 +1045,7 @@ void() W_FireSuperSpikes =
 			
 	}
 	
-	launch_spike (self.origin + muzzle_offset, dir);
+	launch_super_spike (self.origin + muzzle_offset, dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis, "progs/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
@@ -986,8 +1059,6 @@ void(float ox) W_FireSpikes =
 	vector error_h, error_v;
 
 	makevectors (self.v_angle);
-
-	self.ng_accel_on = TRUE;
 
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
