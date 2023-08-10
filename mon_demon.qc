@@ -101,7 +101,7 @@ void()	demon1_jump4	=[	$leap4,		demon1_jump5	]
 	self.touch = Demon_JumpTouch;
 	makevectors (self.angles);
 	self.origin_z = self.origin_z + 1;
-	self.velocity = calculate_dir_to_moving_target(self.enemy, 600) * 600 + v_up * 250;
+	self.velocity = calculate_dir_to_moving_target(600) * 600 + v_up * 250;
 	ai_face();
 	if (self.flags & FL_ONGROUND)
 		self.flags = self.flags - FL_ONGROUND;

@@ -358,9 +358,6 @@ void() W_FireShotgun =
 	float spread_hv; // one barrell
 	vector error_h, error_v;
 
-	if (self.currentammo < 1)
-		return;
-
 	spread_hv = lerp(
 		base_shotgun_spread_hv_min, 
 		base_shotgun_spread_hv_max, 
@@ -439,9 +436,6 @@ W_FireSuperShotgun
 */
 void() W_FireSuperShotgun =
 {
-	if (self.currentammo < 2)
-		return;
-
 	float i = 0;
 	vector dir;
 	float shotcount = 14;
@@ -530,14 +524,8 @@ W_FireTripleShotgun
 */
 void() W_FireTripleShotgun =
 {
-	if (self.currentammo < 3)
-	{
-		W_FireSuperShotgun ();
-		return;
-	}
-
 	vector dir;
-	float shotcount = 21;
+	float shotcount = (self.w_mod_a & MOD_TSG_SIX_SHOT ? 42 : 21);
 	float spread_hv;
 	vector error_h, error_v;
 
@@ -570,7 +558,7 @@ void() W_FireTripleShotgun =
 
 	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
 	self.punchangle_x = -6;
-	self.currentammo = self.ammo_shells = self.ammo_shells - 3;
+	self.currentammo = self.ammo_shells = self.ammo_shells - (self.w_mod_a & MOD_TSG_SIX_SHOT ? 6 : 3);
 	FireBullets (shotcount, dir, [spread_hv, spread_hv]);
 
 	fire_knockback (
@@ -652,8 +640,6 @@ void() missile_think =
 	error[1] = sin(time * self.fly_error[2]) + sin(time * self.fly_error[3]);
 	error[2] = sin(time * self.fly_error[4]) + sin(time * self.fly_error[5]);
 
-	dprint(vtos(error),"\n");
-
 	self.error_fraction = bound(0, self.error_fraction + frametime , 1);
 
 
@@ -666,7 +652,7 @@ void() missile_think =
 	self.angles = vectoangles(self.velocity);
 
 	self.think = missile_think;
-	self.nextthink = time;
+	self.nextthink = time + 0.025;
 }
 
 /*
@@ -714,7 +700,7 @@ void() W_FireRocket =
 
 	// set missile duration
 	missile.nextthink = time;
-	missile.think = missile_think;
+	missile.nextthink = time + 0.025;
 
 	setmodel (missile, "progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');

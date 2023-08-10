@@ -63,43 +63,44 @@ SOLDIER CODE
 
 void() army_fire;
 
-void() army_firerocket =
+
+void() army_firegrenade =
 {
 	entity missile;
-	vector dir;
 
-	sound (self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM);
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
 	missile = spawn ();
 	missile.owner = self;
-	missile.movetype = MOVETYPE_FLY;
+	missile.movetype = MOVETYPE_BOUNCE;
 	missile.solid = SOLID_BBOX;
-	missile.classname = "missile";
+
+	// set missile speed
+	makevectors (self.angles);
+
+	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
 
-	dir = calculate_dir_to_moving_target(self.enemy, 1000);
+	vector dir = calculate_dir_to_moving_target(600);
+	vector ang = 
 
-	missile.velocity = dir;
-	missile.start_dir = dir;
-	missile.velocity = missile.velocity * 1000;
-	missile.angles = vectoangles(missile.velocity);
+	missile.velocity = missile.velocity * 600;
 
-	missile.fly_error[0] = random(-64, 64);
-	missile.fly_error[1] = random(-64, 64);
-	missile.fly_error[2] = random(-64, 64);
-	missile.fly_error[3] = random(-64, 64);
-	missile.fly_error[4] = random(-64, 64);
-	missile.fly_error[5] = random(-64, 64);
+	
 
-	missile.touch = T_MissileTouch;
+	missile.avelocity = '300 300 300';
+
+	missile.touch = OgreGrenadeTouch;
 
 	// set missile duration
-	missile.nextthink = time;
-	missile.think = missile_think;
+	missile.nextthink = time + 1.25 + random(1.15, 3.75);
+	missile.think = OgreGrenadeExplode;
 
-	setmodel (missile, "progs/missile.mdl");
+	setmodel (missile, "progs/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+	setorigin (missile, self.origin);
 }
 
 void() army_load1 = [ $load1, army_load2 ] {ai_face();};
@@ -117,7 +118,7 @@ void()	army_atk_rocket1	=[	$shoot5,	army_atk_rocket2	]
 {
 	ai_face();
 
-	army_firerocket();
+	army_firegrenade();
 	self.effects = self.effects | EF_MUZZLEFLASH;
 };
 void()	army_atk_rocket2 = [	$shoot6,	army_atk_rocket3	] {ai_face();};

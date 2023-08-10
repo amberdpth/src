@@ -127,7 +127,7 @@ void() enforcer_fire =
 	
 	org = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
 
-	LaunchLaser(org, calculate_dir_to_moving_target(self.enemy,1000));
+	LaunchLaser(org, calculate_dir_to_moving_target(1000));
 };
 
 //============================================================================

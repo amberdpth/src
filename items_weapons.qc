@@ -6,7 +6,7 @@ void() weapon_touch =
 	if (self.classname == "weapon_nailgun")
 		other.ammo_nails = other.ammo_nails + 30;
 	else if (self.classname == "weapon_supernailgun")
-		other.ammo_nails = other.ammo_big_spikes + 30;
+		other.ammo_big_spikes = other.ammo_big_spikes + 30;
 	else if (self.classname == "weapon_supershotgun")
 		other.ammo_shells = other.ammo_shells + 5;
 	else if (self.classname == "weapon_rocketlauncher")
@@ -49,7 +49,7 @@ void() weapon_supershotgun =
 			self.weapon = W_SHOTGUN;
 			self.netname = "shotgun";
 			break;
-		case 5: case 6: case 8:
+		case 5: case 6: case 7: case 8:
 			setmodel (self, "progs/g_shot.mdl");
 			self.weapon = W_SUPER_SHOTGUN;
 			self.netname = "double-barrelled shotgun";

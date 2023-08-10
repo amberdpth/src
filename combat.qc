@@ -162,6 +162,15 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		self = oldself;
 	}
 
+	if (attacker.flags & FL_CLIENT)
+	{
+		xp_up (
+			&attacker.raw_accuracy_xp,
+			RATE_ACCURACY_XP,
+			damage * 0.01
+		);
+	}
+
 	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK) )
 	{
 		dir = targ.origin - (inflictor.absmin + inflictor.absmax) * 0.5;

@@ -79,15 +79,27 @@ void() W_SetCurrentAmmo =
 
 float() W_CheckNoAmmo =
 {
-	if (self.currentammo > 0)
-		return TRUE;
-
 	if (self.weapon == W_AXE)
 		return TRUE;
+	if ((self.weapon == W_SHOTGUN) && (self.currentammo > 0))
+		return TRUE;
+	if ((self.weapon == W_SUPER_SHOTGUN) && (self.currentammo > 1))
+		return TRUE;
+	if ((self.weapon == W_TRIPLE_SHOTGUN) 
+	&& (self.currentammo > (self.w_mod_a & MOD_TSG_SIX_SHOT ? 5 : 2)))
+		return TRUE;
+	if ((self.weapon == W_NAILGUN) && (self.currentammo > 0))
+		return TRUE;
+	if ((self.weapon == W_SUPER_NAILGUN) && (self.currentammo > 0))
+		return TRUE;
+	if ((self.weapon == W_GRENADE_LAUNCHER) && (self.currentammo > 0))
+		return TRUE;
+	if ((self.weapon == W_ROCKET_LAUNCHER) && (self.currentammo > 0))
+		return TRUE;
+
 
 	W_SetCurrentAmmo ();
 
-	// drop the weapon down
 	return FALSE;
 };
 
@@ -98,7 +110,6 @@ void() W_Attack =
 	if (!W_CheckNoAmmo ())
 		return;
 
-	// calculate forward angle for velocity
 	makevectors(self.v_angle);
 	// wake monsters up
 	self.show_hostile = time + 1;

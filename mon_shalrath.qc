@@ -180,7 +180,7 @@ void() ShalHome =
 {
 	local vector dir, vtemp;
 
-	vtemp = calculate_dir_to_moving_target(self.enemy, 250);
+	vtemp = calculate_dir_to_moving_target(400);
 
 	if (self.enemy.health < 1)
 	{

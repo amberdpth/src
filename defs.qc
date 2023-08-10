@@ -761,6 +761,11 @@ float lerp(float a, float b, float f)
     return a * (1.0 - f) + (b * f);
 }
 
+float logerp(float a, float b, float t)
+{
+	return a * pow ( b / a, t);
+}
+
 .vector start_dir;
 .float fly_error[6];
 .float error_fraction;

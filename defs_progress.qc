@@ -1,10 +1,7 @@
 float base_maxspeed = 320;
 float base_jump_force = 270;
 float base_gravity = 1.0;
-float base_jump_dir_force;
-
 .float jump_force;
-.float jump_dir_force;
 
 .float  xp_points;
 
@@ -41,10 +38,8 @@ float base_armor_wearing_xp_armortype_min = -0.07;
 float base_armor_wearing_xp_armortype_max = 0.13;
 float base_agility_xp_runspeed_min = -31;
 float base_agility_xp_runspeed_max = 50;
-float base_agility_xp_jump_force_min = -40;
-float base_agility_xp_jump_force_max = 55;
-float base_agility_xp_jump_dir_force_min = 8;
-float base_agility_xp_jump_dir_force_max = 64;
+float base_agility_xp_jump_force_min = -21;
+float base_agility_xp_jump_force_max = 73;
 float base_agility_xp_gravity_min = 0.06;
 float base_agility_xp_gravity_max = - 0.1;
 float base_agility_xp_axe_reload_time_min = 0.03;
@@ -199,7 +194,7 @@ float base_nailgun_fire_knockback_mult = 0.08;
 float base_super_nailgun_error_hv_min = 0.044;
 float base_super_nailgun_error_hv_max = 0.0045;
 
-float base_super_nailgun_fire_knockback_mult = 0.16;
+float base_super_nailgun_fire_knockback_mult = 0.11;
 
 // axe damage and hit distance
 

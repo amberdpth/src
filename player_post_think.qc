@@ -2,7 +2,6 @@ void() CheckSKillModifers  =
 {
 	self.maxspeed = base_maxspeed;
 	self.jump_force = base_jump_force;
-	self.jump_dir_force = base_jump_dir_force;
 	self.gravity = base_gravity;
 
 	self.armor_wearing_xp = self.raw_armor_wearing_xp;
@@ -24,13 +23,6 @@ void() CheckSKillModifers  =
 		base_agility_xp_jump_force_min,
 		base_agility_xp_jump_force_max,
 		self.agility_xp
-	);
-
-	xp_update_param (
-		&self.jump_dir_force,
-		base_agility_xp_jump_dir_force_min,
-		base_agility_xp_jump_dir_force_max,
-		self.jump_dir_force
 	);
 
 	xp_update_param (
@@ -568,7 +560,6 @@ void() PlayerPostThink =
 		else
 			sound (self, CHAN_VOICE, "player/land.wav", 1, ATTN_NORM);
 
-		xp_up( &self.raw_agility_xp, RATE_AGILITY_XP, 0.4);
 		self.jump_flag = 0;
 	}
 

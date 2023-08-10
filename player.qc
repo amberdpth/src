@@ -209,12 +209,12 @@ void()	player_axe2 =	[$axatt2, player_axe3	]
 {
 	self.weaponframe=5;
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
+	W_FireAxe();
 };
 void()	player_axe3 =	[$axatt3, player_axe4	] 
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=7;
-	W_FireAxe();
 };
 void()	player_axe4 =	[$axatt4, player_run	] 
 {
@@ -232,12 +232,12 @@ void()	player_axeb2 =	[$axattb2, player_axeb3	]
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=15;
+	W_FireAxe();
 };
 void()	player_axeb3 =	[$axattb3, player_axeb4	] 
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=17;
-	W_FireAxe();
 };
 void()	player_axeb4 =	[$axattb4, player_run	] 
 {
@@ -254,12 +254,12 @@ void()	player_axec2 =	[$axattc2, player_axec3	]
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=25;
+	W_FireAxe();
 };
 void()	player_axec3 =	[$axattc3, player_axec4	] 
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=27;
-	W_FireAxe();
 };
 void()	player_axec4 =	[$axattc4, player_run	] 
 {
@@ -276,12 +276,12 @@ void()	player_axed2 =	[$axattd2, player_axed3	]
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=35;
+	W_FireAxe();
 };
 void()	player_axed3 =	[$axattd3, player_axed4	] 
 {
 	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
 	self.weaponframe=37;
-	W_FireAxe();
 };
 void()	player_axed4 =	[$axattd4, player_run	] 
 {

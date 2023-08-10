@@ -107,7 +107,7 @@ void() OgreGrenadeTouch =
 
 void() OgreFireGrenade =
 {
-	local entity missile;
+	entity missile;
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -121,13 +121,11 @@ void() OgreFireGrenade =
 	// set missile speed
 	makevectors (self.angles);
 
-	
-
 	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
-	missile.velocity = calculate_dir_to_moving_target(self.enemy, 600);
+	missile.velocity = calculate_dir_to_moving_target(600);
 
-	vector fire_ang = vectoangles(missile.velocity);
+
 
 	missile.velocity = missile.velocity * 600 + v_up * 180;
 	missile.velocity[2] = missile.velocity[2] + v_up[2] * 60;

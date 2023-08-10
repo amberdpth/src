@@ -216,7 +216,7 @@ void() Wiz_FastFire =
 		self.owner.effects = self.owner.effects | EF_MUZZLEFLASH;
 
 		makevectors (self.enemy.angles);
-		dst = self.enemy.origin - 13*self.movedir;
+		dst = self.enemy.origin - 13 * self.movedir;
 
 		vec = normalize(dst - self.origin);
 		sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
@@ -224,6 +224,7 @@ void() Wiz_FastFire =
 		newmis.velocity = vec*600;
 		newmis.owner = self.owner;
 		newmis.classname = "wizspike";
+		newmis.gravity = 0.04;
 		setmodel (newmis, "progs/w_spike.mdl");
 		setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	}
