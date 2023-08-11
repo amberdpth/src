@@ -695,73 +695,6 @@ float(vector delta, vector dir, float proj_speed) aim_mod =
 	
 	return -1;
 }
-	/*
-	local sphere2 = workspace.Sphere:Clone()
-	sphere2.CanCollide = true
-	sphere2.Anchored = false
-	sphere2.Parent = workspace.Shells
-
-
-
-	local function MaxDistance(v, g, d, h)
-		local m = h / d
-		local v2 = v * v
-		return (v2*math.sqrt(m*m + 1) - m*v2) / g
-	end
-
-	-- Compute 2D launch angle. First return value is true if within range, second is the angle.
-	-- v: launch velocity
-	-- g: gravity (positive) e.g. 196.2
-	-- d: horizontal distance
-	-- h: vertical distance
-	-- higherArc: if true, use the higher arc. If false, use the lower arc.
-	local function LaunchAngle(v: number, g: number, d: number, h: number, higherArc: boolean): (boolean, number)
-		local max_x = MaxDistance(v, g, d, h)
-		local v2 = v * v
-
-		if d > max_x then
-			return false, math.atan(v2 / (g * max_x))
-		end
-
-		local v4 = v2 * v2
-		local root = math.sqrt(v4 - g*(g*d*d + 2*h*v2))
-		if not higherArc then root = -root end
-		return true, math.atan((v2 + root) / (g * d))
-	end
-
-	-- Compute 3D launch direction from. First return value is true if within range, second is the direction.
-	-- start: start position
-	-- target: target position
-	-- v: launch velocity
-	-- g: gravity (positive) e.g. 196.2
-	-- higherArc: if true, use the higher arc. If false, use the lower arc.
-	local function LaunchDirection(start, target, v, g, higherArc: boolean)
-		-- get the direction flattened:
-		local horizontal = Vector3.new(target.X - start.X, 0, target.Z - start.Z)
-
-		local h = target.Y - start.Y
-		local d = horizontal.Magnitude
-		local inRange, a = LaunchAngle(v, g, d, h, higherArc)
-
-		-- speed if we were just launching at a flat angle:
-		local vec = horizontal.Unit * v
-
-		-- rotate around the axis perpendicular to that direction...
-		local rotAxis = Vector3.new(-horizontal.Z, 0, horizontal.X)
-
-		-- ...by the angle amount
-		return inRange, CFrame.fromAxisAngle(rotAxis, a) * vec
-	end
-
-	local target = workspace.Target 
-
-	local power = 6600
-	
-	local inRange, dir = LaunchDirection(sphere2.Position, target.Position, 6600, workspace.Gravity, false)
-	
-	sphere2:ApplyImpulse(dir)
-	*/
-
 
 float (float proj_speed, float grav, float distance, float height) max_dist = 
 {
@@ -770,9 +703,12 @@ float (float proj_speed, float grav, float distance, float height) max_dist =
 	return (spd2 * sqrt( m * m + 1) - m * spd2) / grav;
 }
 
-vector (vector dir, float proj_speed) proj_launch_pitch_mod =
+float (vector dir, float proj_speed,optional float grav_mult) proj_launch_pitch_mod =
 {
-	float grav = cvar("sv_gravity");
+	if (!grav_mult)
+		grav_mult = 1;
+
+	float grav = cvar("sv_gravity") * grav_mult;
 
 	float spd2 = proj_speed * proj_speed;
 	float pitch;
@@ -784,15 +720,15 @@ vector (vector dir, float proj_speed) proj_launch_pitch_mod =
 	if (vlen(dir) > maxd)
 	{
 		pitch = atan(spd2 / (grav * maxd));
-		makevectors([-pitch, 0, 0]);
-		return v_forward;
 	}
-	
-	float spd4 = spd2 * spd2;
-	float root = sqrt(spd4 - grav * ( grav * distance * distance + 2 * dir[2] * spd2));
-	pitch = atan( (spd2 + root ) / (grav * distance));
+	else
+	{	
+		float spd4 = spd2 * spd2;
+		float root = sqrt(spd4 - grav * ( grav * distance * distance + 2 * dir[2] * spd2));
+		pitch = atan( (spd2 - root ) / (grav * distance));
+	}
 
-	return -pitch / 3.14 * 180;
+	return -pitch * 180 / 3.14159265359 ;
 }
 
 vector(float proj_speed) calculate_dir_to_moving_target =
@@ -801,12 +737,16 @@ vector(float proj_speed) calculate_dir_to_moving_target =
 	vector dir = self.enemy.origin - self.origin;
 	vector delta = self.enemy.velocity - self.velocity;
 
-	float deltatime = aim_mod(dir, delta, proj_speed) * random(0.6, 1.2);
+	float deltatime = aim_mod(dir, delta, proj_speed);
 
 	traceline(self.origin, self.enemy.origin + self.enemy.velocity * deltatime, TRUE, self);
 
+	float dodge_mult = (self.enemy.dodge_time > time ? random(0.25, 0.75) : 1);
+
 	if (trace_fraction == 1)
-		dir = normalize((self.enemy.origin + self.enemy.velocity * deltatime) - self.origin);
+		dir = normalize((self.enemy.origin + self.enemy.velocity * deltatime * dodge_mult) - self.origin);
+	else
+		dir = normalize(dir);
 
 
 	return dir;

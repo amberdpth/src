@@ -106,11 +106,11 @@ void()	demon1_jump4	=[	$leap4,		demon1_jump5	]
 	if (self.flags & FL_ONGROUND)
 		self.flags = self.flags - FL_ONGROUND;
 };
-void()	demon1_jump5	=[	$leap5,		demon1_jump6	] {};
-void()	demon1_jump6	=[	$leap6,		demon1_jump7	] {};
-void()	demon1_jump7	=[	$leap7,		demon1_jump8	] {};
-void()	demon1_jump8	=[ 	$leap8,		demon1_jump9	] {};
-void()	demon1_jump9	=[ 	$leap9,		demon1_jump10	] {};
+void()	demon1_jump5	=[	$leap5,		demon1_jump6	] {ai_face();};
+void()	demon1_jump6	=[	$leap6,		demon1_jump7	] {ai_face();};
+void()	demon1_jump7	=[	$leap7,		demon1_jump8	] {ai_face();};
+void()	demon1_jump8	=[ 	$leap8,		demon1_jump9	] {ai_face();};
+void()	demon1_jump9	=[ 	$leap9,		demon1_jump10	] {ai_face();};
 void()	demon1_jump10	=[ 	$leap10,	demon1_jump1	]
 {
 	self.nextthink = time + 3;
@@ -121,21 +121,21 @@ void()	demon1_jump11	=[ 	$leap11,	demon1_jump12	] {};
 void()	demon1_jump12	=[ 	$leap12,	demon1_run1	] {};
 
 
-void()	demon1_atta1	=[	$attacka1,		demon1_atta2	] {ai_charge(4);};
-void()	demon1_atta2	=[	$attacka2,		demon1_atta3	] {ai_charge(0);};
-void()	demon1_atta3	=[	$attacka3,		demon1_atta4	] {ai_charge(0);};
-void()	demon1_atta4	=[	$attacka4,		demon1_atta5	] {ai_charge(1);};
+void()	demon1_atta1	=[	$attacka1,		demon1_atta2	] {ai_charge(4);nxtth(0.03);};
+void()	demon1_atta2	=[	$attacka2,		demon1_atta3	] {ai_charge(0);nxtth(0.03);};
+void()	demon1_atta3	=[	$attacka3,		demon1_atta4	] {ai_charge(0);nxtth(0.03);};
+void()	demon1_atta4	=[	$attacka4,		demon1_atta5	] {ai_charge(1);nxtth(0.03);};
 void()	demon1_atta5	=[	$attacka5,		demon1_atta6	] {ai_charge(2); Demon_Melee(200);};
-void()	demon1_atta6	=[	$attacka6,		demon1_atta7	] {ai_charge(1);};
-void()	demon1_atta7	=[	$attacka7,		demon1_atta8	] {ai_charge(6);};
-void()	demon1_atta8	=[	$attacka8,		demon1_atta9	] {ai_charge(8);};
-void()	demon1_atta9	=[	$attacka9,		demon1_atta10] {ai_charge(4);};
-void()	demon1_atta10	=[	$attacka10,		demon1_atta11] {ai_charge(2);};
+void()	demon1_atta6	=[	$attacka6,		demon1_atta7	] {ai_charge(1);nxtth(0.03);};
+void()	demon1_atta7	=[	$attacka7,		demon1_atta8	] {ai_charge(6);nxtth(0.03);};
+void()	demon1_atta8	=[	$attacka8,		demon1_atta9	] {ai_charge(8);nxtth(0.03);};
+void()	demon1_atta9	=[	$attacka9,		demon1_atta10] {ai_charge(4);nxtth(0.03);};
+void()	demon1_atta10	=[	$attacka10,		demon1_atta11] {ai_charge(2);nxtth(0.03);};
 void()	demon1_atta11	=[	$attacka11,		demon1_atta12] {Demon_Melee(-200);};
-void()	demon1_atta12	=[	$attacka12,		demon1_atta13] {ai_charge(5);};
-void()	demon1_atta13	=[	$attacka13,		demon1_atta14] {ai_charge(8);};
-void()	demon1_atta14	=[	$attacka14,		demon1_atta15] {ai_charge(4);};
-void()	demon1_atta15	=[	$attacka15,		demon1_run1] {ai_charge(4);};
+void()	demon1_atta12	=[	$attacka12,		demon1_atta13] {ai_charge(5);nxtth(0.03);};
+void()	demon1_atta13	=[	$attacka13,		demon1_atta14] {ai_charge(8);nxtth(0.03);};
+void()	demon1_atta14	=[	$attacka14,		demon1_atta15] {ai_charge(4);nxtth(0.03);};
+void()	demon1_atta15	=[	$attacka15,		demon1_run1] {ai_charge(4);nxtth(0.03);};
 
 void()	demon1_pain1	=[	$pain1,		demon1_pain2	] {};
 void()	demon1_pain2	=[	$pain2,		demon1_pain3	] {};
@@ -221,7 +221,7 @@ void() monster_demon1 =
 
 	setmodel (self, "progs/demon.mdl");
 
-	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
+	setsize (self, VEC_HULL2_MIN, '32 32 24');
 	self.health = 300;
 
 	self.th_stand = demon1_stand1;

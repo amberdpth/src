@@ -791,3 +791,10 @@ float logerp(float a, float b, float t)
 
 .float ammo_big_spikes;
 .float ammo_grenades;
+
+.vector dodge_moves;
+.float dodge_time;
+
+void(float t) nxtth = {
+	self.nextthink = time + t;
+}

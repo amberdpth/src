@@ -318,6 +318,15 @@ void() PlayerPreThink =
 	if (time < self.pausetime)
 		self.velocity = '0 0 0';
 
+	if (self.movement != self.dodge_moves)
+	{
+		self.dodge_time = time + 0.17;
+		self.dodge_moves = self.movement;
+
+
+
+	}
+
 	if(time > self.attack_finished && self.currentammo == 0 && self.weapon != IT_AXE)
 		W_SetCurrentAmmo ();
 };

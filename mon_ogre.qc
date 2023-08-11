@@ -119,16 +119,19 @@ void() OgreFireGrenade =
 	missile.solid = SOLID_BBOX;
 
 	// set missile speed
-	makevectors (self.angles);
-
+	
 	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
-	missile.velocity = calculate_dir_to_moving_target(600);
+	vector dir = calculate_dir_to_moving_target(700);
+	vector ang = vectoangles(dir);
+	
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 700);
 
+	makevectors(ang);
 
+	missile.velocity = v_forward;
 
-	missile.velocity = missile.velocity * 600 + v_up * 180;
-	missile.velocity[2] = missile.velocity[2] + v_up[2] * 60;
+	missile.velocity = missile.velocity * 700;
 
 	missile.avelocity = '300 300 300';
 
@@ -145,6 +148,33 @@ void() OgreFireGrenade =
 	setorigin (missile, self.origin);
 };
 
+void() OgreFireSpike =
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
+
+	vector dir = calculate_dir_to_moving_target(900);
+	vector ang = vectoangles(dir);
+
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 900, 0.2);
+	
+	makevectors(ang);
+
+	float i = 0;
+
+	for (i = 0; i < floor(random(6,8)); i++)
+	{
+		launch_spike (self.origin, dir);
+		//newmis.movetype = MOVETYPE_FLY;
+		newmis.classname = "ogre_spike";
+		setmodel (newmis, "progs/spike.mdl");
+		setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
+		newmis.velocity = v_forward + random(-0.06, 0.06) * v_up + random(-0.06, 0.06) * v_right;
+		newmis.velocity = newmis.velocity * 900;
+		newmis.gravity = 0.2;
+	}
+}
 
 //=============================================================================
 
@@ -286,13 +316,40 @@ void() ogre_smash12	=[	$smash12,		ogre_smash13 ] {ai_charge(0);};
 void() ogre_smash13	=[	$smash13,		ogre_smash14 ] {ai_charge(4);};
 void() ogre_smash14	=[	$smash14,		ogre_run1	] {ai_charge(12);};
 
+void() ogre_grenade1;
+
 void() ogre_nail1	=[	$shoot1,		ogre_nail2	] {ai_face();};
 void() ogre_nail2	=[	$shoot2,		ogre_nail3	] {ai_face();};
 void() ogre_nail3	=[	$shoot2,		ogre_nail4	] {ai_face();};
-void() ogre_nail4	=[	$shoot3,		ogre_nail5	] {ai_face();OgreFireGrenade();};
+void() ogre_nail4	=[	$shoot3,		ogre_nail5	] {ai_face();OgreFireSpike();};
 void() ogre_nail5	=[	$shoot4,		ogre_nail6	] {ai_face();};
 void() ogre_nail6	=[	$shoot5,		ogre_nail7	] {ai_face();};
-void() ogre_nail7	=[	$shoot6,		ogre_run1	] {ai_face();};
+void() ogre_nail7	=[	$shoot6,		ogre_run1	] 
+{
+	ai_face();
+	SUB_CheckRefire (ogre_grenade1);
+};
+
+
+void() ogre_grenade1	=[	$shoot1,		ogre_grenade2	] 
+{
+
+	if (rint (random ()) == 1)
+	{
+		ogre_nail1();
+		return;
+	}
+
+	ai_face();
+};
+void() ogre_grenade2	=[	$shoot2,		ogre_grenade3	] {ai_face();};
+void() ogre_grenade3	=[	$shoot2,		ogre_grenade4	] {ai_face();};
+void() ogre_grenade4	=[	$shoot3,		ogre_grenade5	] {ai_face();OgreFireGrenade();};
+void() ogre_grenade5	=[	$shoot4,		ogre_grenade6	] {ai_face();};
+void() ogre_grenade6	=[	$shoot5,		ogre_grenade7	] {ai_face();};
+void() ogre_grenade7	=[	$shoot6,		ogre_run1	] {ai_face();};
+
+
 
 void()	ogre_pain1	=[	$pain1,		ogre_pain2	] {};
 void()	ogre_pain2	=[	$pain2,		ogre_pain3	] {};
@@ -483,7 +540,7 @@ void() monster_ogre =
 	self.th_run = ogre_run1;
 	self.th_die = ogre_die;
 	self.th_melee = ogre_melee;
-	self.th_missile = ogre_nail1;
+	self.th_missile = ogre_grenade1;
 	self.th_pain = ogre_pain;
 
 	walkmonster_start();

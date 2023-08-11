@@ -82,13 +82,16 @@ void() army_firegrenade =
 
 	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
-
-	vector dir = calculate_dir_to_moving_target(600);
-	vector ang = 
-
-	missile.velocity = missile.velocity * 600;
-
+	vector dir = calculate_dir_to_moving_target(700);
+	vector ang = vectoangles(dir);
 	
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 700);
+
+	makevectors(ang);
+
+	missile.velocity = v_forward;
+
+	missile.velocity = missile.velocity * 700;
 
 	missile.avelocity = '300 300 300';
 
@@ -181,11 +184,9 @@ void()	army_run8	=[	$run8,		army_run1	] {ai_run(8);};
 
 void()	army_atk1	=[	$shoot1,	army_atk2	] 
 {
-	float distance = vlen(self.enemy.origin - self.origin);
-
 	traceline(self.origin, self.enemy.origin, TRUE, self);
 	
-	if ((distance > random(350, 450)) && (trace_fraction == 1.0))
+	if (rint (random ()) == 1)
 	{
 		army_load1();
 		return;
