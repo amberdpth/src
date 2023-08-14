@@ -63,6 +63,39 @@ SOLDIER CODE
 
 void() army_fire;
 
+void() ArmyGrenadeExplode = 
+{
+	T_RadiusDamage (self, self.owner, 80, world);
+	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
+
+	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
+	WriteCoord (MSG_BROADCAST, self.origin_x);
+	WriteCoord (MSG_BROADCAST, self.origin_y);
+	WriteCoord (MSG_BROADCAST, self.origin_z);
+
+	self.velocity = '0 0 0';
+	self.touch = SUB_Null;
+	setmodel (self, "progs/s_explod.spr");
+	self.solid = SOLID_NOT;
+	s_explode1 ();
+};
+
+void() ArmyGrenadeTouch =
+{
+	if (other == self.owner)
+		// don't explode on owner
+		return;
+	if (other.takedamage == DAMAGE_AIM)
+	{
+		ArmyGrenadeExplode();
+		return;
+	}
+	// bounce sound
+	sound (self, CHAN_VOICE, "weapons/bounce.wav", 1, ATTN_NORM);
+	if (self.velocity == '0 0 0')
+		self.avelocity = '0 0 0';
+};
 
 void() army_firegrenade =
 {
@@ -82,20 +115,20 @@ void() army_firegrenade =
 
 	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
-	vector dir = calculate_dir_to_moving_target(700);
+	vector dir = calculate_dir_to_moving_target(720);
 	vector ang = vectoangles(dir);
 	
-	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 700);
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 720);
 
 	makevectors(ang);
 
 	missile.velocity = v_forward;
 
-	missile.velocity = missile.velocity * 700;
+	missile.velocity = missile.velocity * 720;
 
 	missile.avelocity = '300 300 300';
 
-	missile.touch = OgreGrenadeTouch;
+	missile.touch = ArmyGrenadeTouch;
 
 	// set missile duration
 	missile.nextthink = time + 1.25 + random(1.15, 3.75);
@@ -280,6 +313,7 @@ void(entity attacker, float damage)	army_pain =
 };
 
 
+
 void() army_fire =
 {
 	local vector dir;
@@ -289,13 +323,12 @@ void() army_fire =
 
 	sound (self, CHAN_WEAPON, "soldier/sattck1.wav", 1, ATTN_NORM);
 
-	// fire somewhat behind the player, so a dodging player is harder to hit
 	en = self.enemy;
 
-	dir = en.origin - en.velocity*0.2;
+	dir = en.origin - en.velocity * random(0, 0.2);
 	dir = normalize (dir - self.origin);
 
-	FireBullets (4, dir, '0.1 0.1 0');
+	FireBullets (8, dir, '0.1 0.1 0', 5.11);
 };
 
 
@@ -386,25 +419,9 @@ void() monster_army =
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 
-	self.health = 30;
-
-	float armor_chance = rint ( random ( 10 ) );
-
-	switch (armor_chance)
-	{
-		case 0:case 1:case 2:case 3:
-			self.armortype = 0;
-			self.armorvalue = 0;
-			break;
-		case 4:case 5: case 6:case 7: case 8:
-			self.armortype = 0.25;
-			self.armorvalue = 25;
-			break;
-		case 9: case 10:
-			self.armortype = 0.5;
-			self.armorvalue = 30;
-			break;
-	}
+	self.health = 33;
+	self.armortype = 0.3;
+	self.armorvalue = 25;
 
 
 	self.th_stand = army_stand1;

@@ -45,9 +45,6 @@ void() PlayerJump =
 	self.velocity_z = self.velocity_z + self.jump_force;
 
 	makevectors(self.v_angle);
-
-
-	xp_up( &self.raw_agility_xp, RATE_AGILITY_XP, 1.0);
 };
 
 void() WaterMove =
@@ -73,7 +70,7 @@ void() WaterMove =
 			self.dmg = self.dmg + 2;
 			if (self.dmg > 15)
 				self.dmg = 10;
-			T_Damage (self, world, world, self.dmg);
+			T_Damage (self, world, world, self.dmg, DMG_IGNORE_KNOCKBACK|DMG_IGNORE_ARMOR);
 			self.pain_finished = time + 1;
 		}
 	}
@@ -99,7 +96,7 @@ void() WaterMove =
 			else
 				self.dmgtime = time + 0.2;
 
-			T_Damage (self, world, world, 10*self.waterlevel);
+			T_Damage (self, world, world, 10*self.waterlevel, DMG_HEAT);
 		}
 	}
 	else if (self.watertype == CONTENT_SLIME)
@@ -108,7 +105,7 @@ void() WaterMove =
 		if (self.dmgtime < time && self.radsuit_finished < time)
 		{
 			self.dmgtime = time + 1;
-			T_Damage (self, world, world, 4*self.waterlevel);
+			T_Damage (self, world, world, 4*self.waterlevel, DMG_CHEM);
 		}
 	}
 
@@ -127,7 +124,11 @@ void() WaterMove =
 	}
 
 	if (! (self.flags & FL_WATERJUMP) )
-		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
+	{
+		self.velocity = self.velocity - lerp(0.8, 0.2, xp_frac(self.agility_xp)) * self.waterlevel * frametime * self.velocity;
+
+		xp_up (self.raw_agility_xp, RATE_AGILITY_XP, 0.00025 * self.waterlevel);
+	}
 };
 
 void() CheckWaterJump =
@@ -322,10 +323,10 @@ void() PlayerPreThink =
 	{
 		self.dodge_time = time + 0.17;
 		self.dodge_moves = self.movement;
-
-
-
 	}
+
+	if (time < self.dodge_time)
+		xp_up(self.raw_agility_xp, RATE_AGILITY_XP, 0.001);
 
 	if(time > self.attack_finished && self.currentammo == 0 && self.weapon != IT_AXE)
 		W_SetCurrentAmmo ();

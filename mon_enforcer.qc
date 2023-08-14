@@ -1,34 +1,3 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-    See file, 'COPYING', for details.
-*/
-/*
-==============================================================================
-
-SOLDIER / PLAYER (Enforcer)
-
-==============================================================================
-*/
-
-$cd id1/models/enforcer
-$origin 0 -6 24
-$base base
-$skin skin
-
 $frame stand1 stand2 stand3 stand4 stand5 stand6 stand7
 
 $frame walk1 walk2 walk3 walk4 walk5 walk6 walk7 walk8 walk9 walk10
@@ -75,8 +44,8 @@ void() Laser_Touch =
 
 	if (other.health)
 	{
-		SpawnBlood (org, self.velocity*0.2, 15, other);
-		T_Damage (other, self, self.owner, 15);
+		SpawnBlood (org, self.velocity*0.2, 30, other);
+		T_Damage (other, self, self.owner, 30, DMG_HEAT);
 	}
 	else
 	{
@@ -363,7 +332,9 @@ void() monster_enforcer =
 	setmodel (self, "progs/enforcer.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 80;
+	self.health = 30;
+	self.armortype = 0.5;
+	self.armorvalue = 65;
 
 	self.th_stand = enf_stand1;
 	self.th_walk = enf_walk1;

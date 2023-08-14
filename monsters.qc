@@ -1,8 +1,3 @@
-void() CalculateMonsterStats = 
-{
-	
-};
-
 void() monster_use =
 {
 	if (self.enemy)

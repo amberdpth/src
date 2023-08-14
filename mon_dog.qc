@@ -76,24 +76,22 @@ void() dog_bite =
 	if (vlen(delta) > 100)
 		return;
 
-	ldmg = (random() + random() + random()) * 8;
-	T_Damage (self.enemy, self, self, ldmg);
+	ldmg = (random() + random() + random()) * 15;
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 };
 
 void()	Dog_JumpTouch =
 {
-	local float ldmg;
+	float ldmg;
 
 	if (self.health <= 0)
 		return;
 
 	if (other.takedamage)
 	{
+		ldmg = 7 + 7 * random();
 		if ( vlen(self.velocity) > 300 )
-		{
-			ldmg = 10 + 10*random();
-			T_Damage (other, self, self, ldmg);
-		}
+			T_Damage (other, self, self, ldmg, DMG_MELEE);
 	}
 
 	if (!checkbottom(self))
@@ -362,7 +360,7 @@ void() monster_dog =
 	setmodel (self, "progs/dog.mdl");
 
 	setsize (self, '-32 -32 -24', '32 32 40');
-	self.health = 25;
+	self.health = 15;
 
 	self.th_stand = dog_stand1;
 	self.th_walk = dog_walk1;

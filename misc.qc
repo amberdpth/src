@@ -222,7 +222,7 @@ void() fire_fly =
 
 void() fire_touch =
 {
-	T_Damage (other, self, self, 20);
+	T_Damage (other, self, self, 20, DMG_HEAT);
 	remove(self);
 };
 

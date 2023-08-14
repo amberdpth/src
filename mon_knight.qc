@@ -112,31 +112,31 @@ void()	knight_runatk1	=[	$runattack1,		knight_runatk2	]
 		sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
 	ai_charge(20);
 };
-void()	knight_runatk2	=[	$runattack2,	knight_runatk3	] {self.in_charge = TRUE; ai_charge_side();};
-void()	knight_runatk3	=[	$runattack3,	knight_runatk4	] {self.in_charge = TRUE; ai_charge_side();};
-void()	knight_runatk4	=[	$runattack4,	knight_runatk5	] {self.in_charge = TRUE; ai_charge_side();};
-void()	knight_runatk5	=[	$runattack5,	knight_runatk6	] {self.in_charge = FALSE; ai_melee_side();};
-void()	knight_runatk6	=[	$runattack6,	knight_runatk7	] {self.in_charge = FALSE; ai_melee_side();};
-void()	knight_runatk7	=[	$runattack7,	knight_runatk8	] {self.in_charge = FALSE; ai_melee_side();};
-void()	knight_runatk8	=[	$runattack8,	knight_runatk9	] {self.in_charge = FALSE; ai_melee_side();};
-void()	knight_runatk9	=[	$runattack9,	knight_runatk10	] {self.in_charge = FALSE; ai_melee_side();};
-void()	knight_runatk10	=[	$runattack10,	knight_runatk11	] {self.in_charge = TRUE; ai_charge_side();};
-void()	knight_runatk11	=[	$runattack11,	knight_run1	] {self.in_charge = TRUE; ai_charge(10);};
+void()	knight_runatk2	=[	$runattack2,	knight_runatk3	] {ai_charge_side();};
+void()	knight_runatk3	=[	$runattack3,	knight_runatk4	] {ai_charge_side();};
+void()	knight_runatk4	=[	$runattack4,	knight_runatk5	] {ai_charge_side();};
+void()	knight_runatk5	=[	$runattack5,	knight_runatk6	] {ai_melee_side();};
+void()	knight_runatk6	=[	$runattack6,	knight_runatk7	] {ai_melee_side();};
+void()	knight_runatk7	=[	$runattack7,	knight_runatk8	] {ai_melee_side();};
+void()	knight_runatk8	=[	$runattack8,	knight_runatk9	] {ai_melee_side();};
+void()	knight_runatk9	=[	$runattack9,	knight_runatk10	] {ai_melee_side();};
+void()	knight_runatk10	=[	$runattack10,	knight_runatk11	] {ai_charge_side();};
+void()	knight_runatk11	=[	$runattack11,	knight_run1	] {ai_charge(10);};
 
 void()	knight_atk1	=[	$attackb1,		knight_atk2	]
 {
 	sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
 	ai_charge(0);
 };
-void()	knight_atk2	=[	$attackb2,		knight_atk3	] {self.in_charge = TRUE; ai_charge(7);};
-void()	knight_atk3	=[	$attackb3,		knight_atk4	] {self.in_charge = TRUE; ai_charge(4);};
-void()	knight_atk4	=[	$attackb4,		knight_atk5	] {self.in_charge = TRUE; ai_charge(0);};
-void()	knight_atk5	=[	$attackb5,		knight_atk6	] {self.in_charge = TRUE; ai_charge(3);};
-void()	knight_atk6	=[	$attackb6,		knight_atk7	] {self.in_charge = FALSE; ai_charge(4); ai_melee();};
-void()	knight_atk7	=[	$attackb7,		knight_atk8	] {self.in_charge = FALSE; ai_charge(1); ai_melee();};
-void()	knight_atk8	=[	$attackb8,		knight_atk9	] {self.in_charge = FALSE; ai_charge(3); ai_melee();};
-void()	knight_atk9	=[	$attackb9,		knight_atk10] {self.in_charge = TRUE; ai_charge(1);};
-void()	knight_atk10=[	$attackb10,		knight_run1	] {self.in_charge = TRUE; ai_charge(5);};
+void()	knight_atk2	=[	$attackb2,		knight_atk3	] {ai_charge(7);};
+void()	knight_atk3	=[	$attackb3,		knight_atk4	] {ai_charge(4);};
+void()	knight_atk4	=[	$attackb4,		knight_atk5	] {ai_charge(0);};
+void()	knight_atk5	=[	$attackb5,		knight_atk6	] {ai_charge(3);};
+void()	knight_atk6	=[	$attackb6,		knight_atk7	] {ai_charge(4); ai_melee();};
+void()	knight_atk7	=[	$attackb7,		knight_atk8	] {ai_charge(1); ai_melee();};
+void()	knight_atk8	=[	$attackb8,		knight_atk9	] {ai_charge(3); ai_melee();};
+void()	knight_atk9	=[	$attackb9,		knight_atk10] {ai_charge(1);};
+void()	knight_atk10=[	$attackb10,		knight_run1	] {ai_charge(5);};
 
 //===========================================================================
 
@@ -159,8 +159,6 @@ void()	knight_painb11	=[	$painb11,	knight_run1	] {};
 void(entity attacker, float damage)	knight_pain =
 {
 	local float r;
-
-	self.in_charge = FALSE;
 
 	if (self.pain_finished > time)
 		return;
@@ -270,7 +268,14 @@ void() monster_knight =
 	setmodel (self, "progs/knight.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 75;
+
+	vector three_prm = normalize(randomv());
+
+	self.health = 100 * three_prm[0];
+	self.armortype = 1.0 * three_prm[1];
+	self.armorvalue = 100 * three_prm[2];
+
+	dprint(sprintf( "health %f, protection %f, value %f\n", self.health, self.armortype, self.armorvalue));
 
 	self.th_stand = knight_stand1;
 	self.th_walk = knight_walk1;

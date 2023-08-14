@@ -702,7 +702,7 @@ void() SUB_Remove;
 //
 //	combat.qc
 //
-void(entity targ, entity inflictor, entity attacker, float damage) T_Damage;
+void(entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage;
 
 
 float (entity e, float healamount, float ignore) T_Heal; // health function
@@ -756,38 +756,12 @@ enumflags
 
 
 
-float lerp(float a, float b, float f)
-{
-    return a * (1.0 - f) + (b * f);
-}
 
-float logerp(float a, float b, float t)
-{
-	return a * pow ( b / a, t);
-}
 
 .vector start_dir;
 .float fly_error[6];
 .float error_fraction;
 
-.float armor_flag;
-.float armor_level;
-
-.float max_armorvalue;
-
-.float armor_min_protect;
-.float armor_max_protect;
-.float armor_min_speed;
-.float armor_max_speed;
-.float armor_min_value;
-.float armor_max_value;
-
-// JACKET
-
-#define ARMOR_FLAG_JACKET 1
-#define ARMOR_FLAG_COMBAT 2
-#define ARMOR_FLAG_BODY 3
-#define ARMOR_FLAG_CLASSIC 4
 
 .float ammo_big_spikes;
 .float ammo_grenades;
@@ -798,3 +772,7 @@ float logerp(float a, float b, float t)
 void(float t) nxtth = {
 	self.nextthink = time + t;
 }
+
+.float hit_damage;
+.float rad_damage;
+

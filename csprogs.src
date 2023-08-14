@@ -3,5 +3,6 @@
 #define CSQC
 
 fteextensions.qc
-stats_shared.qc
+shared.qc
+csqc_interface.qc
 csqc_main.qc

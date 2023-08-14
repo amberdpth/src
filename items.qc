@@ -1,21 +1,5 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-	See file, 'COPYING', for details.
-*/
 void() W_SetCurrentAmmo;
 /* ALL LIGHTS SHOULD BE 0 1 0 IN COLOR ALL OTHER ITEMS SHOULD
 BE .8 .3 .4 IN COLOR */
@@ -32,11 +16,6 @@ void() SUB_regen =
 	setorigin (self, self.origin);
 };
 
-
-
-/*QUAKED noclass (0 0 0) (-8 -8 -8) (8 8 8)
-prints a warning message when spawned
-*/
 void() noclass =
 {
 	dprint ("noclass spawned at");
@@ -45,15 +24,6 @@ void() noclass =
 	remove (self);
 };
 
-
-
-/*
-============
-PlaceItem
-
-plants the object on the floor
-============
-*/
 void() PlaceItem =
 {
 	local float oldz;
@@ -77,30 +47,12 @@ void() PlaceItem =
 	}
 };
 
-/*
-============
-StartItem
-
-Sets the clipping size and plants the object on the floor
-============
-*/
 void() StartItem =
 {
 	self.nextthink = time + 0.2;	// items start after other solids
 	self.think = PlaceItem;
 };
 
-/*
-=========================================================================
-
-HEALTH BOX
-
-=========================================================================
-*/
-//
-// T_Heal: add health to an entity, limiting health to max_health
-// "ignore" will ignore max_health limit
-//
 float (entity e, float healamount, float ignore) T_Heal =
 {
 	if (e.health <= 0)
@@ -118,55 +70,12 @@ float (entity e, float healamount, float ignore) T_Heal =
 	return 1;
 };
 
-/*QUAKED item_health (.3 .3 1) (0 0 0) (32 32 32) rotten megahealth
-Health box. Normally gives 25 points.
-Rotten box heals 5-10 points,
-megahealth will add 100 health, then
-rot you down to your maximum health limit,
-one point per second.
-*/
-
 float	H_ROTTEN = 1;
 float	H_MEGA = 2;
 .float	healamount, healtype;
 void() health_touch;
 void() item_megahealth_rot;
 
-void() item_health =
-{
-	self.touch = health_touch;
-
-	if (self.spawnflags & H_ROTTEN)
-	{
-		precache_model("maps/b_bh10.bsp");
-
-		precache_sound("items/r_item1.wav");
-		setmodel(self, "maps/b_bh10.bsp");
-		self.noise = "items/r_item1.wav";
-		self.healamount = 15;
-		self.healtype = 0;
-	}
-	else if (self.spawnflags & H_MEGA)
-	{
-		precache_model("maps/b_bh100.bsp");
-		precache_sound("items/r_item2.wav");
-		setmodel(self, "maps/b_bh100.bsp");
-		self.noise = "items/r_item2.wav";
-		self.healamount = 100;
-		self.healtype = 2;
-	}
-	else
-	{
-		precache_model("maps/b_bh25.bsp");
-		precache_sound("items/health1.wav");
-		setmodel(self, "maps/b_bh25.bsp");
-		self.noise = "items/health1.wav";
-		self.healamount = 25;
-		self.healtype = 1;
-	}
-	setsize (self, '0 0 0', '32 32 56');
-	StartItem ();
-};
 
 
 void() health_touch =
@@ -250,35 +159,6 @@ void() item_megahealth_rot =
 	}
 };
 
-float(float w) RankForWeapon =
-{
-	if (w == W_LIGHTNING)
-		return 1;
-	if (w == W_ROCKET_LAUNCHER)
-		return 2;
-	if (w == W_SUPER_NAILGUN)
-		return 3;
-	if (w == W_GRENADE_LAUNCHER)
-		return 4;
-	if (w == W_SUPER_SHOTGUN)
-		return 5;
-	if (w == W_NAILGUN)
-		return 6;
-	return 7;
-};
-
-void(float old, float new) Deathmatch_Weapon =
-{
-	local float or, nr;
-
-	// change self.weapon if desired
-	or = RankForWeapon (self.weapon);
-	nr = RankForWeapon (new);
-	if ( nr < or )
-		self.weapon = new;
-};
-
-
 void() key_touch =
 {
 	if (other.classname != "player")
@@ -327,17 +207,6 @@ void() key_setsounds =
 	}
 };
 
-/*QUAKED item_key1 (0 .5 .8) (-16 -16 -24) (16 16 32)
-SILVER key
-In order for keys to work
-you MUST set your maps
-worldtype to one of the
-following:
-0: medieval
-1: metal
-2: base
-*/
-
 void() item_key1 =
 {
 	if (world.worldtype == 0)
@@ -364,17 +233,6 @@ void() item_key1 =
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
 };
-
-/*QUAKED item_key2 (0 .5 .8) (-16 -16 -24) (16 16 32)
-GOLD key
-In order for keys to work
-you MUST set your maps
-worldtype to one of the
-following:
-0: medieval
-1: metal
-2: base
-*/
 
 void() item_key2 =
 {
@@ -403,16 +261,6 @@ void() item_key2 =
 	StartItem ();
 };
 
-
-
-/*
-===============================================================================
-
-END OF LEVEL RUNES
-
-===============================================================================
-*/
-
 void() sigil_touch =
 {
 	if (other.classname != "player")
@@ -436,54 +284,7 @@ void() sigil_touch =
 };
 
 
-/*QUAKED item_sigil (0 .5 .8) (-16 -16 -24) (16 16 32) E1 E2 E3 E4
-End of level sigil, pick up to end episode and return to jrstart.
-*/
-
-void() item_sigil =
-{
-	if (!self.spawnflags)
-		objerror ("no spawnflags");
-
-	precache_sound ("misc/runekey.wav");
-	self.noise = "misc/runekey.wav";
-
-	if (self.spawnflags & 1)
-	{
-		precache_model ("progs/end1.mdl");
-		setmodel (self, "progs/end1.mdl");
-	}
-	if (self.spawnflags & 2)
-	{
-		precache_model2 ("progs/end2.mdl");
-		setmodel (self, "progs/end2.mdl");
-	}
-	if (self.spawnflags & 4)
-	{
-		precache_model2 ("progs/end3.mdl");
-		setmodel (self, "progs/end3.mdl");
-	}
-	if (self.spawnflags & 8)
-	{
-		precache_model2 ("progs/end4.mdl");
-		setmodel (self, "progs/end4.mdl");
-	}
-
-	self.touch = sigil_touch;
-	setsize (self, '-16 -16 -24', '16 16 32');
-	StartItem ();
-};
-
-/*
-===============================================================================
-
-POWERUPS
-
-===============================================================================
-*/
-
 void() powerup_touch;
-
 
 void() powerup_touch =
 {
@@ -547,83 +348,7 @@ void() powerup_touch =
 
 
 
-/*QUAKED item_artifact_invulnerability (0 .5 .8) (-16 -16 -24) (16 16 32)
-Player is invulnerable for 30 seconds
-*/
-void() item_artifact_invulnerability =
-{
-	self.touch = powerup_touch;
-
-	precache_model ("progs/invulner.mdl");
-	precache_sound ("items/protect.wav");
-	precache_sound ("items/protect2.wav");
-	precache_sound ("items/protect3.wav");
-	self.noise = "items/protect.wav";
-	setmodel (self, "progs/invulner.mdl");
-	self.netname = "Pentagram of Protection";
-	self.items = IT_INVULNERABILITY;
-	setsize (self, '-16 -16 -24', '16 16 32');
-	StartItem ();
-};
-
-/*QUAKED item_artifact_envirosuit (0 .5 .8) (-16 -16 -24) (16 16 32)
-Player takes no damage from water or slime for 30 seconds
-*/
-void() item_artifact_envirosuit =
-{
-	self.touch = powerup_touch;
-
-	precache_model ("progs/suit.mdl");
-	precache_sound ("items/suit.wav");
-	precache_sound ("items/suit2.wav");
-	self.noise = "items/suit.wav";
-	setmodel (self, "progs/suit.mdl");
-	self.netname = "Biosuit";
-	self.items = IT_SUIT;
-	setsize (self, '-16 -16 -24', '16 16 32');
-	StartItem ();
-};
-
-
-/*QUAKED item_artifact_invisibility (0 .5 .8) (-16 -16 -24) (16 16 32)
-Player is invisible for 30 seconds
-*/
-void() item_artifact_invisibility =
-{
-	self.touch = powerup_touch;
-
-	precache_model ("progs/invisibl.mdl");
-	precache_sound ("items/inv1.wav");
-	precache_sound ("items/inv2.wav");
-	precache_sound ("items/inv3.wav");
-	self.noise = "items/inv1.wav";
-	setmodel (self, "progs/invisibl.mdl");
-	self.netname = "Ring of Shadows";
-	self.items = IT_INVISIBILITY;
-	setsize (self, '-16 -16 -24', '16 16 32');
-	StartItem ();
-};
-
 void() item_weapon_mod_a;
-
-void() item_artifact_super_damage =
-{
-	precache_model ("progs/quaddama.mdl");
-	precache_sound ("items/damage.wav");
-	precache_sound ("items/damage2.wav");
-	precache_sound ("items/damage3.wav");
-
-	/*
-	self.touch = powerup_touch;
-	self.noise = "items/damage.wav";
-	setmodel (self, "progs/quaddama.mdl");
-	self.netname = "Quad Damage";
-	self.items = IT_QUAD;
-	setsize (self, '-16 -16 -24', '16 16 32');
-	StartItem ();
-	*/
-	item_weapon_mod_a();
-};
 
 float(entity o, float ammo, string ammo_name) got_ammo;
 
@@ -656,11 +381,6 @@ void() BackpackTouch =
 	W_SetCurrentAmmo ();
 };
 
-/*
-===============
-DropBackpack
-===============
-*/
 void() DropBackpack =
 {
 	local entity item;
@@ -713,3 +433,4 @@ void() DropBackpack =
 	item.nextthink = time + 120;
 	item.think = SUB_Remove;
 };
+

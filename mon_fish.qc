@@ -116,7 +116,7 @@ void() fish_melee =
 
 	sound (self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
 	ldmg = (random() + random()) * 3;
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 };
 
 void() f_attack1        =[      $attack1,       f_attack2 ] {ai_charge(10);};
@@ -224,7 +224,7 @@ void() monster_fish =
 	setmodel (self, "progs/fish.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 24');
-	self.health = 25;
+	self.health = 1;
 
 	self.th_stand = f_stand1;
 	self.th_walk = f_walk1;

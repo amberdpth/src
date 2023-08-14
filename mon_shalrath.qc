@@ -205,9 +205,8 @@ void() ShalMissileTouch =
 		// don't explode on owner
 		return;
 
-	if (other.classname == "monster_zombie")
-		T_Damage (other, self, self, 110);
-	T_RadiusDamage (self, self.owner, 40, world);
+	T_Damage (other, self, self, 100, DMG_MAGIC);
+	T_RadiusDamage (self, self.owner, 25, world);
 	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
@@ -250,7 +249,7 @@ void() monster_shalrath =
 
 	setmodel (self, "progs/shalrath.mdl");
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
-	self.health = 400;
+	self.health = 140;
 
 	self.th_stand = shal_stand;
 	self.th_walk = shal_walk1;

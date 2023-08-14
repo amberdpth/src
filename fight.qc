@@ -214,17 +214,17 @@ float() ai_melee_damage =
 
 	if (self.enemy.flags & FL_CLIENT)
 	{
-		damg = 1 - skill_fraction(self.enemy.melee_xp);
-		damg = (1 - skill_fraction(self.enemy.agility_xp)) * 2 + damg;
+		damg = 1 - xp_frac(self.enemy.melee_xp);
+		damg = (1 - xp_frac(self.enemy.agility_xp)) * 2 + damg;
 		damg /= 3;
 
 		if (self.enemy.weapon == W_AXE)
 		{
-			damg = damg + 1 - skill_fraction(self.enemy.melee_xp);
+			damg = damg + 1 - xp_frac(self.enemy.melee_xp);
 			damg /= 2;
 		}
 
-		xp_up(&self.enemy.raw_melee_xp, RATE_MELEE_XP, damg);
+		xp_up(self.enemy.raw_melee_xp, RATE_MELEE_XP, damg);
 
 	}
 
@@ -247,7 +247,7 @@ void() ai_melee =
 		return;
 
 	ldmg = ai_melee_damage();
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 };
 
 
@@ -268,7 +268,7 @@ void() ai_melee_side =
 	if (!CanDamage (self.enemy, self))
 		return;
 	ldmg = ai_melee_damage();
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 };
 
 

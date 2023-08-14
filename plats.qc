@@ -126,7 +126,7 @@ void() plat_trigger_use =
 
 void() plat_crush =
 {
-	T_Damage (other, self, self, 1);
+	T_Damage (other, self, self, 1, 0);
 
 	if (self.state == STATE_UP)
 		plat_go_down ();
@@ -236,7 +236,7 @@ void() train_blocked =
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + 0.5;
-	T_Damage (other, self, self, self.dmg);
+	T_Damage (other, self, self, self.dmg, 0);
 };
 void() train_use =
 {

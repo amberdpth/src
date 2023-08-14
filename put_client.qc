@@ -112,14 +112,14 @@ void() SetChangeParms =
 
 	parm1 = self.weapons;
 	parm2 = self.health;
-	parm3 = self.armorvalue;
+	//parm3 = self.armorvalue;
 
 	parm4 = self.ammo_shells;
 	parm5 = self.ammo_nails;
 	parm6 = self.ammo_rockets;
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
-	parm9 = self.armortype;
+	//parm9 = self.armortype;
 	parm10 = self.shards;
 	parm11 = self.vials;
 	parm12 = self.w_mod_a;
@@ -132,10 +132,11 @@ void() SetChangeParms =
 	parm25 = self.raw_agility_xp;
 
 	parm40 = self.armor_flag;
-	parm41 = self.armor_level;
+	parm41 = self.armorvalue;
+	parm42 = self.armortype;
 
-	parm42 = self.ammo_big_spikes;
-	parm43 = self.ammo_grenades;
+	parm43 = self.ammo_big_spikes;
+	parm44 = self.ammo_grenades;
 
 	
 
@@ -153,13 +154,13 @@ void() DecodeLevelParms =
 
 	self.weapons = parm1;
 	self.health = parm2;
-	self.armorvalue = parm3;
+//	self.armorvalue = parm3;
 	self.ammo_shells = parm4;
 	self.ammo_nails = parm5;
 	self.ammo_rockets = parm6;
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
-	self.armortype = parm9;
+//	self.armortype = parm9;
 	self.shards = parm10;
 	self.vials = parm11;
 	self.w_mod_a = parm12;
@@ -172,9 +173,11 @@ void() DecodeLevelParms =
 	self.raw_agility_xp = parm25;
 
 	self.armor_flag = parm40;
-	self.armor_level = parm41;
+	self.armorvalue = parm41;
+	self.armortype = parm42;
 
-	self.ammo_big_spikes = parm42;
+	self.ammo_big_spikes = parm43;
+	self.ammo_grenades = parm44;
 };
 
 void() PutClientInServer =

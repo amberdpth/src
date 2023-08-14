@@ -1,12 +1,11 @@
 void(vector org, vector vel, float damage, entity o) SpawnBlood;
 
-void(float shotcount, vector dir, vector spread) FirePassingBullets =
+void(float shotcount, vector dir, vector spread, float damage) FirePassingBullets =
 {
 	vector direction;
 	vector src;
 	vector vel, org;
-	float damage;
-
+	
 	makevectors(self.v_angle);
 
 	src = self.origin + v_forward*10;
@@ -16,12 +15,10 @@ void(float shotcount, vector dir, vector spread) FirePassingBullets =
 	{
 		direction = dir + random(-1, 1) * spread[0] * v_right + random(-1, 1) * spread[1] * v_up;
 
-		traceline(src, src + direction*2048, 0, self);
+		traceline(src, src + direction*2048, MOVE_HITMODEL, self);
 
 		if (trace_fraction != 1.0)
 		{
-
-			damage = 4;
 
 			while(1)
 			{
@@ -63,7 +60,7 @@ void(float shotcount, vector dir, vector spread) FirePassingBullets =
 
 	while(e)
 	{
-		T_Damage(e, self, self, e.multidamage);
+		T_Damage(e, self, self, e.multidamage, DMG_BULLET);
 		
 		e.multidamage = 0;
 		e.multidamage_flag = FALSE;

@@ -70,7 +70,7 @@ $frame pull1 pull2 pull3 pull4 pull5 pull6 pull7 pull8 pull9 pull10 pull11
 
 void() OgreGrenadeExplode =
 {
-	T_RadiusDamage (self, self.owner, 80, world);
+	T_RadiusDamage (self, self.owner, 88, world);
 	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
@@ -122,16 +122,16 @@ void() OgreFireGrenade =
 	
 	//missile.velocity = normalize(self.enemy.origin - self.origin);
 
-	vector dir = calculate_dir_to_moving_target(700);
+	vector dir = calculate_dir_to_moving_target(670);
 	vector ang = vectoangles(dir);
 	
-	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 700);
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 670);
 
 	makevectors(ang);
 
 	missile.velocity = v_forward;
 
-	missile.velocity = missile.velocity * 700;
+	missile.velocity = missile.velocity * 670;
 
 	missile.avelocity = '300 300 300';
 
@@ -202,8 +202,8 @@ void(float side) chainsaw =
 	if (vlen(delta) > 100)
 		return;
 
-	ldmg = (random() + random() + random()) * 4;
-	T_Damage (self.enemy, self, self, ldmg);
+	ldmg = (random() + random() + random()) * 13;
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 
 	if (side)
 	{
@@ -533,7 +533,7 @@ void() monster_ogre =
 	setmodel (self, "progs/ogre.mdl");
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
-	self.health = 200;
+	self.health = 150;
 
 	self.th_stand = ogre_stand1;
 	self.th_walk = ogre_walk1;

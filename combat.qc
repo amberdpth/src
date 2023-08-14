@@ -1,38 +1,16 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
+/*PROTOTYPES*/
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-    See file, 'COPYING', for details.
-*/
-
+void(float flag, __inout float armortype_mod, float dmg_flag) DamageProcessArmors;
 void() T_MissileTouch;
 void() info_player_start;
 void(entity targ, entity attacker) ClientObituary;
-
 void() monster_death_use;
 
-//============================================================================
 
-/*
-============
-CanDamage
+/* Can Damage */
 
-Returns true if the inflictor can directly damage the target.  Used for
-explosions and melee attacks.
-============
-*/
+
 float(entity targ, entity inflictor) CanDamage =
 {
 	// bmodels need special checking because their origin is 0,0,0
@@ -107,12 +85,60 @@ void(entity targ, entity attacker) Killed =
 	self = oself;
 };
 
-void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
+
+
+void(entity targ, entity inflictor, entity attacker, float damage, __inout float take, __inout float save, float dmg_flag) DamageArmorProcess =
+{
+	if (dmg_flag & DMG_IGNORE_ARMOR)
+		return;
+
+	float dmg = damage;
+	float armor = targ.armor_flag;
+	float armortype_mod = targ.armortype;
+	float armor_residual;
+
+	DamageProcessArmors(armor, armortype_mod, dmg_flag);
+
+
+	save = armortype_mod * dmg;
+	take = dmg - save;
+
+	dprint(sprintf("TAKE SAVE %d %d\n",take,save));
+
+	targ.armorvalue = targ.armorvalue - save;
+
+	if (targ.armorvalue <= 0)
+	{
+		targ.armortype = 0;
+		targ.armorvalue = 0;
+	}
+
+	if (targ.flags & FL_CLIENT)
+	{
+		xp_up(targ.raw_armor_wearing_xp, RATE_ARMOR_XP, targ.armortype);
+
+		if ((targ.armorvalue <= 0) && (targ.armor_flag))
+		{
+			armor_residual = targ.armorvalue < 0 ? -targ.armorvalue : 0;
+
+			targ.armor_flag = 0;
+			targ.armorvalue = 0;
+			targ.armortype = 0;
+		
+			sprint(targ,  "your armor has been destroyed\n");
+		
+			xp_up (targ.raw_armor_wearing_xp, RATE_ARMOR_XP, armor_residual);
+		}
+	}
+}
+
+
+void(entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage =
 {
 	vector	dir;
 	entity	oldself;
-	float	save;
-	float	take;
+	float	save = 0;
+	float	take = 0;
 
 	if (!targ.takedamage)
 		return;
@@ -120,78 +146,27 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	damage_attacker = attacker;
 	damage_inflictor = inflictor;
 
-	if (attacker.super_damage_finished > time)
-		damage = damage * 4;
+	DamageArmorProcess(targ, inflictor, attacker, damage, take, save, dmg_flag);
+	//DamageResistProcess(targ, inflictor, attacker, take, dmg_flag);
 
-	
-	save = ceil ( targ.armortype * damage );
-	take = ceil ( damage - save );
-
-	targ.armorvalue = targ.armorvalue - save;
-
-	if (targ.armorvalue <= 0)
-	{
-		targ.armortype = 0;
-
-		if (targ.armor_flag)
-		{
-			targ.armor_flag = 0;
-			targ.armor_level = 0;
-			targ.armorvalue = 0;
-			targ.max_armorvalue = 0;
-			sprint(targ, " your armor has been destroyed \n");
-		}
-	}
-	
 
 	if (targ.flags & FL_CLIENT)
 	{
 		targ.dmg_take = targ.dmg_take + take;
 		targ.dmg_save = targ.dmg_save + save;
 		targ.dmg_inflictor = inflictor;
-
-		oldself = self;
-		self = targ;
-
-		if (self.armor_flag)
-			xp_up ( 
-				&self.raw_armor_wearing_xp, 
-				RATE_ARMOR_XP, 
-				self.armortype);
-
-		self = oldself;
 	}
 
 	if (attacker.flags & FL_CLIENT)
-	{
-		xp_up (
-			&attacker.raw_accuracy_xp,
-			RATE_ACCURACY_XP,
-			damage * 0.01
-		);
-	}
+		xp_up (attacker.raw_accuracy_xp, RATE_ACCURACY_XP, damage * 0.01);
 
-	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK) )
+	if (!(dmg_flag & DMG_IGNORE_KNOCKBACK)/* && (targ.movetype == MOVETYPE_WALK)*/)
 	{
 		dir = targ.origin - (inflictor.absmin + inflictor.absmax) * 0.5;
 		dir = normalize(dir);
-		targ.velocity = targ.velocity + dir*damage*8;
-	}
 
-	if (targ.flags & FL_GODMODE)
-		return;
-	if (targ.invincible_finished >= time)
-	{
-		if (self.invincible_sound < time)
-		{
-			sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
-			self.invincible_sound = time + 2;
-		}
-		return;
+		targ.velocity = targ.velocity + dir * damage * 8;
 	}
-
-	if ( (teamplay == 1) && (targ.team > 0)&&(targ.team == attacker.team) )
-		return;
 
 	targ.health = targ.health - take;
 
@@ -267,23 +242,21 @@ void(entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDam
 				{
 					if (CanDamage (head, inflictor))
 						points = points * 1;
+
 					else
 					{
-						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, skill_fraction(attacker.explosive_xp)) : 0.25);
+						passing_damage = (attacker.flags & FL_CLIENT ? lerp(0.25, 0.75, xp_frac(attacker.explosive_xp)) : 0.25);
 						points = points * passing_damage;
 					}
 						
-					T_Damage (head, inflictor, attacker, points);
-
+					T_Damage (head, inflictor, attacker, points, DMG_EXPLO);
+					
 					if (attacker.flags & FL_CLIENT)
 						skill_reciever = attacker;
 					if (head.flags & FL_CLIENT)
 						skill_reciever = head;
 					if (skill_reciever.flags & FL_CLIENT)
-						xp_up (
-							&skill_reciever.raw_explosive_xp,
-							RATE_EXPLOSIVE_XP,
-							(head == attacker ? 0.25 : 1.0 ) * summary_multiplier);
+						xp_up (skill_reciever.raw_explosive_xp, RATE_EXPLOSIVE_XP, (head == attacker ? 0.25 : 1.0 ) * summary_multiplier);
 
 					summary_multiplier = summary_multiplier * 1.12;
 				}

@@ -349,14 +349,14 @@ void() tdeath_touch =
 		if (self.owner.classname != "player")
 		{
 			// other monsters explode themselves
-			T_Damage (self.owner, self, self, 50000);
+			T_Damage (self.owner, self, self, 50000, DMG_MAGIC);
 			return;
 		}
 	}
 
 	if (other.health)
 	{
-		T_Damage (other, self, self, 50000);
+		T_Damage (other, self, self, 50000, DMG_MAGIC);
 	}
 };
 
@@ -568,7 +568,7 @@ void() hurt_touch =
 	if (other.takedamage)
 	{
 		self.solid = SOLID_NOT;
-		T_Damage (other, self, self, self.dmg);
+		T_Damage (other, self, self, self.dmg, 0);
 		self.think = hurt_on;
 		self.nextthink = time + 1;
 	}

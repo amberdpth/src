@@ -17,7 +17,7 @@ void() ShowPlayerStats =
     if ((self.impulse == 20) && (self.showstats_overtime > time))
         return;
 
-    string armorflag_name = string_null;
+    string armorflag_name = srtring_armorname(self.armor_flag);
 
     self.showstats_overtime = time + 3;
 
@@ -29,15 +29,7 @@ void() ShowPlayerStats =
     
     if (self.armor_flag)
     {
-        switch (self.armor_flag)
-        {
-            case ARMOR_FLAG_JACKET: armorflag_name = "jacket";break;
-            case ARMOR_FLAG_COMBAT: armorflag_name = "combat armor";break;
-            case ARMOR_FLAG_BODY: armorflag_name = "body armor";break;
-            case ARMOR_FLAG_CLASSIC: armorflag_name = "classic armor";break;
-        }
-
-        sprint(self, armorflag_name ,sprintf(" %d level ", self.armor_level + 1));
+        sprint(self, armorflag_name);
         sprint(self,"\n");
         sprint(self, sprintf("armor protection [%d/%d] ", self.armorvalue, self.max_armorvalue));
         sprint(self, ftos(ceil(100 * self.armortype)), "% resist\n");

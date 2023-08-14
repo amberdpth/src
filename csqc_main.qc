@@ -1,17 +1,5 @@
 float has_armor;
 float showinfo;
-float step_index;
-
-float() init_step_index = 
-{
-    step_index = 1;
-    return step_index;
-};
-float(float in) shift_step_index =
-{
-    step_index = step_index + in;
-    return step_index;
-}
 
 string cl_weapon_list[] = 
 {
@@ -62,22 +50,60 @@ string() get_armor_name =
     return "no armor";
 }
 
-string() get_armor_level =
-{
-    if (!has_armor) return "";
-
-    float flag = getstatf(STAT_ARMOR_LEVEL);
-    return strcat(ftos(flag+1), " level");
-}
-
 #define STATS_FONT_SIZE '8 8'
 #define STATS_FONT_COLOR '1 1 1'
 #define STATS_FONT_HEADER_COLOR '1 0.9 0.5'
+
+void(float raw_stat, float stat, string stat_str, float step) draw_skill_bar =
+{
+
+
+    raw_stat = getstatf(raw_stat);
+    stat = getstatf(stat);
+
+    vector pos = [32,32] + [0, step];
+
+    float floor_stat = floor(stat);
+    float ceil_stat = ceil(stat);
+
+    float floor_raw_stat = floor(raw_stat);
+    float ceil_raw_stat = ceil(raw_stat);
+
+    vector str_color = '1 1 1';
+    float str_alpha = 1;
+
+
+    string message = strcat( stat_str, sprintf(" %d ", floor_stat));
+
+    if (floor_stat > floor_raw_stat)
+        message = strcat ( message, sprintf("[^2+%d^7]", stat - raw_stat));
+    else if (floor_stat < floor_raw_stat)
+        message = strcat ( message, sprintf("[^1%d^7]", stat - raw_stat));
+
+    drawstring(pos, message, '8 8', str_color, str_alpha, 0);
+    
+    vector fill_empty = [128, 2];
+    vector fill_empty_color = '0.1 0.1 0.1';
+
+    vector fill = [lerp(0, 128, raw_stat - floor_raw_stat), 2];
+    vector fill_color = '1 1 1';
+
+    drawfill(pos + [0, 8], fill_empty, fill_empty_color, 1, 0);
+    drawfill(pos + [0, 8], fill, fill_color, 1, 0);
+}
 
 void(float w, float h) DrawStats =
 {
     string currentammo_str = ftos(getstatf(STAT_AMMO));
     float currentammo_strl = strlen(currentammo_str) * 8;
+
+    draw_skill_bar(STAT_RAW_ARMOR_WEARING_XP, STAT_ARMOR_WEARING_XP, "armor wearing:", 0);
+    draw_skill_bar(STAT_RAW_ACCURACY_XP, STAT_ACCURACY_XP, "accuracy:", 10);
+    draw_skill_bar(STAT_RAW_AGILITY_XP, STAT_AGILITY_XP, "agility:", 20);
+    draw_skill_bar(STAT_RAW_MELEE_XP, STAT_MELEE_XP, "melee fight:", 30);
+    draw_skill_bar(STAT_RAW_SEARCHING_XP, STAT_SEARCHING_XP, "searching:", 40);
+    draw_skill_bar(STAT_RAW_EXPLOSIVES_XP, STAT_EXPLOSIVES_XP, "explosives:", 50);
+
 
     drawstring([w / 2, h / 2] - [(currentammo_strl / 2),0] + [0, 128], currentammo_str,STATS_FONT_SIZE, '1 1 1', 1, 0);
 
@@ -102,11 +128,9 @@ float(string cmd) CSQC_ConsoleCommand =
 
 	switch (argv(0))
 	{
-        case "+showscores":
-            showinfo = 1;
-            return TRUE;
-        case "-showscores":
-            showinfo = 0;
+        case "game_help":
+            showinfo = showinfo ? 0 : 1;
+            dprint("WHAT?\n");
             return TRUE;
 	}
 	

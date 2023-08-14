@@ -67,7 +67,7 @@ void () DropHook =
 	chainvec = self.origin - (self.owner.origin + '0 0 16');
 	chainlen = vlen (chainvec);
 
-	float hook_speed = lerp(0, 1200, skill_fraction(self.owner.agility_xp));
+	float hook_speed = lerp(0, 1200, xp_frac(self.owner.agility_xp));
 
 	makevectors(self.owner.v_angle);
 
@@ -198,7 +198,7 @@ void () HookBehavior =
     chainvec = normalize(self.origin - (self.owner.origin + '0 0 16'));
 	chainlen = vlen (chainvec);
 
-	float hook_speed = lerp(457, 600, skill_fraction(self.owner.agility_xp));
+	float hook_speed = lerp(457, 600, xp_frac(self.owner.agility_xp));
 
 	vector chain_ang = vectoangles(chainvec);
 	makevectors(chain_ang);
@@ -240,9 +240,6 @@ void() HookTouch =
 
 	// flags hook as being attached to something
 	self.owner.hook = self.owner.hook | HOOK_IN;
-
-	if (other.takedamage)
-		T_Damage (other, self, self.owner, 10 );
 
  	if (other.solid == SOLID_SLIDEBOX)
 	{

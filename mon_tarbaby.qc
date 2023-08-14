@@ -114,8 +114,8 @@ void()	Tar_JumpTouch =
 	{
 		if ( vlen(self.velocity) > 400 )
 		{
-			ldmg = 10 + 10*random();
-			T_Damage (other, self, self, ldmg);
+			ldmg = 40 + 40 * random();
+			T_Damage (other, self, self, ldmg, DMG_MELEE|DMG_HEAT);
 			sound (self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
 		}
 	}

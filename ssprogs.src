@@ -3,8 +3,15 @@
 #define SSQC
 
 fteextensions.qc
+shared.qc
 defs.qc
+
 defs_progress.qc
+defs_armors.qc
+defs_combat.qc
+defs_weapons.qc
+defs_monsters.qc
+
 subs.qc
 fight.qc
 ai.qc
@@ -14,6 +21,7 @@ items_weapons_mods.qc
 items_ammo.qc
 items_armors.qc
 items_weapons.qc
+items_pool.qc
 player_stats.qc
 
 hook.qc
@@ -22,7 +30,7 @@ weapons_passing_bullets.qc
 weapons.qc
 weapon_summary.qc // switching, attack
 
-stats_shared.qc
+
 world.qc
 
 client.qc

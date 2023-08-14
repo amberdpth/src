@@ -132,8 +132,8 @@ void() sham_smash10    =[      $smash10,      sham_smash11   ]
 	if (!CanDamage (self.enemy, self))
 		return;
 
-	ldmg = (random() + random() + random()) * 40;
-	T_Damage (self.enemy, self, self, ldmg);
+	ldmg = random(1, 3) * 100;
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 	sound (self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
 
 	SpawnMeatSpray (self.origin + v_forward*16, crandom() * 100 * v_right);
@@ -158,8 +158,8 @@ void(float side) ShamClaw =
 	if (vlen(delta) > 100)
 		return;
 
-	ldmg = (random() + random() + random()) * 20;
-	T_Damage (self.enemy, self, self, ldmg);
+	ldmg = random(1, 4) * 60;
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 	sound (self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
 
 	if (side)
@@ -399,7 +399,7 @@ void() monster_shambler =
 	setmodel (self, "progs/shambler.mdl");
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
-	self.health = 600;
+	self.health = 200;
 
 	self.th_stand = sham_stand1;
 	self.th_walk = sham_walk1;

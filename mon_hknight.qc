@@ -94,6 +94,35 @@ void() hknight_spike_homing =
 
 }
 
+void() hspike_touch =
+{
+	if (other == self.owner)
+		return;
+
+	if (other.solid == SOLID_TRIGGER)
+		return;
+
+	if (pointcontents(self.origin) == CONTENT_SKY)
+	{
+		remove(self);
+		return;
+	}
+
+	float damage = 6;
+
+	if (other.takedamage)
+	{
+		spawn_touchblood (damage, other);
+		T_Damage( other, self, self.owner, damage, DMG_SPIKES|DMG_HEAT);
+	}
+	else
+	{
+		WriteByte (MSG_BROADCAST, TE_KNIGHTSPIKE);
+	}
+
+	remove(self);
+}
+
 void() hknight_shot =
 {
 	vector org;
@@ -103,19 +132,25 @@ void() hknight_shot =
 
 	
 	// set missile speed
-	vec = calculate_dir_to_moving_target(600);
+	vec = calculate_dir_to_moving_target(666);
 
-	launch_spike (org, vec);
+	newmis = spawn();
+	newmis.owner = self;
 	newmis.movetype = MOVETYPE_FLY;
+	newmis.solid = SOLID_BBOX;
+
+	newmis.angles = vectoangles(vec);
 	newmis.classname = "knightspike";
+	setorigin(newmis, org);
 	setmodel (newmis, "progs/k_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
-	newmis.velocity = vec*666;
-	newmis.gravity = 0.1;
+	newmis.velocity = vec * 666;
 	newmis.think = hknight_spike_homing;
 	newmis.nextthink = time + 0.025;
 	newmis.enemy = self.enemy;
+	newmis.touch = hspike_touch;
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
+
 };
 
 void() CheckForCharge =
@@ -486,7 +521,9 @@ void() monster_hell_knight =
 	setmodel (self, "progs/hknight.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 250;
+	self.health = 50;
+	self.armortype = 0.6 + random(0.2);
+	self.armorvalue = 100;
 
 	self.th_stand = hknight_stand1;
 	self.th_walk = hknight_walk1;

@@ -1,49 +1,49 @@
-float base_sg_acc_module_a1_spread_low = 0.94;
-float base_sg_acc_module_a1_spread_high = 0.97;
+float g_sg_acc_module_a1_spread_low = 0.94;
+float g_sg_acc_module_a1_spread_high = 0.97;
 
-float base_sg_acc_module_a2_spread_low = 0.86;
-float base_sg_acc_module_a2_spread_high = 0.91;
+float g_sg_acc_module_a2_spread_low = 0.86;
+float g_sg_acc_module_a2_spread_high = 0.91;
 
-float base_sg_acc_module_b1_spread_low = 0.8;
-float base_sg_acc_module_b1_spread_high = 0.84;
-float base_sg_acc_module_b1_error_low = 0.88;
-float base_sg_acc_module_b1_error_high = 0.89;
+float g_sg_acc_module_b1_spread_low = 0.8;
+float g_sg_acc_module_b1_spread_high = 0.84;
+float g_sg_acc_module_b1_error_low = 0.88;
+float g_sg_acc_module_b1_error_high = 0.89;
 
-float base_sg_acc_module_b2_spread_low = 0.68;
-float base_sg_acc_module_b2_spread_high = 0.73;
-float base_sg_acc_module_b2_error_low = 0.82;
-float base_sg_acc_module_b2_error_high = 0.83;
+float g_sg_acc_module_b2_spread_low = 0.68;
+float g_sg_acc_module_b2_spread_high = 0.73;
+float g_sg_acc_module_b2_error_low = 0.82;
+float g_sg_acc_module_b2_error_high = 0.83;
 
-float base_ssg_acc_module_a1_spread_low = 0.89;
-float base_ssg_acc_module_a1_spread_high = 0.91;
-float base_ssg_acc_module_a1_error_low = 0.81;
-float base_ssg_acc_module_a1_error_high = 0.83;
+float g_ssg_acc_module_a1_spread_low = 0.89;
+float g_ssg_acc_module_a1_spread_high = 0.91;
+float g_ssg_acc_module_a1_error_low = 0.81;
+float g_ssg_acc_module_a1_error_high = 0.83;
 
-float base_ssg_acc_module_a2_spread_low = 0.82;
-float base_ssg_acc_module_a2_spread_high = 0.85;
-float base_ssg_acc_module_a2_error_low = 0.73;
-float base_ssg_acc_module_a2_error_high = 0.75;
+float g_ssg_acc_module_a2_spread_low = 0.82;
+float g_ssg_acc_module_a2_spread_high = 0.85;
+float g_ssg_acc_module_a2_error_low = 0.73;
+float g_ssg_acc_module_a2_error_high = 0.75;
 
 .float nailgun_accel;
 .float ng_accel_on;
 .float super_nailgun_accel;
 .float sng_accel_on;
 
-float base_ng_accel_module_slow = 1;
-float base_ng_accel_module_fast = 0.3;
-float base_ng_accel_step = 0.0062;
-float base_ng_hyperspeed_launcher_module_knockback_mult = 0.14;
+float g_ng_accel_module_slow = 1;
+float g_ng_accel_module_fast = 0.3;
+float g_ng_accel_step = 0.0062;
+float g_ng_hyperspeed_launcher_module_knockback_mult = 0.14;
 
-float base_sng_accel_module_slow = 1;
-float base_sng_accel_module_fast = 0.45;
-float base_sng_accel_step = 0.0083;
-
-
+float g_sng_accel_module_slow = 1;
+float g_sng_accel_module_fast = 0.45;
+float g_sng_accel_step = 0.0083;
 
 
-float(float param, float low, float high) module_modifer =
+
+
+float(float param, float worst, float best) inacuraccy_module_prm =
 {
-    return param * random(low, high);
+    return param * random(best, worst);
 }
 
 enumflags
@@ -67,18 +67,18 @@ float() rand_half =
     return (random() > 0.5 ? 1 : 0); 
 };
 
-void(float *accel, float on_off, float fast, float slow, float frac, float do_accel) w_accel = 
+void(__inout float accel, float on_off, float fast, float slow, float frac, float do_accel) w_accel = 
 {
     if (!do_accel)
     {
-        *accel = 1;
+        accel = 1;
         return;
     }
 
-    if (*accel == 0.0)
-        *accel = slow;
+    if (accel == 0.0)
+        accel = slow;
 
-    *accel = lerp( *accel, (on_off ? fast : slow), (on_off ? 4 * frac : frac));
+    accel = lerp( accel, (on_off ? fast : slow), (on_off ? 4 * frac : frac));
 }
 
 

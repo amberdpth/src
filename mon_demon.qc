@@ -222,7 +222,10 @@ void() monster_demon1 =
 	setmodel (self, "progs/demon.mdl");
 
 	setsize (self, VEC_HULL2_MIN, '32 32 24');
-	self.health = 300;
+	
+	self.netname = "fiend";
+
+	self.health = 110;
 
 	self.th_stand = demon1_stand1;
 	self.th_walk = demon1_walk1;
@@ -337,7 +340,7 @@ void(float side)	Demon_Melee =
 
     sound (self, CHAN_WEAPON, "demon/dhit2.wav", 1, ATTN_NORM);
 	ldmg = ai_melee_damage();
-	T_Damage (self.enemy, self, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
 
 	makevectors (self.angles);
 	SpawnMeatSpray (self.origin + v_forward*16, side * v_right);
@@ -356,7 +359,7 @@ void()	Demon_JumpTouch =
 		if ( vlen(self.velocity) > 400 )
 		{
 			ldmg = 40 + 10*random();
-			T_Damage (other, self, self, ldmg);
+			T_Damage (other, self, self, ldmg, DMG_MELEE);
 		}
 	}
 
