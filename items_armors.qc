@@ -1,3 +1,37 @@
+float armor_pool[] =
+{
+	ARMOR_JACKET_GREEN,
+	ARMOR_JACKET_GREEN,
+	ARMOR_JACKET_GREEN,
+	ARMOR_JACKET_GREEN,
+	ARMOR_JACKET_YELLOW,
+	ARMOR_JACKET_YELLOW,
+	ARMOR_JACKET_YELLOW,
+	ARMOR_JACKET_RED,
+	ARMOR_JACKET_RED,
+	ARMOR_JACKET_BLUE,
+	ARMOR_COMBAT_GREEN,
+	ARMOR_COMBAT_GREEN,
+	ARMOR_COMBAT_GREEN,
+	ARMOR_COMBAT_GREEN,
+	ARMOR_COMBAT_YELLOW,
+	ARMOR_COMBAT_YELLOW,
+	ARMOR_COMBAT_YELLOW,
+	ARMOR_COMBAT_RED,
+	ARMOR_COMBAT_RED,
+	ARMOR_COMBAT_BLUE,
+	ARMOR_SLIPGATE_GREEN,
+	ARMOR_SLIPGATE_GREEN,
+	ARMOR_SLIPGATE_GREEN,
+	ARMOR_SLIPGATE_GREEN,
+	ARMOR_SLIPGATE_YELLOW,
+	ARMOR_SLIPGATE_YELLOW,
+	ARMOR_SLIPGATE_YELLOW,
+	ARMOR_SLIPGATE_RED,
+	ARMOR_SLIPGATE_RED,
+	ARMOR_SLIPGATE_BLUE
+};
+
 void (__inout float armortype_mod, float mult) armortype_modifer =
 {
 	armortype_mod = (armortype_mod * mult);
@@ -225,39 +259,6 @@ void() armor_touch =
 
 float () set_armor_by_entnum =
 {
-	float armor_pool[] =
-	{
-		ARMOR_JACKET_GREEN,
-		ARMOR_JACKET_GREEN,
-		ARMOR_JACKET_GREEN,
-		ARMOR_JACKET_GREEN,
-		ARMOR_JACKET_YELLOW,
-		ARMOR_JACKET_YELLOW,
-		ARMOR_JACKET_YELLOW,
-		ARMOR_JACKET_RED,
-		ARMOR_JACKET_RED,
-		ARMOR_JACKET_BLUE,
-		ARMOR_COMBAT_GREEN,
-		ARMOR_COMBAT_GREEN,
-		ARMOR_COMBAT_GREEN,
-		ARMOR_COMBAT_GREEN,
-		ARMOR_COMBAT_YELLOW,
-		ARMOR_COMBAT_YELLOW,
-		ARMOR_COMBAT_YELLOW,
-		ARMOR_COMBAT_RED,
-		ARMOR_COMBAT_RED,
-		ARMOR_COMBAT_BLUE,
-		ARMOR_SLIPGATE_GREEN,
-		ARMOR_SLIPGATE_GREEN,
-		ARMOR_SLIPGATE_GREEN,
-		ARMOR_SLIPGATE_GREEN,
-		ARMOR_SLIPGATE_YELLOW,
-		ARMOR_SLIPGATE_YELLOW,
-		ARMOR_SLIPGATE_YELLOW,
-		ARMOR_SLIPGATE_RED,
-		ARMOR_SLIPGATE_RED,
-		ARMOR_SLIPGATE_BLUE
-	};
 
 	string e_str = etos(self);
 	float e_str_num = tokenize(e_str);
@@ -266,6 +267,15 @@ float () set_armor_by_entnum =
 
 	return armor_pool[e];
 
+}
+
+void() armor_fix_origin =
+{
+	if (self.classname == "item_health")
+	{
+		setorigin(self,self.origin + '16 16 0');
+		return;
+	}
 }
 
 void() item_random_armor =
@@ -294,7 +304,8 @@ void() item_random_armor =
 	if (self.armor_flag == ARMOR_SLIPGATE_RED)		{setmodel(self, armor_slipgate_model); self.skin = 2;}
 	if (self.armor_flag == ARMOR_SLIPGATE_BLUE)		{setmodel(self, armor_slipgate_model); self.skin = 3;}
 
-    setsize(self, '-16 -16 0', '16 16 56');
+    setsize(self, '-16 -16 0', '16 16 36');
+	armor_fix_origin();
     StartItem();
     
 }

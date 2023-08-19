@@ -31,6 +31,8 @@ float() crandom =
 	return 2*(random() - 0.5);
 };
 
+
+
 void() W_FireAxe =
 {
 	local vector source;
@@ -59,9 +61,11 @@ void() W_FireAxe =
 
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', damage, trace_ent);
-		T_Damage (trace_ent, self, self, damage, DMG_MELEE);
+		T_Damage (trace_ent, self, self, damage, DMG_MELEE|DMG_AXE);
 
 		xp_up (self.raw_melee_xp, RATE_MELEE_XP, 1.0);
+
+
 	}
 	else
 	{	// hit wall
@@ -113,6 +117,13 @@ void(vector org, vector vel) SpawnMeatSpray =
 	setorigin (missile, org);
 };
 
+void(__inout vector vel, vector normal  ) SpawnBloodVel =
+{
+	vel = randomv();
+	vel = vel + 2 * normal;
+	vel = vel * 200;
+
+}
 
 void(vector org, vector vel, float damage, entity o) SpawnBlood =
 {
@@ -146,16 +157,17 @@ void(vector org, vector vel) SpawnChunk =
 
 void(float damage, vector dir) TraceAttack =
 {
-	local vector vel, org;
+	local vector org;
 
-	vel = normalize(dir + v_up * random(-1, 1) + v_right * random(-1, 1));
-	vel = vel + 2*trace_plane_normal;
-	vel = vel * 200;
 
 	org = trace_endpos - dir*4;
 
 	if (trace_ent.takedamage)
 	{
+
+		vector vel = (trace_plane_normal + randomv() * 0.5) * 200;
+
+		SpawnBloodVel(vel, trace_plane_normal);
 		SpawnBlood (org, vel*0.2, damage, trace_ent);
 		trace_ent.multidamage_flag = TRUE;
 		trace_ent.multidamage = trace_ent.multidamage + damage;
@@ -243,9 +255,9 @@ void() W_FireShotgun =
 	{
 		spread_hv = inacuraccy_module_prm (spread_hv, 0.93, 0.88);
 		
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_v[i] = inacuraccy_module_prm (error_v[i], 0.57, 0.44);
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_h[i] = inacuraccy_module_prm (error_h[i], 0.57, 0.44);
 	}
 
@@ -253,9 +265,9 @@ void() W_FireShotgun =
 	{
 		spread_hv = inacuraccy_module_prm (spread_hv, 0.7, 0.67);
 
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_v[i] = inacuraccy_module_prm (error_v[i], 0.76, 0.71);
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_h[i] = inacuraccy_module_prm (error_h[i], 0.76, 0.71);
 	}
 
@@ -299,9 +311,9 @@ void() W_FireSuperShotgun =
 		spread_h = inacuraccy_module_prm (spread_h, 0.84, 0.71);
 		spread_v = inacuraccy_module_prm (spread_v, 0.84, 0.71);
 		
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_v[i] = inacuraccy_module_prm (error_v[i], 0.68, 0.61);
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_h[i] = inacuraccy_module_prm (error_h[i], 0.68, 0.61);
 	}
 
@@ -310,9 +322,9 @@ void() W_FireSuperShotgun =
 		spread_h = inacuraccy_module_prm (spread_h, 0.78, 0.69);
 		spread_v = inacuraccy_module_prm (spread_v, 0.78, 0.69);
 
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_v[i] = inacuraccy_module_prm (error_v[i], 0.61, 0.55);
-		for (i = 0; i <= 2; i++)
+		for (i = 0; i < 3; i++)
 			error_h[i] = inacuraccy_module_prm (error_h[i], 0.61, 0.55);
 	}
 

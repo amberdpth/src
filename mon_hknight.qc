@@ -84,7 +84,7 @@ void() hknight_spike_homing =
 	vec_new = vec_new * 666;
 	float i = 0;
 
-	for (i=0; i<=2; i++)
+	for (i=0; i < 3; i++)
 		self.velocity[i] = lerp( self.velocity[i], vec_new[i], 0.035);
 
 	self.angles = vectoangles(self.velocity);
@@ -283,10 +283,11 @@ void() hknight_die =
 	if (self.health < -40)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_hellkn.mdl", self.health);
+
 		ThrowGib ("progs/gib1.mdl", self.health);
 		ThrowGib ("progs/gib2.mdl", self.health);
 		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("progs/h_hellkn.mdl", self.health);
 		return;
 	}
 

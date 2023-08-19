@@ -22,6 +22,8 @@ enum
     STAT_KEYS,
 	STAT_SHARDS,
 	STAT_VIALS,
+	//params
+	STAT_MAX_HEALTH
 };
 
 float lerp(float a, float b, float f)

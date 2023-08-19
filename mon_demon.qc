@@ -179,10 +179,11 @@ void() demon_die =
 	if (self.health < -80)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		
+		ThrowGib ("progs/gib1.mdl", self.health);
+		ThrowGib ("progs/gib1.mdl", self.health);
+		ThrowGib ("progs/gib1.mdl", self.health);
 		ThrowHead ("progs/h_demon.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
 		return;
 	}
 

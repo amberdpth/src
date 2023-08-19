@@ -92,9 +92,31 @@ void(float raw_stat, float stat, string stat_str, float step) draw_skill_bar =
     drawfill(pos + [0, 8], fill, fill_color, 1, 0);
 }
 
+void(float w, float h) draw_health_bar =
+{
+    float health_stat = getstatf(STAT_HEALTH);
+    float maxhealth_stat = getstatf(STAT_MAX_HEALTH);
+
+    h = h - 64;
+
+    float health_frac = health_stat / maxhealth_stat;
+    float i;
+
+    vector color_h_low = '0.4 0 0';
+    vector color_h_high = '0.1 0.6 0.1';
+
+    vector color_h_current;
+
+    for (i = 0; i < 3; i++)
+        color_h_current[i] = lerp(color_h_low[i], color_h_high[i], health_frac);
+
+    drawfill([32, h], [health_stat, 2], color_h_current, 1, 0);
+}
+
 void(float w, float h) DrawStats =
 {
     string currentammo_str = ftos(getstatf(STAT_AMMO));
+    string health_str = ftos(getstatf(STAT_HEALTH));
     float currentammo_strl = strlen(currentammo_str) * 8;
 
     draw_skill_bar(STAT_RAW_ARMOR_WEARING_XP, STAT_ARMOR_WEARING_XP, "armor wearing:", 0);
@@ -103,9 +125,11 @@ void(float w, float h) DrawStats =
     draw_skill_bar(STAT_RAW_MELEE_XP, STAT_MELEE_XP, "melee fight:", 30);
     draw_skill_bar(STAT_RAW_SEARCHING_XP, STAT_SEARCHING_XP, "searching:", 40);
     draw_skill_bar(STAT_RAW_EXPLOSIVES_XP, STAT_EXPLOSIVES_XP, "explosives:", 50);
+    draw_health_bar(w, h);
 
+    vector ammo_count_pos = [w / 2, h / 2] - [(currentammo_strl / 2),0] + [0, 128];
 
-    drawstring([w / 2, h / 2] - [(currentammo_strl / 2),0] + [0, 128], currentammo_str,STATS_FONT_SIZE, '1 1 1', 1, 0);
+    drawstring(ammo_count_pos, currentammo_str, STATS_FONT_SIZE, '1 1 1', 1, 0);
 
 }
 

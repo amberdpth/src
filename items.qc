@@ -33,18 +33,11 @@ void() PlaceItem =
 	// make extra wide
 	self.flags = FL_ITEM;
 	self.solid = SOLID_TRIGGER;
-	self.movetype = MOVETYPE_TOSS;
+	//self.movetype = MOVETYPE_TOSS;
 	self.velocity = '0 0 0';
-	self.origin_z = self.origin_z + 6;
+	self.origin_z = self.origin_z + 16;
 	oldz = self.origin_z;
-	if (!droptofloor())
-	{
-		dprint ("Bonus item fell out of level at ");
-		dprint (vtos(self.origin));
-		dprint ("\n");
-		remove(self);
-		return;
-	}
+
 };
 
 void() StartItem =
@@ -350,11 +343,10 @@ void() powerup_touch =
 
 void() item_weapon_mod_a;
 
-float(entity o, float ammo, string ammo_name) got_ammo;
 
 void() BackpackTouch =
 {
-
+/*
 
 	if (other.classname != "player")
 		return;
@@ -373,7 +365,7 @@ void() BackpackTouch =
 	sprint (other, "You got backpack\n");
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
-
+*/
 	// remove the backpack
 	remove(self);
 	self = other;

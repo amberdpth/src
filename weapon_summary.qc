@@ -1,7 +1,4 @@
 void()	player_axe1;
-void()	player_axeb1;
-void()	player_axec1;
-void()	player_axed1;
 void()	player_shot1;
 void()	player_nail;
 void()	player_snail;
@@ -105,7 +102,6 @@ float() W_CheckNoAmmo =
 
 void() W_Attack =
 {
-	local float r;
 
 	if (!W_CheckNoAmmo ())
 		return;
@@ -118,21 +114,11 @@ void() W_Attack =
     {
         case W_AXE:
             sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
-            r = random();
-
+            self.ax_variant = rint(random(3));
             self.reload_time = self.axe_reload_time;
-
-            if (r < 0.25)
-                player_axe1 ();
-            else if (r<0.5)
-                player_axeb1 ();
-            else if (r<0.75)
-                player_axec1 ();
-            else
-                player_axed1 ();
-            
-            break;
-
+            player_axe1 ();
+			break;
+			
         case W_SHOTGUN:
             self.reload_time = self.sg_reload_time;	
             player_shot1 ();

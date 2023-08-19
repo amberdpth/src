@@ -281,4 +281,7 @@ void() PlayerPostThink =
 		self.jump_flag = self.velocity_z;
 
 	CheckPowerups ();
+
+	
+
 };

@@ -239,4 +239,10 @@ void() PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin, self);
+
+	if (!set_items)
+	{
+		set_items = TRUE;
+		SetupItems();
+	}
 };

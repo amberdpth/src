@@ -8,9 +8,6 @@ void(entity targ, entity attacker) ClientObituary;
 void() monster_death_use;
 
 
-/* Can Damage */
-
-
 float(entity targ, entity inflictor) CanDamage =
 {
 	// bmodels need special checking because their origin is 0,0,0
@@ -107,6 +104,13 @@ void(entity targ, entity inflictor, entity attacker, float damage, __inout float
 
 	targ.armorvalue = targ.armorvalue - save;
 
+	if (targ.armorvalue < 0.0)
+		take = take - targ.armorvalue * targ.armortype;
+	
+
+	if ((dmg_flag & DMG_DESTROY_ALL_ARMOR) && (targ.armorvalue > 0.0))
+		targ.armorvalue = 0;
+
 	if (targ.armorvalue <= 0)
 	{
 		targ.armortype = 0;
@@ -132,6 +136,98 @@ void(entity targ, entity inflictor, entity attacker, float damage, __inout float
 	}
 }
 
+void (float melee_xp_threshold, float agility_xp_threshold, __inout float dmg_flag, float new_flag, string message) axe_add_flag =
+{
+	if (self.melee_xp < melee_xp_threshold)
+		return;
+	if (self.agility_xp < agility_xp_threshold)
+		return;
+	
+	dmg_flag = dmg_flag | new_flag;
+	sprint(self, message);
+}
+
+
+void(entity attacker, entity targ, __inout float dmg_flag, __inout float dmg) PlayerCombatBonus =
+{
+	entity oself = self;
+
+	float olddmg = dmg;
+	
+	self = attacker;
+
+	if (dmg_flag & DMG_AXE)
+	{
+		if ((targ.classname == "monster_knight") && (targ.enemy == self)) {
+			switch(targ.frame) {
+				case 20: 
+					xptoprm(dmg,targ.health * 0.3, targ.health * 1.2, self.melee_xp);
+					xptoprm(dmg, dmg * 0.17, dmg * 0.21, self.agility_xp);
+					axe_add_flag(10, 3, dmg_flag, DMG_DESTROY_ALL_ARMOR, "knight's armor has been destroyed\n");
+					break;
+				case 46: case 47:
+					xptoprm(dmg,targ.health * 0.8, targ.health * 1.5, self.melee_xp);
+					xptoprm(dmg, dmg * 0.3, dmg * 0.6, self.agility_xp);
+					axe_add_flag(4, 8, dmg_flag, DMG_DESTROY_ALL_ARMOR, "knight's armor has been destroyed\n");
+					break;
+			}
+		}
+		
+		if ((targ.classname == "monster_hell_knight") && (targ.enemy == self)) {
+			switch(targ.frame) {
+				case 66:
+					xptoprm(dmg, targ.health * 0.15, targ.health * 0.5, self.melee_xp);
+					xptoprm(dmg, dmg * 0.35, dmg * 0.4, self.agility_xp);
+					axe_add_flag(17, 20, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+				case 72:
+					xptoprm(dmg, targ.health * 0.13, targ.health * 0.8, self.melee_xp);
+					xptoprm(dmg, dmg * 0.1, dmg * 1.2, self.agility_xp);
+					axe_add_flag(21, 40, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+				case 114:
+					xptoprm(dmg, targ.health * 0.4, targ.health * 2, self.melee_xp);
+					xptoprm(dmg, dmg * 0.3, dmg * 0.5, self.agility_xp);
+					axe_add_flag(50, 32, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+				case 124:
+					xptoprm(dmg, targ.health * 0.2, targ.health * 1.4, self.melee_xp);
+					xptoprm(dmg, dmg * 0.3, dmg * 0.5, self.agility_xp);
+					axe_add_flag(15, 25, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+				case 138:
+					xptoprm(dmg, targ.health * 0.1, targ.health * 0.6, self.melee_xp);
+					xptoprm(dmg, dmg * 0.1, dmg * 1.2, self.agility_xp);
+					axe_add_flag(75, 45, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+				case 138:case 145:
+					xptoprm(dmg, targ.health * 0.1, targ.health * 0.6, self.melee_xp);
+					xptoprm(dmg, dmg * 0.1, dmg * 1.2, self.agility_xp);
+					axe_add_flag(21, 5, dmg_flag, DMG_DESTROY_ALL_ARMOR, "hell knight's armor has been destroyed\n");
+					break;
+
+			}
+		}
+
+		if ((targ.classname == "monster_ogre") && (targ.enemy == self)) {
+			switch(targ.frame)
+			{
+				case 33: case 34: case 35: case 47: case 48:
+				case 49: case 49: case 50: case 51: case 52:
+					xptoprm(dmg, targ.health * 0.3, targ.health, self.melee_xp);
+					xptoprm(dmg, dmg * 0.2, dmg * 0.5, self.agility_xp);
+					axe_add_flag(0, 0, dmg_flag, DMG_PAIN_PASS, "ogre is in pain from axe\n");
+					break;
+			}
+		}
+	}
+
+	xp_up(self.raw_melee_xp, RATE_MELEE_XP, dmg / olddmg);
+	xp_up(self.raw_agility_xp, RATE_AGILITY_XP, dmg / olddmg);
+	dprint((sprintf("%f dmg mult", dmg / olddmg)));
+
+	self = oself;
+}
 
 void(entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage =
 {
@@ -146,6 +242,15 @@ void(entity targ, entity inflictor, entity attacker, float damage, float dmg_fla
 	damage_attacker = attacker;
 	damage_inflictor = inflictor;
 
+	if (attacker.flags & FL_CLIENT)
+	{
+		xp_up (attacker.raw_accuracy_xp, RATE_ACCURACY_XP, damage * 0.01);
+		
+		if ((dmg_flag & DMG_MELEE) && (attacker.weapon == W_AXE))
+			PlayerCombatBonus(attacker, targ, dmg_flag, damage);
+	}
+
+
 	DamageArmorProcess(targ, inflictor, attacker, damage, take, save, dmg_flag);
 	//DamageResistProcess(targ, inflictor, attacker, take, dmg_flag);
 
@@ -156,9 +261,6 @@ void(entity targ, entity inflictor, entity attacker, float damage, float dmg_fla
 		targ.dmg_save = targ.dmg_save + save;
 		targ.dmg_inflictor = inflictor;
 	}
-
-	if (attacker.flags & FL_CLIENT)
-		xp_up (attacker.raw_accuracy_xp, RATE_ACCURACY_XP, damage * 0.01);
 
 	if (!(dmg_flag & DMG_IGNORE_KNOCKBACK)/* && (targ.movetype == MOVETYPE_WALK)*/)
 	{
@@ -181,23 +283,13 @@ void(entity targ, entity inflictor, entity attacker, float damage, float dmg_fla
 
 	if ((self.flags & FL_MONSTER) && attacker != world)
 	{
-		if (self != attacker && attacker != self.enemy)
-		{
-			if ((self.classname != attacker.classname)
-				|| (self.classname == "monster_army" ))
-			{
-				if (self.enemy.classname == "player")
-					self.oldenemy = self.enemy;
-				self.enemy = attacker;
-				FoundTarget();
-			}
-		}
+		self.oldenemy = self.enemy;
+		self.enemy = attacker;
+		FoundTarget();
 	}
 
 	if (self.th_pain)
-	{
-		self.th_pain(attacker, take);
-	}
+		self.th_pain(attacker, take, dmg_flag);
 
 	self = oldself;
 

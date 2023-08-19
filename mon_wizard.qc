@@ -373,10 +373,11 @@ void() wiz_die =
 	if (self.health < -40)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		
+		ThrowGib ("progs/gib2.mdl", self.health);
+		ThrowGib ("progs/gib2.mdl", self.health);
+		ThrowGib ("progs/gib2.mdl", self.health);
 		ThrowHead ("progs/h_wizard.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
 		return;
 	}
 

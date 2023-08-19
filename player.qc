@@ -97,6 +97,14 @@ $frame axattc1 axattc2 axattc3 axattc4 axattc5 axattc6
 
 $frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 
+#define ax_att_a 119
+#define ax_att_b 125
+#define ax_att_c 131
+#define ax_att_d 137
+
+float ax_att_frame[] = { ax_att_a, ax_att_b, ax_att_c, ax_att_d };
+
+
 
 /*
 ==============================================================================
@@ -198,96 +206,50 @@ void()	player_shot6 =	[$shotatt6, player_run	]
 	self.weaponframe = 6;
 };
 
+//AXE A
 
-
-void()	player_axe1 =	[$axatt1, player_axe2	] 
-{
-	self.weaponframe=2;
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
+void()	player_axe1 =	[ax_att_frame[self.ax_variant], player_axe2	] {
+	self.weaponframe = self.ax_variant  * 10 + 1;
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
 };
-void()	player_axe2 =	[$axatt2, player_axe3	] 
-{
-	self.weaponframe=5;
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
+void()	player_axe2 =	[ax_att_frame[self.ax_variant], player_axe3	] {
+	self.weaponframe = self.ax_variant  * 10 + 2;
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+};
+void()	player_axe3 =	[ax_att_frame[self.ax_variant] + 1, player_axe4	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 3;
+};
+void()	player_axe4 =	[ax_att_frame[self.ax_variant] + 1, player_axe5	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 4;
+};
+void()	player_axe5 =	[ax_att_frame[self.ax_variant] + 2, player_axe6	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 5;
 	W_FireAxe();
 };
-void()	player_axe3 =	[$axatt3, player_axe4	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=7;
+void()	player_axe6 =	[ax_att_frame[self.ax_variant] + 2, player_axe7	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 6;
 };
-void()	player_axe4 =	[$axatt4, player_run	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=10;
+void()	player_axe7 =	[ax_att_frame[self.ax_variant] + 3, player_axe8	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 7;
 };
-
-void()	player_axeb1 =	[$axattb1, player_axeb2	] 
-{
-	
-	self.weaponframe=12;
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
+void()	player_axe8 =	[ax_att_frame[self.ax_variant] + 4, player_axe9	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 8;
 };
-void()	player_axeb2 =	[$axattb2, player_axeb3	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=15;
-	W_FireAxe();
+void()	player_axe9 =	[ax_att_frame[self.ax_variant] + 5, player_axe10	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 9;
 };
-void()	player_axeb3 =	[$axattb3, player_axeb4	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=17;
-};
-void()	player_axeb4 =	[$axattb4, player_run	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=20;
+void()	player_axe10 =	[ax_att_frame[self.ax_variant] + 5, player_run	] {
+	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
+	self.weaponframe = self.ax_variant  * 10 + 10;
 };
 
-void()	player_axec1 =	[$axattc1, player_axec2	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=22;
-};
-void()	player_axec2 =	[$axattc2, player_axec3	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=25;
-	W_FireAxe();
-};
-void()	player_axec3 =	[$axattc3, player_axec4	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=27;
-};
-void()	player_axec4 =	[$axattc4, player_run	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=30;
-};
-
-void()	player_axed1 =	[$axattd1, player_axed2	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=32;
-};
-void()	player_axed2 =	[$axattd2, player_axed3	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=35;
-	W_FireAxe();
-};
-void()	player_axed3 =	[$axattd3, player_axed4	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=37;
-};
-void()	player_axed4 =	[$axattd4, player_run	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 4);
-	self.weaponframe=40;
-};
 
 
 //============================================================================
@@ -636,36 +598,21 @@ void() PlayerDead =
 
 vector(float dm) VelocityForDamage =
 {
-	local vector v;
+	vector v = normalize(self.origin - damage_inflictor.origin);
 
-	// check if the inflictor had velocity, e.g. like a rocket or explode box
-	if (vlen(damage_inflictor.velocity) > 0)
-	{
-		// impact some of inflictor's velocity on the gibs
-		v = 0.5 * damage_inflictor.velocity;
-		v = v + (25 * normalize(self.origin - damage_inflictor.origin));
-		v_z = 100 + 100 * random();
-		v_x = v_x + (50 * crandom());
-		v_y = v_y + (50 * crandom());
-	}
-	else
-	{
-		// use a random velocity for the gibs
-		v_x = 100 * crandom();
-		v_y = 100 * crandom();
-		v_z = 200 + 100 * random();
-	}
+	dm = -dm;
 
-	if (dm > -50)
-	{
-		v = v * 0.7;
-	}
-	else if (dm > -200)
-	{
-		v = v * 2;
-	}
-	else
-		v = v * 10;
+	v = v * dm * 4;
+
+	float i;
+
+	for (i = 0; i < 3; i++)
+		v[i] = lerp( v[i], damage_inflictor.velocity[i], random(0.3, 0.65));
+	for (i = 0; i < 3; i++)
+		v[i] = lerp( v[i], v[i] * 0.25 * random(-1, 1), random(0.1, 0.8));
+	
+	v[2] = v[2] + random(300);
+	dprint(sprintf("%v velocity\n", v));
 
 	return v;
 };
@@ -676,6 +623,12 @@ void(string gibname, float dm) ThrowGib =
 
 	new = spawn();
 	new.origin = self.origin;
+
+	float i;
+
+	for (i = 0; i < 3; i++)
+		new.origin[i] = new.origin[i] + (self.mins[i] - self.maxs[i]) * random(0.5);
+
 	setmodel (new, gibname);
 	setsize (new, '0 0 0', '0 0 0');
 	new.velocity = VelocityForDamage (dm);
@@ -702,7 +655,7 @@ void(string gibname, float dm) ThrowHead =
 	self.view_ofs = '0 0 8';
 	setsize (self, '-16 -16 0', '16 16 56');
 	self.velocity = VelocityForDamage (dm);
-	self.origin_z = self.origin_z - 24;
+	//self.origin[2] = self.origin[2] + 22;
 	self.flags = self.flags - (self.flags & FL_ONGROUND);
 	self.avelocity = crandom() * '0 600 0';
 };
@@ -710,10 +663,11 @@ void(string gibname, float dm) ThrowHead =
 
 void() GibPlayer =
 {
-	ThrowHead ("progs/h_player.mdl", self.health);
+	
 	ThrowGib ("progs/gib1.mdl", self.health);
 	ThrowGib ("progs/gib2.mdl", self.health);
 	ThrowGib ("progs/gib3.mdl", self.health);
+	ThrowHead ("progs/h_player.mdl", self.health);
 
 	self.deadflag = DEAD_DEAD;
 

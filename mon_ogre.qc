@@ -405,12 +405,12 @@ void()	ogre_paine14=[	$paine14,	ogre_paine15	] {};
 void()	ogre_paine15=[	$paine15,	ogre_run1	] {};
 
 
-void(entity attacker, float damage)	ogre_pain =
+void(entity attacker, float damage, float dmg_flag)	ogre_pain =
 {
 	local float r;
 
-	// don't make multiple pain sounds right after each other
-	if (self.pain_finished > time)
+	//огр получает боль в любом случае, настроить реакцию под флаг
+	if ((self.pain_finished > time) && (dmg_flag &~ DMG_PAIN_PASS))
 		return;
 
 	sound (self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);
@@ -482,10 +482,11 @@ void() ogre_die =
 	if (self.health < -80)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		
+		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowGib ("progs/gib3.mdl", self.health);
 		ThrowHead ("progs/h_ogre.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
 		return;
 	}
 

@@ -456,7 +456,7 @@ float		skill;
 .void()		th_run;
 .void()		th_missile;
 .void()		th_melee;
-.void(entity attacker, float damage)		th_pain;
+.void(entity attacker, float damage, optional float dmg_flag)		th_pain;
 .void()		th_die;
 
 .entity		oldenemy;		// mad at this player before taking damage
@@ -529,11 +529,6 @@ float	AS_MISSILE		= 4;
 .float 		pausetime;
 .entity 	movetarget;
 
-
-//
-// doors
-//
-.float		aflag;
 .float		dmg;			// damage done by door when hit
 
 //
@@ -776,3 +771,6 @@ void(float t) nxtth = {
 .float hit_damage;
 .float rad_damage;
 
+float set_items;
+
+.float ax_variant;
