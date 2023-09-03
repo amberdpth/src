@@ -110,18 +110,17 @@ void() SetChangeParms =
 
 	parm_string = "{\n";
 
-	parm1 = self.weapons;
-	parm2 = self.health;
-	//parm3 = self.armorvalue;
-
+	parm1 = self.health;
+//	parm2
+	parm3 = self.ammo_bullets;
 	parm4 = self.ammo_shells;
 	parm5 = self.ammo_nails;
 	parm6 = self.ammo_rockets;
 	parm7 = self.ammo_cells;
-	parm8 = self.weapon;
-	//parm9 = self.armortype;
-	parm10 = self.shards;
-	parm11 = self.vials;
+	parm8 = self.wprimary;
+	parm9 = self.wsecondary;
+//	parm10 = self.shards;
+//	parm11 = self.vials;
 	parm12 = self.w_mod_a;
 	
 	parm20 = self.raw_melee_xp;
@@ -146,23 +145,25 @@ void() DecodeLevelParms =
 {
 	if (world.model == "maps/start.bsp")
 	{
-		self.weapons = W_AXE | W_SHOTGUN;
-		self.weapon = W_AXE;
-		self.ammo_shells = 25;
+		self.health = 12;
+		self.wprimary = W_STN;
+		self.wsecondary = W_SSG;
+		self.ammo_shells = 150;
+		self.ammo_bullets = 200;
 		return;
 	}
 
-	self.weapons = parm1;
-	self.health = parm2;
-//	self.armorvalue = parm3;
+	self.health = parm1;
+	//parm2
+	self.ammo_bullets = parm3;
 	self.ammo_shells = parm4;
 	self.ammo_nails = parm5;
 	self.ammo_rockets = parm6;
 	self.ammo_cells = parm7;
-	self.weapon = parm8;
-//	self.armortype = parm9;
-	self.shards = parm10;
-	self.vials = parm11;
+	self.wprimary = parm8;
+	self.wsecondary = parm9;
+//	self.shards = parm10;
+//	self.vials = parm11;
 	self.w_mod_a = parm12;
 	
 	self.raw_melee_xp = parm20;
@@ -189,7 +190,6 @@ void() PutClientInServer =
 	spot = SelectSpawnPoint ();
 
 	self.classname = "player";
-	self.health = 100;
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_WALK;
@@ -204,7 +204,8 @@ void() PutClientInServer =
 	self.invincible_finished = 0;
 	self.effects = 0;
 	self.invincible_time = 0;
-
+	self.wcurrent = self.wprimary;
+	
 	W_SetCurrentAmmo ();
 
 	self.attack_finished = time;
@@ -240,9 +241,5 @@ void() PutClientInServer =
 
 	spawn_tdeath (self.origin, self);
 
-	if (!set_items)
-	{
-		set_items = TRUE;
-		SetupItems();
-	}
+	//generate_world_weps();
 };

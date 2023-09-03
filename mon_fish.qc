@@ -200,38 +200,3 @@ void(entity attacker, float damage)	fish_pain =
 	// fish always do pain frames
 	f_pain1 ();
 };
-
-
-
-/*QUAKED monster_fish (1 0 0) (-16 -16 -24) (16 16 24) Ambush
-*/
-void() monster_fish =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model2 ("progs/fish.mdl");
-
-	precache_sound2 ("fish/death.wav");
-	precache_sound2 ("fish/bite.wav");
-	precache_sound2 ("fish/idle.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/fish.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 24');
-	self.health = 1;
-
-	self.th_stand = f_stand1;
-	self.th_walk = f_walk1;
-	self.th_run = f_run1;
-	self.th_die = fish_die;
-	self.th_pain = fish_pain;
-	self.th_melee = f_attack1;
-
-	swimmonster_start ();
-};

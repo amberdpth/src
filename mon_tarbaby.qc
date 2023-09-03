@@ -183,7 +183,7 @@ void()	tbaby_die1	=[	$exp,		tbaby_die2	]
 };
 void()	tbaby_die2	=[	$exp,		tbaby_run1	]
 {
-	T_RadiusDamage (self, self, 120, world);
+	T_RadiusDamage (self, self, 120, 300, 0.8, DMG_EXPLO|DMG_MAGIC|DMG_CHEM);
 
 	sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);
@@ -202,34 +202,4 @@ void()	tbaby_die2	=[	$exp,		tbaby_run1	]
 
 /*QUAKED monster_tarbaby (1 0 0) (-16 -16 -24) (16 16 24) Ambush
 */
-void() monster_tarbaby =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model2 ("progs/tarbaby.mdl");
 
-	precache_sound2 ("blob/death1.wav");
-	precache_sound2 ("blob/hit1.wav");
-	precache_sound2 ("blob/land1.wav");
-	precache_sound2 ("blob/sight1.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/tarbaby.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 1;
-
-	self.th_stand = tbaby_stand1;
-	self.th_walk = tbaby_walk1;
-	self.th_run = tbaby_run1;
-	self.th_missile = tbaby_jump1;
-	self.th_melee = tbaby_jump1;
-	self.th_die = tbaby_die1;
-
-	walkmonster_start ();
-};

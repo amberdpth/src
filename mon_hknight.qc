@@ -85,7 +85,7 @@ void() hknight_spike_homing =
 	float i = 0;
 
 	for (i=0; i < 3; i++)
-		self.velocity[i] = lerp( self.velocity[i], vec_new[i], 0.035);
+		self.velocity[i] = lerp( self.velocity[i], vec_new[i], 0.1);
 
 	self.angles = vectoangles(self.velocity);
 
@@ -94,7 +94,7 @@ void() hknight_spike_homing =
 
 }
 
-void() hspike_touch =
+void() hkspike_touch =
 {
 	if (other == self.owner)
 		return;
@@ -108,12 +108,12 @@ void() hspike_touch =
 		return;
 	}
 
-	float damage = 6;
+	float damage = 3.5;
 
 	if (other.takedamage)
 	{
 		spawn_touchblood (damage, other);
-		T_Damage( other, self, self.owner, damage, DMG_SPIKES|DMG_HEAT);
+		T_Damage( other, self, self.owner, damage, DMG_HEAT|DMG_MAGIC);
 	}
 	else
 	{
@@ -134,6 +134,12 @@ void() hknight_shot =
 	// set missile speed
 	vec = calculate_dir_to_moving_target(666);
 
+	makevectors(self.angles);
+
+	vec = vec + v_up * random(-0.5, 0.5) + v_right * random(-0.5, 0.5);
+
+	vec = normalize(vec);
+
 	newmis = spawn();
 	newmis.owner = self;
 	newmis.movetype = MOVETYPE_FLY;
@@ -148,7 +154,7 @@ void() hknight_shot =
 	newmis.think = hknight_spike_homing;
 	newmis.nextthink = time + 0.025;
 	newmis.enemy = self.enemy;
-	newmis.touch = hspike_touch;
+	newmis.touch = hkspike_touch;
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
 
 };
@@ -490,49 +496,3 @@ void() hknight_melee =
 	}
 };
 
-/*QUAKED monster_hell_knight (1 0 0) (-16 -16 -24) (16 16 40) Ambush
-*/
-void() monster_hell_knight =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model2 ("progs/hknight.mdl");
-	precache_model2 ("progs/k_spike.mdl");
-	precache_model2 ("progs/h_hellkn.mdl");
-
-
-	precache_sound2 ("hknight/attack1.wav");
-	precache_sound2 ("hknight/death1.wav");
-	precache_sound2 ("hknight/pain1.wav");
-	precache_sound2 ("hknight/sight1.wav");
-	precache_sound ("hknight/hit.wav");		// used by C code, so don't sound2
-	precache_sound2 ("hknight/slash1.wav");
-	precache_sound2 ("hknight/idle.wav");
-	precache_sound2 ("hknight/grunt.wav");
-
-	precache_sound ("knight/sword1.wav");
-	precache_sound ("knight/sword2.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/hknight.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 50;
-	self.armortype = 0.6 + random(0.2);
-	self.armorvalue = 100;
-
-	self.th_stand = hknight_stand1;
-	self.th_walk = hknight_walk1;
-	self.th_run = hknight_run1;
-	self.th_melee = hknight_melee;
-	self.th_missile = hknight_magic;
-	self.th_pain = hknight_pain;
-	self.th_die = hknight_die;
-
-	walkmonster_start ();
-};

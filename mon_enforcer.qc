@@ -64,6 +64,9 @@ void(vector org, vector vec) LaunchLaser =
 	if (self.classname == "monster_enforcer")
 		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
+	for (float i = 0;i < 3; i++)
+		vec[i] = vec[i] + random(-1, 1) * 0.04;
+
 	vec = normalize(vec);
 	
 	newmis = spawn();
@@ -301,48 +304,10 @@ void() enf_die =
 		enf_fdie1 ();
 };
 
-
-/*QUAKED monster_enforcer (1 0 0) (-16 -16 -24) (16 16 40) Ambush
-
-*/
-void() monster_enforcer =
+void() set_enforcer_armor =
 {
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model2 ("progs/enforcer.mdl");
-	precache_model2 ("progs/h_mega.mdl");
-	precache_model2 ("progs/laser.mdl");
+	//self.armor_flag = ARMOR_ENF;
+	self.armortype = random() > 0.75 ? 0.7 : random(0.35, 0.5);
+	self.armorvalue = random() > 0.75 ? 80 : random(40, 60);
+}
 
-	precache_sound2 ("enforcer/death1.wav");
-	precache_sound2 ("enforcer/enfire.wav");
-	precache_sound2 ("enforcer/enfstop.wav");
-	precache_sound2 ("enforcer/idle1.wav");
-	precache_sound2 ("enforcer/pain1.wav");
-	precache_sound2 ("enforcer/pain2.wav");
-	precache_sound2 ("enforcer/sight1.wav");
-	precache_sound2 ("enforcer/sight2.wav");
-	precache_sound2 ("enforcer/sight3.wav");
-	precache_sound2 ("enforcer/sight4.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/enforcer.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 40');
-	self.health = 30;
-	self.armortype = 0.5;
-	self.armorvalue = 65;
-
-	self.th_stand = enf_stand1;
-	self.th_walk = enf_walk1;
-	self.th_run = enf_run1;
-	self.th_pain = enf_pain;
-	self.th_die = enf_die;
-	self.th_missile = enf_atk1;
-
-	walkmonster_start();
-};

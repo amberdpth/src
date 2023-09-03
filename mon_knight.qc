@@ -244,46 +244,4 @@ void() knight_die =
 };
 
 
-/*QUAKED monster_knight (1 0 0) (-16 -16 -24) (16 16 40) Ambush
-*/
-void() monster_knight =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model ("progs/knight.mdl");
-	precache_model ("progs/h_knight.mdl");
 
-	precache_sound ("knight/kdeath.wav");
-	precache_sound ("knight/khurt.wav");
-	precache_sound ("knight/ksight.wav");
-	precache_sound ("knight/sword1.wav");
-	precache_sound ("knight/sword2.wav");
-	precache_sound ("knight/idle.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/knight.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 40');
-
-	vector three_prm = normalize(randomv());
-
-	self.health = 100 * three_prm[0];
-	self.armortype = 1.0 * three_prm[1];
-	self.armorvalue = 100 * three_prm[2];
-
-	dprint(sprintf( "health %f, protection %f, value %f\n", self.health, self.armortype, self.armorvalue));
-
-	self.th_stand = knight_stand1;
-	self.th_walk = knight_walk1;
-	self.th_run = knight_run1;
-	self.th_melee = knight_atk1;
-	self.th_pain = knight_pain;
-	self.th_die = knight_die;
-
-	walkmonster_start ();
-};

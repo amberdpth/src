@@ -760,6 +760,7 @@ enumflags
 
 .float ammo_big_spikes;
 .float ammo_grenades;
+.float ammo_bullets;
 
 .vector dodge_moves;
 .float dodge_time;
@@ -768,9 +769,14 @@ void(float t) nxtth = {
 	self.nextthink = time + t;
 }
 
-.float hit_damage;
-.float rad_damage;
 
-float set_items;
+.float rot_time;
 
-.float ax_variant;
+.float heal_finished;
+.float heal_time;
+
+.vector enemy_last_org;
+
+.vector muzzle_point;
+.vector spam_point;
+.float prefire_finished;

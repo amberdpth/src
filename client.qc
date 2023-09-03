@@ -55,3 +55,4 @@ void() ClientDisconnect =
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
 	set_suicide_frame ();
 };
+

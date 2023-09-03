@@ -1,71 +1,27 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-    See file, 'COPYING', for details.
-*/
-/*
-==============================================================================
-
-SOLDIER / PLAYER (Grunt)
-
-==============================================================================
-*/
-
-$cd id1/models/soldier3
-$origin 0 -6 24
-$base base
-$skin skin
-
 $frame stand1 stand2 stand3 stand4 stand5 stand6 stand7 stand8
-
 $frame death1 death2 death3 death4 death5 death6 death7 death8
 $frame death9 death10
-
 $frame deathc1 deathc2 deathc3 deathc4 deathc5 deathc6 deathc7 deathc8
 $frame deathc9 deathc10 deathc11
-
 $frame load1 load2 load3 load4 load5 load6 load7 load8 load9 load10 load11
-
 $frame pain1 pain2 pain3 pain4 pain5 pain6
-
 $frame painb1 painb2 painb3 painb4 painb5 painb6 painb7 painb8 painb9 painb10
 $frame painb11 painb12 painb13 painb14
-
 $frame painc1 painc2 painc3 painc4 painc5 painc6 painc7 painc8 painc9 painc10
 $frame painc11 painc12 painc13
-
 $frame run1 run2 run3 run4 run5 run6 run7 run8
-
 $frame shoot1 shoot2 shoot3 shoot4 shoot5 shoot6 shoot7 shoot8 shoot9
-
 $frame prowl_1 prowl_2 prowl_3 prowl_4 prowl_5 prowl_6 prowl_7 prowl_8
 $frame prowl_9 prowl_10 prowl_11 prowl_12 prowl_13 prowl_14 prowl_15 prowl_16
 $frame prowl_17 prowl_18 prowl_19 prowl_20 prowl_21 prowl_22 prowl_23 prowl_24
 
-/*
-==============================================================================
-SOLDIER CODE
-==============================================================================
-*/
+
 
 void() army_fire;
 
 void() ArmyGrenadeExplode = 
 {
-	T_RadiusDamage (self, self.owner, 80, world);
+	T_RadiusDamage (self, self.owner, 120, 300, 1.49, DMG_EXPLO);
 	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
@@ -118,12 +74,18 @@ void() army_firegrenade =
 	vector dir = calculate_dir_to_moving_target(720);
 	vector ang = vectoangles(dir);
 	
-	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 720);
+	
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 720, 1.0);
 
 	makevectors(ang);
 
 	missile.velocity = v_forward;
 
+	for (float i = 0;i < 3; i++)
+		missile.velocity[i] = missile.velocity[i] + random(-1, 1) * 0.04;
+
+	missile.velocity = normalize(missile.velocity);
+	
 	missile.velocity = missile.velocity * 720;
 
 	missile.avelocity = '300 300 300';
@@ -136,7 +98,7 @@ void() army_firegrenade =
 
 	setmodel (missile, "progs/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	setorigin (missile, self.origin);
+	setorigin (missile, self.origin + '0 0 12');
 }
 
 void() army_load1 = [ $load1, army_load2 ] {ai_face();};
@@ -217,9 +179,8 @@ void()	army_run8	=[	$run8,		army_run1	] {ai_run(8);};
 
 void()	army_atk1	=[	$shoot1,	army_atk2	] 
 {
-	traceline(self.origin, self.enemy.origin, TRUE, self);
 	
-	if (rint (random ()) == 1)
+	if (!visible(self.enemy) || (random() > 0.9))
 	{
 		army_load1();
 		return;
@@ -283,11 +244,6 @@ void(entity attacker, float damage)	army_pain =
 	float r;
 
 	if (self.pain_finished > time)
-		self.pain_threshold = 24;
-	else
-		self.pain_threshold = 12;
-
-	if (damage < self.pain_threshold)
 		return;
 
 	r = random();
@@ -316,19 +272,14 @@ void(entity attacker, float damage)	army_pain =
 
 void() army_fire =
 {
-	local vector dir;
-	local entity en;
+	vector org;
 
-	ai_face();
+	self.effects = self.effects | EF_MUZZLEFLASH;
+	makevectors (self.angles);
 
-	sound (self, CHAN_WEAPON, "soldier/sattck1.wav", 1, ATTN_NORM);
+	org = self.origin + v_forward * 20 + v_right * 8.5 + '0 0 16';
 
-	en = self.enemy;
-
-	dir = en.origin - en.velocity * random(0, 0.2);
-	dir = normalize (dir - self.origin);
-
-	FireBullets (8, dir, '0.1 0.1 0', 5.11);
+	LaunchLaser(org, calculate_dir_to_moving_target(1000));
 };
 
 
@@ -386,52 +337,3 @@ void() army_die =
 		army_cdie1 ();
 };
 
-
-/*QUAKED monster_army (1 0 0) (-16 -16 -24) (16 16 40) Ambush
-*/
-void() monster_army =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model ("progs/soldier.mdl");
-	precache_model ("progs/h_guard.mdl");
-	precache_model ("progs/gib1.mdl");
-	precache_model ("progs/gib2.mdl");
-	precache_model ("progs/gib3.mdl");
-
-	precache_sound ("soldier/death1.wav");
-	precache_sound ("soldier/idle.wav");
-	precache_sound ("soldier/pain1.wav");
-	precache_sound ("soldier/pain2.wav");
-	precache_sound ("soldier/sattck1.wav");
-	precache_sound ("soldier/sight1.wav");
-
-	// gib death
-	precache_sound ("player/udeath.wav");
-
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/soldier.mdl");
-
-	setsize (self, '-16 -16 -24', '16 16 40');
-
-	self.health = 33;
-	self.armortype = 0.3;
-	self.armorvalue = 25;
-
-
-	self.th_stand = army_stand1;
-	self.th_walk = army_walk1;
-	self.th_run = army_run1;
-	self.th_missile = army_atk1;
-	
-	self.th_pain = army_pain;
-	self.th_die = army_die;
-
-	walkmonster_start ();
-};

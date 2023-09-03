@@ -1,6 +1,6 @@
 void (entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage;
 void () player_run;
-void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
+void(entity bomb, entity attacker, float damage, float radius, float pow_f, float dmg_flag) T_RadiusDamage;
 void(vector org, vector vel, float damage, entity o) SpawnBlood;
 
 
@@ -32,348 +32,6 @@ float() crandom =
 };
 
 
-
-void() W_FireAxe =
-{
-	local vector source;
-	local vector org;
-
-	float damage;
-
-	float hit_dist = 48;
-
-	xptoprm (hit_dist, 0, 32, self.melee_xp);
-
-	makevectors (self.v_angle);
-	source = self.origin + '0 0 16';
-	traceline (source, source + v_forward*hit_dist, FALSE, self);
-	if (trace_fraction == 1.0)
-		return;
-
-	org = trace_endpos - v_forward*4;
-
-	if (trace_ent.takedamage)
-	{
-		damage = 20;
-
-		xptoprm(damage, -10, 60, self.agility_xp);
-		xptoprm(damage, 0, 100, self.melee_xp);
-
-		trace_ent.axhitme = 1;
-		SpawnBlood (org, '0 0 0', damage, trace_ent);
-		T_Damage (trace_ent, self, self, damage, DMG_MELEE|DMG_AXE);
-
-		xp_up (self.raw_melee_xp, RATE_MELEE_XP, 1.0);
-
-
-	}
-	else
-	{	// hit wall
-		sound (self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM);
-		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
-		WriteCoord (MSG_BROADCAST, org_x);
-		WriteCoord (MSG_BROADCAST, org_y);
-		WriteCoord (MSG_BROADCAST, org_z);
-	}
-};
-
-
-vector() wall_velocity =
-{
-	local vector vel;
-
-	vel = normalize (self.velocity);
-	vel = normalize(vel + v_up*(random()- 0.5) + v_right*(random()- 0.5));
-	vel = vel + 2*trace_plane_normal;
-	vel = vel * 200;
-
-	return vel;
-};
-
-
-void(vector org, vector vel) SpawnMeatSpray =
-{
-	local entity missile;
-
-	missile = spawn ();
-	missile.owner = self;
-	missile.movetype = MOVETYPE_BOUNCE;
-	missile.solid = SOLID_NOT;
-
-	makevectors (self.angles);
-
-	missile.velocity = vel;
-	missile.velocity_z = missile.velocity_z + 250 + 50*random();
-
-	missile.avelocity = '3000 1000 2000';
-
-	// set missile duration
-	missile.nextthink = time + 1;
-	missile.think = SUB_Remove;
-
-	setmodel (missile, "progs/zom_gib.mdl");
-	setsize (missile, '0 0 0', '0 0 0');
-	setorigin (missile, org);
-};
-
-void(__inout vector vel, vector normal  ) SpawnBloodVel =
-{
-	vel = randomv();
-	vel = vel + 2 * normal;
-	vel = vel * 200;
-
-}
-
-void(vector org, vector vel, float damage, entity o) SpawnBlood =
-{
-	float atype_sparks = ceil(o.armortype ? o.armortype * damage : 0);
-	float atype_blood_pass = ceil(damage - atype_sparks);
-	float atype_sparks_brightness = rint(lerp(103, 110, o.armortype));
-
-	if (o.armorvalue)
-		particle (org, vel*0.1, atype_sparks_brightness, atype_sparks);
-
-	particle (org, vel*0.1, 73, atype_blood_pass);
-};
-
-/*
-================
-spawn_touchblood
-================
-*/
-void(float damage, entity o) spawn_touchblood =
-{
-	local vector vel;
-
-	vel = wall_velocity () * 0.2;
-	SpawnBlood (self.origin + vel*0.01, vel, damage, o);
-};
-
-void(vector org, vector vel) SpawnChunk =
-{
-	particle (org, vel*0.02, 0, 10);
-};
-
-void(float damage, vector dir) TraceAttack =
-{
-	local vector org;
-
-
-	org = trace_endpos - dir*4;
-
-	if (trace_ent.takedamage)
-	{
-
-		vector vel = (trace_plane_normal + randomv() * 0.5) * 200;
-
-		SpawnBloodVel(vel, trace_plane_normal);
-		SpawnBlood (org, vel*0.2, damage, trace_ent);
-		trace_ent.multidamage_flag = TRUE;
-		trace_ent.multidamage = trace_ent.multidamage + damage;
-	}
-	else
-	{
-		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
-		WriteCoord (MSG_BROADCAST, org_x);
-		WriteCoord (MSG_BROADCAST, org_y);
-		WriteCoord (MSG_BROADCAST, org_z);
-	}
-};
-
-/*
-================
-FireBullets
-
-Used by shotgun, super shotgun, and enemy soldier firing
-Go to the trouble of combining multiple pellets into a single damage call.
-================
-*/
-void(float shotcount, vector dir, vector spread, float damage) FireBullets =
-{
-	local vector direction;
-	local vector src;
-
-
-	makevectors(self.v_angle);
-
-	src = self.origin + v_forward*10;
-	src_z = self.absmin_z + self.size_z * 0.7;
-
-	while (shotcount > 0)
-	{
-		direction = dir + random(-1, 1) * spread[0] * v_right + random(-1, 1) * spread[1] * v_up;
-
-		traceline (src, src + direction*2048, MOVE_HITMODEL, self);
-
-		if (trace_fraction != 1.0)
-			TraceAttack (damage, direction);
-
-		shotcount = shotcount - 1;
-	}
-
-	entity e = findflags(world,multidamage_flag,TRUE);
-
-	while(e)
-	{
-		T_Damage(e, self, self, e.multidamage, DMG_BULLET);
-
-		e.multidamage = 0;
-		e.multidamage_flag = FALSE;
-		e = findflags(e,multidamage_flag,TRUE);
-	}
-};
-
-/*
-================
-W_FireShotgun
-================
-*/
-void() W_FireShotgun =
-{
-	float i = 0;
-	vector dir;
-	float shotcount = 7;
-	float damage = 5.2;
-	float spread_hv; // one barrell
-	vector error_h, error_v;
-
-	spread_hv = lerp(0.08, 0.04, xp_frac(self.accuracy_xp));
-
-
-	error_h = v_right * random ( -lerp (0.1, 0, xp_frac(self.accuracy_xp)), lerp ( 0.1, 0, xp_frac(self.accuracy_xp)));
-	error_v = v_up * random ( -lerp (0.1, 0, xp_frac(self.accuracy_xp)), lerp ( 0.1, 0, xp_frac(self.accuracy_xp)));
-
-
-
-	if (self.w_mod_a & MOD_SG_ACC_A1)
-		spread_hv = inacuraccy_module_prm(spread_hv, 0.92, 0.7);
-	if (self.w_mod_a & MOD_SG_ACC_A2)
-		spread_hv = inacuraccy_module_prm (spread_hv, 0.88, 0.78);	
-	if (self.w_mod_a & MOD_SG_ACC_B1)
-	{
-		spread_hv = inacuraccy_module_prm (spread_hv, 0.93, 0.88);
-		
-		for (i = 0; i < 3; i++)
-			error_v[i] = inacuraccy_module_prm (error_v[i], 0.57, 0.44);
-		for (i = 0; i < 3; i++)
-			error_h[i] = inacuraccy_module_prm (error_h[i], 0.57, 0.44);
-	}
-
-	if (self.w_mod_a & MOD_SG_ACC_B2)
-	{
-		spread_hv = inacuraccy_module_prm (spread_hv, 0.7, 0.67);
-
-		for (i = 0; i < 3; i++)
-			error_v[i] = inacuraccy_module_prm (error_v[i], 0.76, 0.71);
-		for (i = 0; i < 3; i++)
-			error_h[i] = inacuraccy_module_prm (error_h[i], 0.76, 0.71);
-	}
-
-
-	dir = v_forward + error_h + error_v;
-
-	
-	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
-	self.punchangle_x = -2;
-	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
-	FireBullets (shotcount, dir, [spread_hv, spread_hv], damage);
-
-	fire_knockback ( &self.velocity, dir * 1000, 0.15, self.armortype);
-};
-
-
-/*
-================
-W_FireSuperShotgun
-================
-*/
-void() W_FireSuperShotgun =
-{
-	float i = 0;
-	vector dir;
-	float shotcount = 14;
-	float damage = 5.7;
-	float spread_h, spread_v;
-	vector error_h, error_v;
-
-	spread_h = lerp ( 0.2, 0.08, xp_frac(self.accuracy_xp));
-	spread_v = lerp ( 0.1, 0.04, xp_frac(self.accuracy_xp));
-
-	error_h = v_right * random ( -lerp( 0.2, 0, xp_frac(self.accuracy_xp)), lerp ( 0.2, 0, xp_frac(self.accuracy_xp)));
-	error_v = v_up * random ( -lerp( 0.2, 0, xp_frac(self.accuracy_xp)), lerp ( 0.2, 0, xp_frac(self.accuracy_xp)));
-	
-	dir = v_forward + error_h + error_v;
-
-	if (self.w_mod_a & MOD_SSG_ACC_A1)
-	{
-		spread_h = inacuraccy_module_prm (spread_h, 0.84, 0.71);
-		spread_v = inacuraccy_module_prm (spread_v, 0.84, 0.71);
-		
-		for (i = 0; i < 3; i++)
-			error_v[i] = inacuraccy_module_prm (error_v[i], 0.68, 0.61);
-		for (i = 0; i < 3; i++)
-			error_h[i] = inacuraccy_module_prm (error_h[i], 0.68, 0.61);
-	}
-
-	if (self.w_mod_a & MOD_SSG_ACC_A2)
-	{
-		spread_h = inacuraccy_module_prm (spread_h, 0.78, 0.69);
-		spread_v = inacuraccy_module_prm (spread_v, 0.78, 0.69);
-
-		for (i = 0; i < 3; i++)
-			error_v[i] = inacuraccy_module_prm (error_v[i], 0.61, 0.55);
-		for (i = 0; i < 3; i++)
-			error_h[i] = inacuraccy_module_prm (error_h[i], 0.61, 0.55);
-	}
-
-	
-	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
-	self.punchangle_x = -4;
-	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
-
-	if (self.w_mod_a & MOD_SSG_PASSING_BULLETS)
-	{
-		FirePassingBullets(shotcount, dir, [spread_h, spread_v], damage);
-		return;
-	}
-
-	FireBullets (shotcount, dir, [spread_h, spread_v], damage);
-
-	fire_knockback ( &self.velocity,  dir * 1000, 0.22, self.armortype);
-};
-
-
-/*
-================
-W_FireTripleShotgun
-================
-*/
-void() W_FireTripleShotgun =
-{
-	vector dir;
-	float shotcount = (self.w_mod_a & MOD_TSG_SIX_SHOT ? 42 : 21);
-	float damage = 6.2;
-	float spread_hv;
-	vector error_h, error_v;
-
-	spread_hv = lerp ( 0.3, 0.06, xp_frac(self.accuracy_xp));
-
-	error_h = v_right * random ( -lerp ( 0.15, 0, xp_frac(self.accuracy_xp)), lerp ( 0.15, 0, xp_frac(self.accuracy_xp)));
-	error_v = v_up * random ( -lerp ( 0.15, 0, xp_frac(self.accuracy_xp)), lerp ( 0.15, 0, xp_frac(self.accuracy_xp)));
-
-	dir = v_forward + error_h + error_v;
-
-	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
-	self.punchangle_x = -6;
-	self.currentammo = self.ammo_shells = self.ammo_shells - (self.w_mod_a & MOD_TSG_SIX_SHOT ? 6 : 3);
-	FireBullets (shotcount, dir, [spread_hv, spread_hv], damage);
-
-	fire_knockback ( &self.velocity, dir * 1000, 0.36, self.armortype);
-};
-
-
 /*
 ==============================================================================
 
@@ -402,6 +60,10 @@ void() BecomeExplosion =
 void() T_MissileTouch =
 {
 	float damage = 100;
+	float radius = 200;
+	float pow_f = 1.6;
+
+
 
 	if (other == self.owner)
 		// don't explode on owner
@@ -412,15 +74,13 @@ void() T_MissileTouch =
 		remove(self);
 		return;
 	}
+	xptoprm(damage, 0, 80, self.owner.explosive_xp);
+	xptoprm(radius, 0, 50, self.owner.explosive_xp);
+	xptoprm(pow_f, 0, -0.3, self.owner.explosive_xp);
 
-	xptoprm(damage, 0, 120, self.explosive_xp);
+	T_RadiusDamage (self, self.owner, damage, radius, pow_f, DMG_EXPLO);
 
-	if (other.health)
-		xp_up(self.owner.raw_explosive_xp, RATE_EXPLOSIVE_XP, 1.5); // 1.5x exp for direct hit
-
-	T_RadiusDamage (self, self.owner, damage, world);
-
-	self.origin = self.origin - 8*normalize(self.velocity);
+	self.origin = self.origin - 8 * normalize(self.velocity);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
@@ -578,7 +238,7 @@ void() W_FireLightning =
 		cells = self.ammo_cells;
 		self.ammo_cells = 0;
 		W_SetCurrentAmmo ();
-		T_RadiusDamage (self, self, 35*cells, world);
+		T_RadiusDamage (self, self, 35 * cells, 480, 1.3, DMG_EXPLO|DMG_ELEC);
 		return;
 	}
 
@@ -614,9 +274,16 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	float damage = 100 + lerp(0, 60, self.explosive_xp / 100);
+	float damage = 120;
+	float radius = 300;
+	float pow_f = 1.8;
 
-	T_RadiusDamage (self, self.owner, damage, world);
+
+	xptoprm(damage, 0, 60, self.owner.explosive_xp);
+	xptoprm(radius, 0, 60, self.owner.explosive_xp);
+	xptoprm(pow_f, 0, -0.7, self.owner.explosive_xp);
+
+	T_RadiusDamage (self, self.owner, damage, radius, pow_f, DMG_EXPLO);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
@@ -712,24 +379,9 @@ void(vector org, vector dir) launch_spike =
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	setorigin (newmis, org);
 
-	if (self.flags & FL_CLIENT)
-	{
-		newmis.gravity = 0.6;
-		newmis.velocity = dir * 900 + v_up * 100;
+	newmis.gravity = 0.6;
+	newmis.velocity = dir * 900 + v_up * 100;
 
-		if (self.w_mod_a & MOD_NG_HYPERSPEED_LAUNCHER)
-		{
-			newmis.gravity = 0.21;
-			newmis.velocity = dir * 1250 + v_up * 62;
-		}
-
-		fire_knockback ( &self.velocity, newmis.velocity, 0.08, self.armortype);
-
-		return;
-	}
-
-
-	newmis.velocity = dir * 1000;
 };
 
 void(vector org, vector dir) launch_super_spike =
@@ -836,7 +488,7 @@ void() spike_touch =
 	if (other.takedamage)
 	{
 		spawn_touchblood (damage, other);
-		T_Damage (other, self, self.owner, damage, DMG_SPIKES);
+		T_Damage (other, self, self.owner, damage, DMG_BULLET);
 	}
 	else
 	{
@@ -878,7 +530,7 @@ void() superspike_touch =
 	if (other.takedamage)
 	{
 		spawn_touchblood (damage, other);
-		T_Damage (other, self, self.owner, damage, DMG_SPIKES);
+		T_Damage (other, self, self.owner, damage, DMG_BULLET);
 	}
 	else
 	{
@@ -893,16 +545,3 @@ void() superspike_touch =
 	remove(self);
 
 };
-
-
-/*
-===============================================================================
-
-PLAYER WEAPON USE
-
-===============================================================================
-*/
-
-
-
-

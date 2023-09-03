@@ -156,7 +156,17 @@ Stay facing the enemy
 */
 void() ai_face =
 {
-	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
+	if (visible(self.enemy))
+	{
+		self.spam_point = self.enemy.origin;
+		self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
+	}
+	else
+	{
+		self.ideal_yaw = vectoyaw(self.spam_point - self.origin);
+	}
+
+	
 	ChangeYaw ();
 };
 
@@ -286,21 +296,16 @@ float() SoldierCheckAttack =
 {
 	local vector spot1, spot2;
 	local entity targ;
-	local float chance;
 
 	targ = self.enemy;
 
-	// see if any entities are in the way of the shot
-	spot1 = self.origin + self.view_ofs;
-	spot2 = targ.origin + targ.view_ofs;
-
-	traceline (spot1, spot2, FALSE, self);
-
-	if (trace_inopen && trace_inwater)
-		return FALSE;			// sight line crossed contents
-
-	if (trace_ent != targ)
-		return FALSE;	// don't have a clear shot
+	spot1 = self.origin;
+	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
+	
+	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
+	
+	if (trace_fraction != 1.0)
+		return FALSE;
 
 
 	// missile attack
@@ -310,16 +315,45 @@ float() SoldierCheckAttack =
 	if (enemy_range == RANGE_FAR)
 		return FALSE;
 
-	if (enemy_range == RANGE_MELEE)
-		chance = 0.9;
-	else if (enemy_range == RANGE_NEAR)
-		chance = 0.4;
-	else if (enemy_range == RANGE_MID)
-		chance = 0.05;
-	else
-		chance = 0;
+	if (random () > 0.25)
+	{
+		self.th_missile ();
+		SUB_AttackFinished (1 + random());
+		if (random() < 0.3)
+			self.lefty = !self.lefty;
 
-	if (random () < chance)
+		return TRUE;
+	}
+
+	return FALSE;
+};
+
+float() EnfCheckAttack =
+{
+	local vector spot1, spot2;
+	local entity targ;
+
+	targ = self.enemy;
+
+	makevectors(self.angles);
+
+	spot1 = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
+	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
+	
+	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
+	
+	if (trace_fraction != 1.0)
+		return FALSE;
+
+
+	// missile attack
+	if (time < self.attack_finished)
+		return FALSE;
+
+	if (enemy_range == RANGE_FAR)
+		return FALSE;
+
+	if (random () > 0.25)
 	{
 		self.th_missile ();
 		SUB_AttackFinished (1 + random());
@@ -389,21 +423,10 @@ float() ShamCheckAttack =
 	return TRUE;
 };
 
-//============================================================================
-
-/*
-===========
-OgreCheckAttack
-
-The player is in view, so decide to move or launch an attack
-Returns FALSE if movement should continue
-============
-*/
 float() OgreCheckAttack =
 {
 	local vector spot1, spot2;
 	local entity targ;
-	local float chance;
 
 	if (enemy_range == RANGE_MELEE)
 	{
@@ -414,45 +437,28 @@ float() OgreCheckAttack =
 		}
 	}
 
-	if (time < self.attack_finished)
-		return FALSE;
-
-	if (!enemy_vis)
-		return FALSE;
-
 	targ = self.enemy;
 
-	// see if any entities are in the way of the shot
-	spot1 = self.origin + self.view_ofs;
-	spot2 = targ.origin + targ.view_ofs;
+	makevectors(self.angles);
 
-	traceline (spot1, spot2, FALSE, self);
-
-	if (trace_inopen && trace_inwater)
-		// sight line crossed contents
+	spot1 = self.origin + v_up * 22 - v_right * 4;
+	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
+	
+	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
+	
+	if (trace_fraction != 1.0)
 		return FALSE;
 
-	if (trace_ent != targ)
-	{
-		// don't have a clear shot
-		return FALSE;
-	}
-
-	// missile attack
 	if (time < self.attack_finished)
 		return FALSE;
 
 	if (enemy_range == RANGE_FAR)
 		return FALSE;
 
-	else if (enemy_range == RANGE_NEAR)
-		chance = 0.10;
-	else if (enemy_range == RANGE_MID)
-		chance = 0.05;
-	else
-		chance = 0;
 
 	self.attack_state = AS_MISSILE;
-	SUB_AttackFinished (1 + 2*random());
+
+	SUB_AttackFinished (random(1,6));
+	dprint("ALL DONE?\n");
 	return TRUE;
 };

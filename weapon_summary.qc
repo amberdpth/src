@@ -1,99 +1,20 @@
-void()	player_axe1;
-void()	player_shot1;
+
 void()	player_nail;
 void()	player_snail;
 void()	player_light1;
 void()	player_rocket1;
 
+
 void() W_SetCurrentAmmo =
 {
-	if (self.weapon == W_AXE)
-	{
-		self.currentammo = 0;
-		self.weaponmodel = "progs/v_axe.mdl";
-		self.weaponframe = 0;
-		
-	}
-	else if (self.weapon == W_SHOTGUN)
-	{
-		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot.mdl";
-		self.weaponframe = 0;
-
-		
-	}
-	else if (self.weapon == W_SUPER_SHOTGUN)
-	{
-		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot2.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_NAILGUN)
-	{
-		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_SUPER_NAILGUN)
-	{
-		self.currentammo = self.ammo_big_spikes;
-		self.weaponmodel = "progs/v_nail2.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_GRENADE_LAUNCHER)
-	{
-		self.currentammo = self.ammo_grenades;
-		self.weaponmodel = "progs/v_rock.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_ROCKET_LAUNCHER)
-	{
-		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock2.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_LIGHTNING)
-	{
-		self.currentammo = self.ammo_cells;
-		self.weaponmodel = "progs/v_light.mdl";
-		self.weaponframe = 0;
-	}
-	else if (self.weapon == W_TRIPLE_SHOTGUN)
-	{
-		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot3.mdl";
-		self.weaponframe = 0;
-	}
-	else
-	{
-		self.currentammo = 0;
-		self.weaponmodel = string_null;
-		self.weaponframe = 0;
-	}
-
+	w_currents[self.wcurrent]();
 };
 
 
 float() W_CheckNoAmmo =
 {
-	if (self.weapon == W_AXE)
+	if (self.weapon_check_no_ammo())
 		return TRUE;
-	if ((self.weapon == W_SHOTGUN) && (self.currentammo > 0))
-		return TRUE;
-	if ((self.weapon == W_SUPER_SHOTGUN) && (self.currentammo > 1))
-		return TRUE;
-	if ((self.weapon == W_TRIPLE_SHOTGUN) 
-	&& (self.currentammo > (self.w_mod_a & MOD_TSG_SIX_SHOT ? 5 : 2)))
-		return TRUE;
-	if ((self.weapon == W_NAILGUN) && (self.currentammo > 0))
-		return TRUE;
-	if ((self.weapon == W_SUPER_NAILGUN) && (self.currentammo > 0))
-		return TRUE;
-	if ((self.weapon == W_GRENADE_LAUNCHER) && (self.currentammo > 0))
-		return TRUE;
-	if ((self.weapon == W_ROCKET_LAUNCHER) && (self.currentammo > 0))
-		return TRUE;
-
 
 	W_SetCurrentAmmo ();
 
@@ -119,20 +40,6 @@ void() W_Attack =
             player_axe1 ();
 			break;
 			
-        case W_SHOTGUN:
-            self.reload_time = self.sg_reload_time;	
-            player_shot1 ();
-            break;
-
-        case W_SUPER_SHOTGUN:
-            self.reload_time = self.ssg_reload_time;
-            player_shot1 ();
-            break;
-
-		case W_TRIPLE_SHOTGUN:
-			self.reload_time = self.tsg_reload_time;
-			player_shot1 ();
-			break;
 
         case W_NAILGUN:
             self.reload_time = self.ng_reload_time;
@@ -164,266 +71,44 @@ void() W_Attack =
 
 void() W_ChangeWeapon =
 {
-	local float it, am, fl;
+	self.wcurrent = self.wcurrent == self.wprimary ? self.wsecondary : self.wprimary;
 
-	it = self.weapons;
-	am = 0;
-	fl = 0;
-
-	if (self.impulse == 1)
-		fl = W_AXE;
-	else if (self.impulse == 2)
-		fl = W_SHOTGUN;
-	else if (self.impulse == 3)
-		fl = W_SUPER_SHOTGUN;
-	else if (self.impulse == 4)
-		fl = W_NAILGUN;
-	else if (self.impulse == 5)
-		fl = W_SUPER_NAILGUN;
-	else if (self.impulse == 6)
-		fl = W_GRENADE_LAUNCHER;
-	else if (self.impulse == 7)
-		fl = W_ROCKET_LAUNCHER;
-	else if (self.impulse == 8)
-		fl = W_LIGHTNING;
-	else if (self.impulse == 9)
-		fl = W_TRIPLE_SHOTGUN;
-
-	self.impulse = 0;
-
-	if (!(self.weapons & fl))
-	{
-		// don't have the weapon or the ammo
-		sprint (self, "no weapon.\n");
-		return;
-	}
-
-	// set weapon, set ammo
-	self.weapon = fl;
 	W_SetCurrentAmmo ();
 };
 
-void() CycleWeaponCommand =
+
+void() weapon_prefire = [ self.frame, W_CheckNoAmmo() ? self.weapon_attack : SUB_Null ]
 {
-	self.impulse = 0;
-	
-	if (self.weapons == 0)
-		return;
 
-	while (1)
-	{
-		if (self.weapon == W_LIGHTNING)
-			self.weapon = W_AXE;
-		else if (self.weapon == W_AXE)
-			self.weapon = W_SHOTGUN;
-		else if (self.weapon == W_SHOTGUN)
-			self.weapon = W_SUPER_SHOTGUN;
-		else if (self.weapon == W_SUPER_SHOTGUN)
-			self.weapon = W_TRIPLE_SHOTGUN;
-		else if (self.weapon == W_TRIPLE_SHOTGUN)
-			self.weapon = W_NAILGUN;
-		else if (self.weapon == W_NAILGUN)
-			self.weapon = W_SUPER_NAILGUN;
-		else if (self.weapon == W_SUPER_NAILGUN)
-			self.weapon = W_GRENADE_LAUNCHER;
-		else if (self.weapon == W_GRENADE_LAUNCHER)
-			self.weapon = W_ROCKET_LAUNCHER;
-		else if (self.weapon == W_ROCKET_LAUNCHER)
-			self.weapon = W_LIGHTNING;
+    self.attack_finished = self.nextthink = self.prefire_delay * random(0.7, 1.2) + time;
+    self.prefire_finished = self.attack_finished;
+    self.show_hostile = time + 1;
 
 
-		if (self.weapons & self.weapon)
-		{
-			W_SetCurrentAmmo ();
-			return;
-		}
-	}
-};
-
-/*
-============
-CycleWeaponReverseCommand
-
-Go to the prev weapon with ammo
-============
-*/
-void() CycleWeaponReverseCommand =
-{
-	self.impulse = 0;
-
-	if (self.weapons == 0)
-		return;
-
-	while (1)
-	{
-		if (self.weapon == W_LIGHTNING)
-			self.weapon = W_ROCKET_LAUNCHER;
-		else if (self.weapon == W_ROCKET_LAUNCHER)
-			self.weapon = W_GRENADE_LAUNCHER;
-		else if (self.weapon == W_GRENADE_LAUNCHER)
-			self.weapon = W_SUPER_NAILGUN;
-		else if (self.weapon == W_SUPER_NAILGUN)
-			self.weapon = W_NAILGUN;
-		else if (self.weapon == W_NAILGUN)
-			self.weapon = W_TRIPLE_SHOTGUN;
-		else if (self.weapon == W_TRIPLE_SHOTGUN)
-			self.weapon = W_SUPER_SHOTGUN;
-		else if (self.weapon == W_SUPER_SHOTGUN)
-			self.weapon = W_SHOTGUN;
-		else if (self.weapon == W_SHOTGUN)
-			self.weapon = W_AXE;
-		else if (self.weapon == W_AXE)
-			self.weapon = W_LIGHTNING;
-
-		if (self.weapons & self.weapon)
-		{
-			W_SetCurrentAmmo ();
-			return;
-		}
-	}
-};
-
-void() ImpulseCommands =
-{
-	if (self.impulse >= 1 && self.impulse <= 9)
-		W_ChangeWeapon ();
-
-	if (self.impulse == 10)
-		CycleWeaponCommand ();
-	if (self.impulse == 12)
-		CycleWeaponReverseCommand ();
-	if (self.impulse == 20)
-		ShowPlayerStats();
-
-	self.impulse = 0;
-};
-
-enumflags
-{
-	FND_VIAL,
-	FND_SHARD,
-	FND_SHELLS,
-	FND_NAILS,
-	FND_ROCKETS,
-	FND_CELLS,
-};
-
-float SOLDIER_FND_POOL = FND_VIAL|FND_SHARD|FND_SHELLS;
-float OGRE_FND_POOL = FND_VIAL|FND_SHARD|FND_ROCKETS;
-float FND_FULL_PULL = FND_VIAL|FND_SHARD|FND_SHELLS|FND_NAILS|FND_ROCKETS|FND_CELLS;
-
-.float searched;
-.float searching_bodies;
-
-string(entity body) get_dead_name =
-{
-	if (body.classname == "monster_soldier") return "grunt";
-
-	return "body";
-}
-
-void(entity body,float fnd_flags, string dead_body_name) find_item =
-{
-	float *consumables[6];
-
-	consumables[0] = &self.vials;
-	consumables[1] = &self.shards;
-	consumables[2] = &self.ammo_shells;
-	consumables[3] = &self.ammo_nails;
-	consumables[4] = &self.ammo_rockets;
-	consumables[5] = &self.ammo_cells;
-
-	string found_name[] =
-	{
-		"health vial",
-		"armor shard",
-		"shotgun shell",
-		"spike",
-		"rocket",
-		"battery cell"
-	};
-
-	float min[] = { 0, 0, 3, 0, 0, 0 };
-	float max[] = { 6, 10, 30, 25, 10, 20 };
-
-	float i;
-	float value;
-	float found_something = 0;
-	string message;
-
-	for (i = 0; i < 6; i++)
-	{
-		if ( fnd_flags & (1<<i))
-		{
-			value = rint ( random ( lerp (min[i], max[i], self.searching_xp / 100 ) ) );
-			if (value)
-			{
-				*consumables[i] = *consumables[i] + value;
-				found_something = TRUE;
-
-				message = strcat( sprintf ( "you found %d ", value ) , found_name[i], ( value > 1 ? "s" : "" ) );
-				message = strcat( message, " from dead ", dead_body_name,"\n");
-				sprint(self, message);
-			}
-		}
-	}
-
-	if (!found_something)
-		sprint(self, "found nothing from dead", dead_body_name, "\n");
-
-}
-
-void() SearchingDeadBodies =
-{
-	entity body = findradius(self.origin, 64);
-
-	float itms = rint(random(lerp(1, 20, self.searching_xp / 100)));
-	float i = 0;
-
-
-	while(body)
-	{
-		if (!body.searched)
-		{
-			if (body.classname == "monster_army")
-				find_item(body, SOLDIER_FND_POOL,"grunt");
-			if (body.classname == "monster_ogre")
-				find_item(body, OGRE_FND_POOL,"ogre");
-			
-			body.searched = 1;
-		}
-
-
-
-		body = body.chain;
-	}
-
-	self.searching_bodies = time + 1;
-	W_SetCurrentAmmo();
+    dprint("W_PREFIRE\n");
 }
 
 
 void() W_WeaponFrame =
 {
-
-	CheckGrapHook ();
-
 	if (time < self.attack_finished)
 		return;
 
-	ImpulseCommands ();
+	if (self.impulse == 2)
+    {
+        W_ChangeWeapon ();
+        self.impulse = 0;
+        return;
+    }
+		
 
-	self.weaponframe = cvar("wframe");
-
-	// check for attack
+	if (self.impulse == 3)
+    {
+        ShowPlayerStats();
+        self.impulse = 0;
+        return;
+    }
+		
 	if (self.button0)
-	{
-		W_Attack ();
-	}
-
-	if (time < self.searching_bodies)
-		return;
-
-	if (self.button6)
-		SearchingDeadBodies();
+		weapon_prefire();
 };

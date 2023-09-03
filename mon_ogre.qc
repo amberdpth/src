@@ -70,7 +70,7 @@ $frame pull1 pull2 pull3 pull4 pull5 pull6 pull7 pull8 pull9 pull10 pull11
 
 void() OgreGrenadeExplode =
 {
-	T_RadiusDamage (self, self.owner, 88, world);
+	T_RadiusDamage (self, self.owner, 88, 320, 1.35, DMG_EXPLO);
 	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
@@ -111,6 +111,7 @@ void() OgreFireGrenade =
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
+
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
 	missile = spawn ();
@@ -118,14 +119,10 @@ void() OgreFireGrenade =
 	missile.movetype = MOVETYPE_BOUNCE;
 	missile.solid = SOLID_BBOX;
 
-	// set missile speed
-	
-	//missile.velocity = normalize(self.enemy.origin - self.origin);
-
 	vector dir = calculate_dir_to_moving_target(670);
 	vector ang = vectoangles(dir);
 	
-	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 670);
+	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 670, 1.0);
 
 	makevectors(ang);
 
@@ -145,7 +142,10 @@ void() OgreFireGrenade =
 
 	setmodel (missile, "progs/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	setorigin (missile, self.origin);
+
+	makevectors(self.angles);
+
+	setorigin (missile, self.origin + v_up * 22 - v_right * 4);
 };
 
 void() OgreFireSpike =
@@ -157,6 +157,10 @@ void() OgreFireSpike =
 	vector dir = calculate_dir_to_moving_target(900);
 	vector ang = vectoangles(dir);
 
+	makevectors(self.angles);
+
+	vector offset = v_up * 22 - v_right * 4;
+
 	ang[0] = proj_launch_pitch_mod(self.enemy.origin - self.origin, 900, 0.2);
 	
 	makevectors(ang);
@@ -165,12 +169,12 @@ void() OgreFireSpike =
 
 	for (i = 0; i < floor(random(6,8)); i++)
 	{
-		launch_spike (self.origin, dir);
+		launch_spike (self.origin + offset, dir);
 		//newmis.movetype = MOVETYPE_FLY;
 		newmis.classname = "ogre_spike";
 		setmodel (newmis, "progs/spike.mdl");
 		setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
-		newmis.velocity = v_forward + random(-0.06, 0.06) * v_up + random(-0.06, 0.06) * v_right;
+		newmis.velocity = v_forward + random(-0.08, 0.08) * v_up + random(-0.08, 0.08) * v_right;
 		newmis.velocity = newmis.velocity * 900;
 		newmis.gravity = 0.2;
 	}
@@ -409,8 +413,7 @@ void(entity attacker, float damage, float dmg_flag)	ogre_pain =
 {
 	local float r;
 
-	//огр получает боль в любом случае, настроить реакцию под флаг
-	if ((self.pain_finished > time) && (dmg_flag &~ DMG_PAIN_PASS))
+	if (self.pain_finished > time)
 		return;
 
 	sound (self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);
@@ -506,48 +509,3 @@ void() ogre_melee =
 		ogre_swing1 ();
 };
 
-
-/*QUAKED monster_ogre (1 0 0) (-32 -32 -24) (32 32 64) Ambush
-*/
-void() monster_ogre =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model ("progs/ogre.mdl");
-	precache_model ("progs/h_ogre.mdl");
-	precache_model ("progs/grenade.mdl");
-
-	precache_sound ("ogre/ogdrag.wav");
-	precache_sound ("ogre/ogdth.wav");
-	precache_sound ("ogre/ogidle.wav");
-	precache_sound ("ogre/ogidle2.wav");
-	precache_sound ("ogre/ogpain1.wav");
-	precache_sound ("ogre/ogsawatk.wav");
-	precache_sound ("ogre/ogwake.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/ogre.mdl");
-
-	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
-	self.health = 150;
-
-	self.th_stand = ogre_stand1;
-	self.th_walk = ogre_walk1;
-	self.th_run = ogre_run1;
-	self.th_die = ogre_die;
-	self.th_melee = ogre_melee;
-	self.th_missile = ogre_grenade1;
-	self.th_pain = ogre_pain;
-
-	walkmonster_start();
-};
-
-void() monster_ogre_marksman =
-{
-	monster_ogre ();
-};

@@ -1,20 +1,19 @@
 .float showstats_overtime;
 
-
-void (string xp_name, float xp_value, float xp_raw_value) sprint_skills = {
-    sprint(self, xp_name, sprintf("%d", xp_value));
-
-    if (xp_value > xp_raw_value)
-        sprint(self, (xp_value != xp_raw_value ? sprintf(" [^2+%d^7]", xp_value - xp_raw_value) : ""));
-    else if (xp_value < xp_raw_value)
-        sprint(self, (xp_value != xp_raw_value ? sprintf(" [^3%d^7]", xp_value - xp_raw_value) : ""));
-
-    sprint(self, "\n");
-};
+void(string xp_name, float xp, float raw_xp) sprint_xp =
+{
+    if (xp > raw_xp)
+        sprint(self, xp_name, sprintf(" ^2%g^7\n", xp));
+    else if (xp < raw_xp)
+        sprint(self, xp_name, sprintf(" ^1%g^7\n", xp));
+    else
+        sprint(self, xp_name, sprintf(" %g\n", xp));
+    
+}
 
 void() ShowPlayerStats =
 {
-    if ((self.impulse == 20) && (self.showstats_overtime > time))
+    if (self.showstats_overtime > time)
         return;
 
     string armorflag_name = srtring_armorname(self.armor_flag);
@@ -41,15 +40,15 @@ void() ShowPlayerStats =
 
     sprint(self, "\n");
 
-    sprint(self, "^2Skills:^7\n");
+    sprint(self, "^2XP:^7\n");
 
-    sprint_skills("armor wearing: ", self.armor_wearing_xp, self.raw_armor_wearing_xp);
-    sprint_skills("melee fight: ", self.melee_xp, self.raw_melee_xp);
-    sprint_skills("accuracy: ", self.accuracy_xp, self.raw_accuracy_xp);
-    sprint_skills("explosives: ", self.explosive_xp, self.raw_explosive_xp);
-    sprint_skills("searching: ", self.searching_xp, self.raw_searching_xp);
-    sprint_skills("agility: ", self.agility_xp, self.raw_agility_xp);
+    sprint_xp("armor wearing", self.armor_wearing_xp, self.raw_armor_wearing_xp);
+    sprint_xp("melee fight", self.melee_xp, self.raw_melee_xp);
+    sprint_xp("accuracy", self.accuracy_xp, self.raw_accuracy_xp);
+    sprint_xp("explosives", self.explosive_xp, self.raw_explosive_xp);
+    sprint_xp("searching", self.searching_xp, self.raw_searching_xp);
+    sprint_xp("agility", self.agility_xp, self.raw_agility_xp);
 
-    sprint(self, "\n\n\n");
+    sprint(self, "\n");
     
 }

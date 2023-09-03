@@ -25,14 +25,14 @@ void() init_clientstats =
 {
 	clientstat(STAT_RAW_MELEE_XP, EV_FLOAT, raw_melee_xp);
 	clientstat(STAT_RAW_ACCURACY_XP, EV_FLOAT, raw_accuracy_xp);
-	clientstat(STAT_RAW_EXPLOSIVES_XP, EV_FLOAT, raw_explosive_xp);
+	clientstat(STAT_RAW_EXPLO_XP, EV_FLOAT, raw_explosive_xp);
 	clientstat(STAT_RAW_ARMOR_WEARING_XP, EV_FLOAT, raw_armor_wearing_xp);
 	clientstat(STAT_RAW_SEARCHING_XP, EV_FLOAT, raw_searching_xp);
 	clientstat(STAT_RAW_AGILITY_XP, EV_FLOAT, raw_agility_xp);
 
 	clientstat(STAT_MELEE_XP, EV_FLOAT, melee_xp);
 	clientstat(STAT_ACCURACY_XP, EV_FLOAT, accuracy_xp);
-	clientstat(STAT_EXPLOSIVES_XP, EV_FLOAT, explosive_xp);
+	clientstat(STAT_EXPLO_XP, EV_FLOAT, explosive_xp);
 	clientstat(STAT_ARMOR_WEARING_XP, EV_FLOAT, armor_wearing_xp);
 	clientstat(STAT_SEARCHING_XP, EV_FLOAT, searching_xp);
 	clientstat(STAT_AGILITY_XP, EV_FLOAT, agility_xp);
@@ -49,6 +49,7 @@ void() init_clientstats =
 
 }
 
+/*
 void() main =
 {
 	dprint ("main function\n");
@@ -198,6 +199,7 @@ void() main =
 	precache_file2 ("maps/dm6.bsp");
 };
 
+*/
 
 entity	lastspawn;
 
@@ -334,9 +336,14 @@ void() worldspawn =
 	precache_model ("progs/hook.mdl");
 	precache_model ("progs/chain.mdl");
 	precache_model ("progs/backpack.mdl");
-	precache_model ("progs/armor_shard.mdl");
+	
 	precache_model ("progs/zom_gib.mdl");
 	precache_model ("progs/v_light.mdl");
+
+	precache_model(vial_model);
+	precache_model (shard_model);
+
+	precache_model("progs/bullet.mdl");
 
 	// Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
 
@@ -382,6 +389,9 @@ void() worldspawn =
 	lightstyle(63, "a");
 
 	init_clientstats();
+
+	Init_Weapons();
+
 }
 
 void() RestoreGame =
@@ -430,3 +440,25 @@ void(entity ent) CopyToBodyQue =
 	setsize (bodyque_head, ent.mins, ent.maxs);
 	bodyque_head = bodyque_head.owner;
 };
+
+void(float flags, float fl, float probability) gen_world_item =
+{
+	if (flags & fl)
+		return;
+
+	if (rint(random() * 100 ) <= probability)
+		world_weps = world_weps | fl;
+	
+}
+
+void() generate_world_weps = 
+{
+	gen_world_item(self.weapons, W_SUPER_SHOTGUN, 40);
+	gen_world_item(self.weapons, W_TRIPLE_SHOTGUN, 15);
+	gen_world_item(self.weapons, W_NAILGUN, 22);
+	gen_world_item(self.weapons, W_SUPER_NAILGUN, 5);
+	gen_world_item(self.weapons, W_GRENADE_LAUNCHER, 33);
+	gen_world_item(self.weapons, W_ROCKET_LAUNCHER, 7);
+	gen_world_item(self.weapons, W_LIGHTNING, 3);
+}
+

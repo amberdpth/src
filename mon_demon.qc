@@ -197,64 +197,6 @@ void() Demon_MeleeAttack =
 	demon1_atta1 ();
 };
 
-
-/*QUAKED monster_demon1 (1 0 0) (-32 -32 -24) (32 32 64) Ambush
-*/
-void() monster_demon1 =
-{
-	if (deathmatch)
-	{
-		remove(self);
-		return;
-	}
-	precache_model ("progs/demon.mdl");
-	precache_model ("progs/h_demon.mdl");
-
-	precache_sound ("demon/ddeath.wav");
-	precache_sound ("demon/dhit2.wav");
-	precache_sound ("demon/djump.wav");
-	precache_sound ("demon/dpain1.wav");
-	precache_sound ("demon/idle1.wav");
-	precache_sound ("demon/sight2.wav");
-
-	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
-
-	setmodel (self, "progs/demon.mdl");
-
-	setsize (self, VEC_HULL2_MIN, '32 32 24');
-	
-	self.netname = "fiend";
-
-	self.health = 110;
-
-	self.th_stand = demon1_stand1;
-	self.th_walk = demon1_walk1;
-	self.th_run = demon1_run1;
-	self.th_die = demon_die;
-	self.th_melee = Demon_MeleeAttack;		// one of two attacks
-	self.th_missile = demon1_jump1;			// jump attack
-	self.th_pain = demon1_pain;
-
-	walkmonster_start();
-};
-
-
-/*
-==============================================================================
-
-DEMON
-
-==============================================================================
-*/
-
-/*
-==============
-CheckDemonMelee
-
-Returns TRUE if a melee attack would hit right now
-==============
-*/
 float()	CheckDemonMelee =
 {
 	if (enemy_range == RANGE_MELEE)
@@ -276,15 +218,6 @@ float()	CheckDemonJump =
 	local vector dist;
 	local float	d;
 
-/*
-
-	if (self.origin_z + self.mins_z > self.enemy.origin_z + self.enemy.mins_z + 0.75 * self.enemy.size_z)
-		return FALSE;
-
-	if (self.origin_z + self.maxs_z < self.enemy.origin_z + self.enemy.mins_z + 0.25 * self.enemy.size_z)
-		return FALSE;
-
-*/
 	dist = self.enemy.origin - self.origin;
 	dist_z = 0;
 

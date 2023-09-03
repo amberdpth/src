@@ -97,12 +97,7 @@ $frame axattc1 axattc2 axattc3 axattc4 axattc5 axattc6
 
 $frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 
-#define ax_att_a 119
-#define ax_att_b 125
-#define ax_att_c 131
-#define ax_att_d 137
 
-float ax_att_frame[] = { ax_att_a, ax_att_b, ax_att_c, ax_att_d };
 
 
 
@@ -167,88 +162,11 @@ void()	player_run =[	$rockrun1,	player_run	]
 };
 
 
-void()	player_shot1 =	[$shotatt1, player_shot2	]
-{
-	if (self.weapon == W_SHOTGUN)
-		W_FireShotgun ();
-	else if (self.weapon == W_SUPER_SHOTGUN)
-		W_FireSuperShotgun();
-	if (self.weapon == W_TRIPLE_SHOTGUN)
-		W_FireTripleShotgun();
 
-	self.weaponframe=1;
-	self.effects = self.effects | EF_MUZZLEFLASH;
-	self.attack_finished = time + 0.1;
-};
-void()	player_shot2 =	[$shotatt2, player_shot3	] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe = 2;
-};
-void()	player_shot3 =	[$shotatt3, player_shot4	] 
-{
-	self.attack_finished = self.nextthink = time + self.reload_time / 6;
-	self.weaponframe = 3;
-};
-void()	player_shot4 =	[$shotatt4, player_shot5	] 
-{
-	self.attack_finished = self.nextthink = time + self.reload_time / 6;
-	self.weaponframe = 4;
-};
-void()	player_shot5 =	[$shotatt5, player_shot6	] 
-{
-	self.attack_finished = self.nextthink = time + self.reload_time / 6;
-	self.weaponframe = 5;
-};
-void()	player_shot6 =	[$shotatt6, player_run	] 
-{
-	self.attack_finished = self.nextthink = time + self.reload_time / 6;
-	self.weaponframe = 6;
-};
 
 //AXE A
 
-void()	player_axe1 =	[ax_att_frame[self.ax_variant], player_axe2	] {
-	self.weaponframe = self.ax_variant  * 10 + 1;
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-};
-void()	player_axe2 =	[ax_att_frame[self.ax_variant], player_axe3	] {
-	self.weaponframe = self.ax_variant  * 10 + 2;
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-};
-void()	player_axe3 =	[ax_att_frame[self.ax_variant] + 1, player_axe4	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 3;
-};
-void()	player_axe4 =	[ax_att_frame[self.ax_variant] + 1, player_axe5	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 4;
-};
-void()	player_axe5 =	[ax_att_frame[self.ax_variant] + 2, player_axe6	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 5;
-	W_FireAxe();
-};
-void()	player_axe6 =	[ax_att_frame[self.ax_variant] + 2, player_axe7	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 6;
-};
-void()	player_axe7 =	[ax_att_frame[self.ax_variant] + 3, player_axe8	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 7;
-};
-void()	player_axe8 =	[ax_att_frame[self.ax_variant] + 4, player_axe9	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 8;
-};
-void()	player_axe9 =	[ax_att_frame[self.ax_variant] + 5, player_axe10	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 9;
-};
-void()	player_axe10 =	[ax_att_frame[self.ax_variant] + 5, player_run	] {
-	self.attack_finished = self.nextthink = time + (self.reload_time / 10);
-	self.weaponframe = self.ax_variant  * 10 + 10;
-};
+
 
 
 
@@ -292,14 +210,12 @@ void() player_nail   = [ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), play
 
 	if (!self.button0)
 	{
-		self.ng_accel_on = FALSE;
 		player_run ();
 		return;
 	}
 
 	if (self.ammo_nails < 1)
 	{
-		self.ng_accel_on = FALSE;
 		player_run ();
 		W_SetCurrentAmmo ();
 		return;
@@ -598,21 +514,24 @@ void() PlayerDead =
 
 vector(float dm) VelocityForDamage =
 {
-	vector v = normalize(self.origin - damage_inflictor.origin);
+	vector v;
+
+	v[2] = v[2] + random(150,300);
+	v[0] = v[0] + random(-100, 100);
+	v[1] = v[1] + random(-100, 100);
+
+	vector add = normalize(self.origin - damage_inflictor.origin);
+
 
 	dm = -dm;
-
-	v = v * dm * 4;
-
+	float inf_vlen = vlen(damage_inflictor.velocity);
+	add = add * sqrt(inf_vlen + dm) * 8;
 	float i;
 
 	for (i = 0; i < 3; i++)
-		v[i] = lerp( v[i], damage_inflictor.velocity[i], random(0.3, 0.65));
-	for (i = 0; i < 3; i++)
-		v[i] = lerp( v[i], v[i] * 0.25 * random(-1, 1), random(0.1, 0.8));
+		add[i] = lerp( add[i], add[i] * 0.25 * random(-1, 1), random(0.1, 0.8));
 	
-	v[2] = v[2] + random(300);
-	dprint(sprintf("%v velocity\n", v));
+	v = v + add;
 
 	return v;
 };

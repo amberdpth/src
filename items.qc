@@ -33,7 +33,7 @@ void() PlaceItem =
 	// make extra wide
 	self.flags = FL_ITEM;
 	self.solid = SOLID_TRIGGER;
-	//self.movetype = MOVETYPE_TOSS;
+	self.movetype = MOVETYPE_TOSS;
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 16;
 	oldz = self.origin_z;
@@ -50,16 +50,18 @@ float (entity e, float healamount, float ignore) T_Heal =
 {
 	if (e.health <= 0)
 		return 0;
+
 	if ((!ignore) && (e.health >= e.max_health))
 		return 0;
-	healamount = ceil(healamount);
 
+	healamount = ceil(healamount);
 	e.health = e.health + healamount;
+
 	if ((!ignore) && (e.health >= e.max_health))
 		e.health = e.max_health;
 
-	if (e.health > 250)
-		e.health = 250;
+	e.rot_time = time + 5;
+
 	return 1;
 };
 
@@ -71,63 +73,7 @@ void() item_megahealth_rot;
 
 
 
-void() health_touch =
-{
-	local string s;
 
-	if (other.classname != "player")
-		return;
-
-	// Megahealth?  Ignore max_health...
-	if (self.healtype == 2)
-	{
-		if (other.health >= 250)
-			return;
-		if (!T_Heal(other, self.healamount, 1))
-			return;
-	}
-	else
-	{
-		if (!T_Heal(other, self.healamount, 0))
-			return;
-	}
-
-	sprint(other, "You receive ");
-	s = ftos(self.healamount);
-	sprint(other, s);
-	sprint(other, " health\n");
-
-	// health touch sound
-	sound(other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
-
-	stuffcmd (other, "bf\n");
-
-	self.model = string_null;
-	self.solid = SOLID_NOT;
-
-	// Megahealth = rot down the player's super health
-	if (self.healtype == 2)
-	{
-		other.items = other.items | IT_SUPERHEALTH;
-		self.nextthink = time + 5;
-		self.think = item_megahealth_rot;
-		self.owner = other;
-	}
-	else
-	{
-		// deathmatch 2 is the silly old rules
-		if (deathmatch != 2)
-		{
-			if (deathmatch)
-				self.nextthink = time + 20;
-			self.think = SUB_regen;
-		}
-	}
-
-	activator = other;
-	// fire all targets / killtargets
-	SUB_UseTargets();
-};
 
 void() item_megahealth_rot =
 {

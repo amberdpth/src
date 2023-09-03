@@ -44,7 +44,7 @@ void() walkmonster_start_go =
 
 	if (!walkmove(0,0))
 	{
-		dprint ("walkmonster in wall at: ");
+		dprint (self.classname, "walkmonster in wall at: ");
 		dprint (vtos(self.origin));
 		dprint ("\n");
 	}
@@ -65,7 +65,7 @@ void() walkmonster_start_go =
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 		if (!self.movetarget)
 		{
-			dprint ("Monster can't find target at ");
+			dprint (self.classname, " Monster can't find target at ");
 			dprint (vtos(self.origin));
 			dprint ("\n");
 		}
@@ -111,7 +111,7 @@ void() flymonster_start_go =
 
 	if (!walkmove(0,0))
 	{
-		dprint ("flymonster in wall at: ");
+		dprint (self.classname, " flymonster in wall at: ");
 		dprint (vtos(self.origin));
 		dprint ("\n");
 	}

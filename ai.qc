@@ -512,7 +512,7 @@ float() FacingIdeal =
 	local	float	delta;
 
 	delta = anglemod(self.angles_y - self.ideal_yaw);
-	if (delta > 45 && delta < 315)
+	if (delta > 90 && delta < 270)
 		return FALSE;
 	return TRUE;
 };
@@ -525,8 +525,6 @@ float()	DogCheckAttack;
 
 float() CheckAnyAttack =
 {
-	if (!enemy_vis)
-		return FALSE;
 	if (self.classname == "monster_army")
 		return SoldierCheckAttack ();
 	if (self.classname == "monster_ogre")
@@ -539,6 +537,8 @@ float() CheckAnyAttack =
 		return DogCheckAttack ();
 	if (self.classname == "monster_wizard")
 		return WizardCheckAttack ();
+	if (self.classname == "monster_enforcer")
+		return EnfCheckAttack ();
 	return CheckAttack ();
 };
 
@@ -582,13 +582,6 @@ void() ai_run_missile =
 };
 
 
-/*
-=============
-ai_run_slide
-
-Strafe sideways, but stay at aproximately the same range
-=============
-*/
 void() ai_run_slide =
 {
 	local float	ofs;
@@ -609,6 +602,20 @@ void() ai_run_slide =
 };
 
 
+void() ai_run_missile_dodging =
+{
+	self.ideal_yaw = enemy_yaw;
+	ChangeYaw ();
+
+	ai_run_slide();
+
+	if (FacingIdeal())
+	{
+		self.th_missile ();
+		self.attack_state = AS_STRAIGHT;
+	}
+};
+
 /*
 =============
 ai_run
@@ -618,6 +625,8 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
+
+
 	movedist = dist;
 	// see if the enemy is dead
 	if (self.enemy.health <= 0)
@@ -644,11 +653,20 @@ void(float dist) ai_run =
 
 	// check knowledge of enemy
 	enemy_vis = visible(self.enemy);
-	if (enemy_vis)
-		self.search_time = time + 5;
 
-	// look for other coop players
-	if (coop && self.search_time < time)
+	if (enemy_vis)
+	{
+		self.search_time = time + random(5,15);
+		self.spam_point = self.enemy.origin;
+
+		enemy_yaw = vectoyaw(self.enemy.origin - self.origin);
+	}
+	else
+	{
+		enemy_yaw = vectoyaw(self.spam_point - self.origin);
+	}
+
+	if (coop && (self.search_time < time))
 	{
 		if (FindTarget ())
 			return;
@@ -656,13 +674,16 @@ void(float dist) ai_run =
 
 	enemy_infront = infront(self.enemy);
 	enemy_range = range(self.enemy);
-	enemy_yaw = vectoyaw(self.enemy.origin - self.origin);
+
+	if ((self.enemy.prefire_finished > time) && (enemy_vis))
+		ai_run_slide();
 
 	if (self.attack_state == AS_MISSILE)
 	{
 		ai_run_missile ();
 		return;
 	}
+
 	if (self.attack_state == AS_MELEE)
 	{
 		ai_run_melee ();
@@ -682,73 +703,4 @@ void(float dist) ai_run =
 	movetogoal (dist);		// done in C code...
 };
 
-float(vector delta, vector dir, float proj_speed) aim_mod =
-{
-	float a = dotproduct(dir, dir) - proj_speed * proj_speed;
-	float b = 2 * dotproduct(dir, delta);
-	float c = dotproduct(delta, delta);
 
-	float desc = b * b - 4 * a * c;
-
-	if (desc > 0.0)
-		return (2 * c) / (sqrt(desc) - b);
-	
-	return -1;
-}
-
-float (float proj_speed, float grav, float distance, float height) max_dist = 
-{
-	float m = height / distance;
-	float spd2 = proj_speed * proj_speed;
-	return (spd2 * sqrt( m * m + 1) - m * spd2) / grav;
-}
-
-float (vector dir, float proj_speed,optional float grav_mult) proj_launch_pitch_mod =
-{
-	if (!grav_mult)
-		grav_mult = 1;
-
-	float grav = cvar("sv_gravity") * grav_mult;
-
-	float spd2 = proj_speed * proj_speed;
-	float pitch;
-	float distance = vlen(dir);
-	float height = dir[2];
-
-	float maxd = max_dist(proj_speed, grav, distance, height);
-
-	if (vlen(dir) > maxd)
-	{
-		pitch = atan(spd2 / (grav * maxd));
-	}
-	else
-	{	
-		float spd4 = spd2 * spd2;
-		float root = sqrt(spd4 - grav * ( grav * distance * distance + 2 * dir[2] * spd2));
-		pitch = atan( (spd2 - root ) / (grav * distance));
-	}
-
-	return -pitch * 180 / 3.14159265359 ;
-}
-
-vector(float proj_speed) calculate_dir_to_moving_target =
-{
-
-	vector dir = self.enemy.origin - self.origin;
-	vector delta = self.enemy.velocity - self.velocity;
-
-	float deltatime = aim_mod(dir, delta, proj_speed);
-
-	traceline(self.origin, self.enemy.origin + self.enemy.velocity * deltatime, TRUE, self);
-
-	float dodge_mult = (self.enemy.dodge_time > time ? random(0.25, 0.75) : 1);
-
-	if (trace_fraction == 1)
-		dir = normalize((self.enemy.origin + self.enemy.velocity * deltatime * dodge_mult) - self.origin);
-	else
-		dir = normalize(dir);
-
-
-	return dir;
-	
-}
