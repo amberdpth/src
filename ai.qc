@@ -21,7 +21,7 @@ void() t_movetarget;
 void() knight_walk1;
 void() knight_bow6;
 void() knight_bow1;
-void(entity etemp, entity stemp, entity stemp, float dmg, float dmg_flag) T_Damage;
+void(entity etemp, entity stemp, entity stemp, float dmg) T_Damage;
 /*
 
 .enemy
@@ -121,7 +121,7 @@ moving towards it, change the next destination and continue.
 */
 void() t_movetarget =
 {
-	local entity	temp;
+	entity	temp;
 
 	if (other.movetarget != self)
 		return;
@@ -163,8 +163,8 @@ returns the range catagorization of an entity reletive to self
 */
 float(entity targ) range =
 {
-	local vector	spot1, spot2;
-	local float		r;
+	vector	spot1, spot2;
+	float		r;
 
 	spot1 = self.origin + self.view_ofs;
 	spot2 = targ.origin + targ.view_ofs;
@@ -188,7 +188,7 @@ returns 1 if the entity is visible to self, even if not infront ()
 */
 float (entity targ) visible =
 {
-	local vector spot1, spot2;
+	vector spot1, spot2;
 
 	spot1 = self.origin + self.view_ofs;
 	spot2 = targ.origin + targ.view_ofs;
@@ -212,8 +212,8 @@ returns 1 if the entity is in front (in sight) of self
 */
 float(entity targ) infront =
 {
-	local vector	vec;
-	local float		dot;
+	vector	vec;
+	float		dot;
 
 	makevectors (self.angles);
 	vec = normalize (targ.origin - self.origin);
@@ -240,7 +240,7 @@ void() HuntTarget =
 
 void() SightSound =
 {
-	local float	rsnd;
+	float	rsnd;
 
 	if (self.classname == "monster_ogre")
 		sound (self, CHAN_VOICE, "ogre/ogwake.wav", 1, ATTN_NORM);
@@ -311,8 +311,8 @@ slower noticing monsters.
 */
 float() FindTarget =
 {
-	local entity	client;
-	local float		r;
+	entity	client;
+	float		r;
 
 	// if the first spawnflag bit is set, the monster will only wake up on
 	// really seeing the player, not another monster getting angry
@@ -478,7 +478,7 @@ ChooseTurn
 */
 void(vector dest3) ChooseTurn =
 {
-	local vector	dir, newdir;
+	vector	dir, newdir;
 
 	dir = self.origin - dest3;
 
@@ -512,7 +512,7 @@ float() FacingIdeal =
 	local	float	delta;
 
 	delta = anglemod(self.angles_y - self.ideal_yaw);
-	if (delta > 90 && delta < 270)
+	if (delta > 45 && delta < 315)
 		return FALSE;
 	return TRUE;
 };
@@ -525,10 +525,15 @@ float()	DogCheckAttack;
 
 float() CheckAnyAttack =
 {
-	if (self.classname == "monster_army")
-		return SoldierCheckAttack ();
 	if (self.classname == "monster_ogre")
 		return OgreCheckAttack ();
+	if (self.classname == "monster_enforcer")
+		return EnfCheckAttack ();
+
+	if (!enemy_vis)
+		return FALSE;
+	if (self.classname == "monster_army")
+		return SoldierCheckAttack ();
 	if (self.classname == "monster_shambler")
 		return ShamCheckAttack ();
 	if (self.classname == "monster_demon1")
@@ -537,8 +542,6 @@ float() CheckAnyAttack =
 		return DogCheckAttack ();
 	if (self.classname == "monster_wizard")
 		return WizardCheckAttack ();
-	if (self.classname == "monster_enforcer")
-		return EnfCheckAttack ();
 	return CheckAttack ();
 };
 
@@ -582,9 +585,16 @@ void() ai_run_missile =
 };
 
 
+/*
+=============
+ai_run_slide
+
+Strafe sideways, but stay at aproximately the same range
+=============
+*/
 void() ai_run_slide =
 {
-	local float	ofs;
+	float	ofs;
 
 	self.ideal_yaw = enemy_yaw;
 	ChangeYaw ();
@@ -602,20 +612,6 @@ void() ai_run_slide =
 };
 
 
-void() ai_run_missile_dodging =
-{
-	self.ideal_yaw = enemy_yaw;
-	ChangeYaw ();
-
-	ai_run_slide();
-
-	if (FacingIdeal())
-	{
-		self.th_missile ();
-		self.attack_state = AS_STRAIGHT;
-	}
-};
-
 /*
 =============
 ai_run
@@ -625,8 +621,6 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-
-
 	movedist = dist;
 	// see if the enemy is dead
 	if (self.enemy.health <= 0)
@@ -653,37 +647,32 @@ void(float dist) ai_run =
 
 	// check knowledge of enemy
 	enemy_vis = visible(self.enemy);
-
 	if (enemy_vis)
 	{
-		self.search_time = time + random(5,15);
+		self.search_time = time + 5;
 		self.spam_point = self.enemy.origin;
-
+		
 		enemy_yaw = vectoyaw(self.enemy.origin - self.origin);
 	}
-	else
+	else 
 	{
-		enemy_yaw = vectoyaw(self.spam_point - self.origin);
-	}
+		if (coop && self.search_time < time)
+		{
+			if (FindTarget ())
+				return;
+		}
 
-	if (coop && (self.search_time < time))
-	{
-		if (FindTarget ())
-			return;
+		enemy_yaw = vectoyaw(self.spam_point - self.origin);
 	}
 
 	enemy_infront = infront(self.enemy);
 	enemy_range = range(self.enemy);
-
-	if ((self.enemy.prefire_finished > time) && (enemy_vis))
-		ai_run_slide();
 
 	if (self.attack_state == AS_MISSILE)
 	{
 		ai_run_missile ();
 		return;
 	}
-
 	if (self.attack_state == AS_MELEE)
 	{
 		ai_run_melee ();
@@ -702,5 +691,3 @@ void(float dist) ai_run =
 	// head straight in
 	movetogoal (dist);		// done in C code...
 };
-
-

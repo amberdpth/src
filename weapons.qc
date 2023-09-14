@@ -1,8 +1,27 @@
-void (entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage;
-void () player_run;
-void(entity bomb, entity attacker, float damage, float radius, float pow_f, float dmg_flag) T_RadiusDamage;
-void(vector org, vector vel, float damage, entity o) SpawnBlood;
+/*  Copyright (C) 1996-1997  Id Software, Inc.
 
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    See file, 'COPYING', for details.
+*/
+
+void (entity targ, entity inflictor, entity attacker, float damage) T_Damage;
+void () player_run;
+void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
+void(vector org, vector vel, float damage) SpawnBlood;
+void() SuperDamageSound;
 
 
 // called by worldspawn
@@ -20,15 +39,281 @@ void() W_Precache =
 	precache_sound ("weapons/grenade.wav");	// grenade launcher
 	precache_sound ("weapons/bounce.wav");		// grenade bounce
 	precache_sound ("weapons/shotgn2.wav");	// super shotgun
-	precache_sound ("shambler/smack.wav");
-	precache_sound ("hook/chain1.wav");
-	precache_sound ("hook/chain2.wav");
-	precache_sound ("hook/retract.wav");
 };
 
 float() crandom =
 {
 	return 2*(random() - 0.5);
+};
+
+/*
+================
+W_FireAxe
+================
+*/
+void() W_FireAxe =
+{
+	vector source;
+	vector org;
+
+	makevectors (self.v_angle);
+	source = self.origin + '0 0 16';
+	traceline (source, source + v_forward*64, FALSE, self);
+	if (trace_fraction == 1.0)
+		return;
+
+	org = trace_endpos - v_forward*4;
+
+	if (trace_ent.takedamage)
+	{
+		trace_ent.axhitme = 1;
+		SpawnBlood (org, '0 0 0', 20);
+		T_Damage (trace_ent, self, self, 20);
+	}
+	else
+	{	// hit wall
+		sound (self, CHAN_WEAPON, "player/axhit2.wav", 1, ATTN_NORM);
+		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
+		WriteCoord (MSG_BROADCAST, org_x);
+		WriteCoord (MSG_BROADCAST, org_y);
+		WriteCoord (MSG_BROADCAST, org_z);
+	}
+};
+
+
+//============================================================================
+
+
+vector() wall_velocity =
+{
+	vector vel;
+
+	vel = normalize (self.velocity);
+	vel = normalize(vel + v_up*(random()- 0.5) + v_right*(random()- 0.5));
+	vel = vel + 2*trace_plane_normal;
+	vel = vel * 200;
+
+	return vel;
+};
+
+
+/*
+================
+SpawnMeatSpray
+================
+*/
+void(vector org, vector vel) SpawnMeatSpray =
+{
+	entity missile;
+
+	missile = spawn ();
+	missile.owner = self;
+	missile.movetype = MOVETYPE_BOUNCE;
+	missile.solid = SOLID_NOT;
+
+	makevectors (self.angles);
+
+	missile.velocity = vel;
+	missile.velocity_z = missile.velocity_z + 250 + 50*random();
+
+	missile.avelocity = '3000 1000 2000';
+
+	// set missile duration
+	missile.nextthink = time + 1;
+	missile.think = SUB_Remove;
+
+	setmodel (missile, "progs/zom_gib.mdl");
+	setsize (missile, '0 0 0', '0 0 0');
+	setorigin (missile, org);
+};
+
+/*
+================
+SpawnBlood
+================
+*/
+void(vector org, vector vel, float damage) SpawnBlood =
+{
+	particle (org, vel*0.1, 73, damage*2);
+};
+
+/*
+================
+spawn_touchblood
+================
+*/
+void(float damage) spawn_touchblood =
+{
+	vector vel;
+
+	vel = wall_velocity () * 0.2;
+	SpawnBlood (self.origin + vel*0.01, vel, damage);
+};
+
+
+/*
+================
+SpawnChunk
+================
+*/
+void(vector org, vector vel) SpawnChunk =
+{
+	particle (org, vel*0.02, 0, 10);
+};
+
+/*
+==============================================================================
+
+MULTI-DAMAGE
+
+Collects multiple small damages into a single damage
+
+==============================================================================
+*/
+
+entity multi_ent;
+float multi_damage;
+
+void() ClearMultiDamage =
+{
+	multi_ent = world;
+	multi_damage = 0;
+};
+
+void() ApplyMultiDamage =
+{
+	if (!multi_ent)
+		return;
+	T_Damage (multi_ent, self, self, multi_damage);
+};
+
+void(entity hit, float damage) AddMultiDamage =
+{
+	if (!hit)
+		return;
+
+	if (hit != multi_ent)
+	{
+		ApplyMultiDamage ();
+		multi_damage = damage;
+		multi_ent = hit;
+	}
+	else
+		multi_damage = multi_damage + damage;
+};
+
+/*
+==============================================================================
+
+BULLETS
+
+==============================================================================
+*/
+
+/*
+================
+TraceAttack
+================
+*/
+void(float damage, vector dir) TraceAttack =
+{
+	vector vel, org;
+
+	vel = normalize(dir + v_up*crandom() + v_right*crandom());
+	vel = vel + 2*trace_plane_normal;
+	vel = vel * 200;
+
+	org = trace_endpos - dir*4;
+
+	if (trace_ent.takedamage)
+	{
+		SpawnBlood (org, vel*0.2, damage);
+		AddMultiDamage (trace_ent, damage);
+	}
+	else
+	{
+		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
+		WriteCoord (MSG_BROADCAST, org_x);
+		WriteCoord (MSG_BROADCAST, org_y);
+		WriteCoord (MSG_BROADCAST, org_z);
+	}
+};
+
+/*
+================
+FireBullets
+
+Used by shotgun, super shotgun, and enemy soldier firing
+Go to the trouble of combining multiple pellets into a single damage call.
+================
+*/
+void(float shotcount, vector dir, vector spread) FireBullets =
+{
+	vector direction;
+	vector src;
+
+	makevectors(self.v_angle);
+
+	src = self.origin + v_forward*10;
+	src_z = self.absmin_z + self.size_z * 0.7;
+
+	ClearMultiDamage ();
+	while (shotcount > 0)
+	{
+		direction = dir + crandom()*spread_x*v_right + crandom()*spread_y*v_up;
+
+		traceline (src, src + direction*2048, FALSE, self);
+		if (trace_fraction != 1.0)
+			TraceAttack (4, direction);
+
+		shotcount = shotcount - 1;
+	}
+	ApplyMultiDamage ();
+};
+
+/*
+================
+W_FireShotgun
+================
+*/
+void() W_FireShotgun =
+{
+	vector dir;
+
+	sound (self, CHAN_WEAPON, "weapons/guncock.wav", 1, ATTN_NORM);
+
+	self.punchangle_x = -2;
+
+	self.currentammo = self.ammo_shells = self.ammo_shells - 1;
+	dir = aim (self, 100000);
+	FireBullets (6, dir, '0.04 0.04 0');
+};
+
+
+/*
+================
+W_FireSuperShotgun
+================
+*/
+void() W_FireSuperShotgun =
+{
+	vector dir;
+
+	if (self.currentammo == 1)
+	{
+		W_FireShotgun ();
+		return;
+	}
+
+	sound (self ,CHAN_WEAPON, "weapons/shotgn2.wav", 1, ATTN_NORM);
+
+	self.punchangle_x = -4;
+
+	self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+	dir = aim (self, 100000);
+	FireBullets (14, dir, '0.14 0.08 0');
 };
 
 
@@ -59,11 +344,7 @@ void() BecomeExplosion =
 
 void() T_MissileTouch =
 {
-	float damage = 100;
-	float radius = 200;
-	float pow_f = 1.6;
-
-
+	float damg;
 
 	if (other == self.owner)
 		// don't explode on owner
@@ -74,13 +355,22 @@ void() T_MissileTouch =
 		remove(self);
 		return;
 	}
-	xptoprm(damage, 0, 80, self.owner.explosive_xp);
-	xptoprm(radius, 0, 50, self.owner.explosive_xp);
-	xptoprm(pow_f, 0, -0.3, self.owner.explosive_xp);
 
-	T_RadiusDamage (self, self.owner, damage, radius, pow_f, DMG_EXPLO);
+	damg = 100 + random()*20;
 
-	self.origin = self.origin - 8 * normalize(self.velocity);
+	if (other.health)
+	{
+		if (other.classname == "monster_shambler")
+			// mostly immune
+			damg = damg * 0.5;
+		T_Damage (other, self, self.owner, damg );
+	}
+
+	// don't do radius damage to the other, because all the damage
+	// was done in the impact
+	T_RadiusDamage (self, self.owner, 120, other);
+
+	self.origin = self.origin - 8*normalize(self.velocity);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
@@ -91,42 +381,16 @@ void() T_MissileTouch =
 	BecomeExplosion ();
 };
 
-void() missile_think =
-{
-	vector error;
 
-	error[0] = sin(time * self.fly_error[0]) + sin(time * self.fly_error[1]);
-	error[1] = sin(time * self.fly_error[2]) + sin(time * self.fly_error[3]);
-	error[2] = sin(time * self.fly_error[4]) + sin(time * self.fly_error[5]);
-
-	self.error_fraction = bound(0, self.error_fraction + frametime , 1);
-
-
-	vector new_vel = normalize(self.start_dir + error * 0.08) * 1000;
-
-	self.velocity[0] = lerp(self.velocity[0], new_vel[0], frametime * 16);
-	self.velocity[1] = lerp(self.velocity[1], new_vel[1], frametime * 16);
-	self.velocity[2] = lerp(self.velocity[2], new_vel[2], frametime * 16);
-
-	self.angles = vectoangles(self.velocity);
-
-	self.think = missile_think;
-	self.nextthink = time + 0.025;
-}
 
 /*
 ================
 W_FireRocket
 ================
 */
-
-
-
 void() W_FireRocket =
 {
 	entity missile;
-	vector dir;
-	float i = 0;
 
 	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
@@ -142,24 +406,15 @@ void() W_FireRocket =
 
 	// set missile speed
 	makevectors (self.v_angle);
-
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
-	dir = v_forward + error_h + error_v;
-
-	missile.velocity = dir;
-	missile.start_dir = dir;
+	missile.velocity = aim(self, 1000);
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles(missile.velocity);
-
-	for (i = 0; i < 5; i++ )
-		missile.fly_error[i] = random(-64, 64);
 
 	missile.touch = T_MissileTouch;
 
 	// set missile duration
-	missile.think = missile_think;
-	missile.nextthink = time + 0.025;
+	missile.nextthink = time + 5;
+	missile.think = SUB_Remove;
 
 	setmodel (missile, "progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
@@ -181,8 +436,8 @@ LightningDamage
 */
 void(vector p1, vector p2, entity from, float damage) LightningDamage =
 {
-	local entity e1, e2;
-	local vector f;
+	entity e1, e2;
+	vector f;
 
 	f = p2 - p1;
 	normalize (f);
@@ -197,8 +452,7 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 	if (trace_ent.takedamage)
 	{
 		particle (trace_endpos, '0 0 100', 225, damage*4);
-		T_Damage (trace_ent, from, from, damage, DMG_ELEC);
-
+		T_Damage (trace_ent, from, from, damage);
 		if (self.classname == "player")
 		{
 			if (other.classname == "player")
@@ -211,7 +465,7 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 	if (trace_ent != e1 && trace_ent.takedamage)
 	{
 		particle (trace_endpos, '0 0 100', 225, damage*4);
-		T_Damage (trace_ent, from, from, damage, DMG_ELEC);
+		T_Damage (trace_ent, from, from, damage);
 	}
 	e2 = trace_ent;
 
@@ -219,18 +473,22 @@ void(vector p1, vector p2, entity from, float damage) LightningDamage =
 	if (trace_ent != e1 && trace_ent != e2 && trace_ent.takedamage)
 	{
 		particle (trace_endpos, '0 0 100', 225, damage*4);
-		T_Damage (trace_ent, from, from, damage, DMG_ELEC);
+		T_Damage (trace_ent, from, from, damage);
 	}
 };
 
 
 void() W_FireLightning =
 {
-	local vector org;
-	local float cells;
+	vector org;
+	float cells;
 
 	if (self.ammo_cells < 1)
+	{
+		self.weapon = W_BestWeapon ();
+		W_SetCurrentAmmo ();
 		return;
+	}
 
 	// explode if under water
 	if (self.waterlevel > 1)
@@ -238,7 +496,7 @@ void() W_FireLightning =
 		cells = self.ammo_cells;
 		self.ammo_cells = 0;
 		W_SetCurrentAmmo ();
-		T_RadiusDamage (self, self, 35 * cells, 480, 1.3, DMG_EXPLO|DMG_ELEC);
+		T_RadiusDamage (self, self, 35*cells, world);
 		return;
 	}
 
@@ -274,16 +532,15 @@ void() W_FireLightning =
 
 void() GrenadeExplode =
 {
-	float damage = 120;
-	float radius = 300;
-	float pow_f = 1.8;
+	float radius = 120;
+	float damage =  100;
+	float radius_exp = 1.0;
 
+	radius = self.owner.gameplay_flags_a & GPFLAGA_GRENADE_EXTRA_RADIUS ? 180 : radius;
+	damage = self.owner.gameplay_flags_a & GPFLAGA_GRENADE_EXTRA_DAMAGE ? 150 : damage;
+	radius_exp = self.owner.gameplay_flags_a & GPFLAGA_GRENADE_RADIUS_EXP ? 0.88 : radius_exp;
 
-	xptoprm(damage, 0, 60, self.owner.explosive_xp);
-	xptoprm(radius, 0, 60, self.owner.explosive_xp);
-	xptoprm(pow_f, 0, -0.7, self.owner.explosive_xp);
-
-	T_RadiusDamage (self, self.owner, damage, radius, pow_f, DMG_EXPLO);
+	T_RadiusDamage2 (self, self.owner, damage, radius, radius_exp, 0);
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
@@ -299,7 +556,6 @@ void() GrenadeTouch =
 	if (other == self.owner)
 		// don't explode on owner
 		return;
-
 	if (other.takedamage == DAMAGE_AIM)
 	{
 		GrenadeExplode();
@@ -311,12 +567,16 @@ void() GrenadeTouch =
 		self.avelocity = '0 0 0';
 };
 
+/*
+================
+W_FireGrenade
+================
+*/
 void() W_FireGrenade =
 {
 	entity missile;
-	vector dir;
 
-	self.currentammo = self.ammo_grenades = self.ammo_grenades - 1;
+	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
@@ -327,18 +587,18 @@ void() W_FireGrenade =
 	missile.movetype = MOVETYPE_BOUNCE;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "grenade";
-	missile.flags = missile.flags | FL_LAGGEDMOVE;
 
 	// set missile speed
 	makevectors (self.v_angle);
 
-	vector error_v = v_up * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
-	vector error_h = v_right * random(-lerp(0.045, 0.0023, self.explosive_xp / 100), lerp(0.045, 0.0023, self.explosive_xp / 100) );
-	dir = v_forward + error_h + error_v;
-
-	missile.velocity = dir * 585;
-	missile.velocity[2] = missile.velocity[2] + v_up[2] * 180;
-	missile.velocity = missile.velocity + v_up * 60;
+	if (self.v_angle_x)
+		missile.velocity = v_forward*600 + v_up * 200 + crandom()*v_right*10 + crandom()*v_up*10;
+	else
+	{
+		missile.velocity = aim(self, 10000);
+		missile.velocity = missile.velocity * 600;
+		missile.velocity_z = 200;
+	}
 
 	missile.avelocity = '300 300 300';
 
@@ -361,12 +621,19 @@ void() W_FireGrenade =
 void() spike_touch;
 void() superspike_touch;
 
+
+/*
+===============
+launch_spike
+
+Used for both the player and the ogre
+===============
+*/
 void(vector org, vector dir) launch_spike =
-{	
-
+{
 	newmis = spawn ();
 	newmis.owner = self;
-	newmis.movetype = MOVETYPE_TOSS;
+	newmis.movetype = MOVETYPE_FLYMISSILE;
 	newmis.solid = SOLID_BBOX;
 
 	newmis.angles = vectoangles(dir);
@@ -379,68 +646,18 @@ void(vector org, vector dir) launch_spike =
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
 	setorigin (newmis, org);
 
-	newmis.gravity = 0.6;
-	newmis.velocity = dir * 900 + v_up * 100;
-
+	newmis.velocity = dir * 1000;
 };
-
-void(vector org, vector dir) launch_super_spike =
-{	
-
-	newmis = spawn ();
-	newmis.owner = self;
-	newmis.movetype = MOVETYPE_TOSS;
-	newmis.solid = SOLID_BBOX;
-
-	newmis.angles = vectoangles(dir);
-
-	newmis.touch = spike_touch;
-	newmis.classname = "spike";
-	newmis.think = SUB_Remove;
-	newmis.nextthink = time + 6;
-	setmodel (newmis, "progs/spike.mdl");
-	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
-	setorigin (newmis, org);
-
-	newmis.gravity = 0.5;
-	newmis.velocity = dir * 868 + v_up * 120;
-
-	fire_knockback ( &self.velocity, newmis.velocity, 0.2, self.armortype);
-}
-
 
 void() W_FireSuperSpikes =
 {
 	vector dir;
-	vector error_h, error_v;
-
-	makevectors (self.v_angle);
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
-	self.currentammo = self.ammo_big_spikes = self.ammo_big_spikes - 1;
-
-	fire_inaccuracy(error_h, v_right, 0.1, 0.02, self.accuracy_xp);
-	fire_inaccuracy(error_v, v_up, 0.1, 0.02, self.accuracy_xp);
-	
-	dir = v_forward + error_h + error_v;
-
-	vector muzzle_offset = '0 0 0';
-	float muzzle_offset_mult = 3.2;
-
-	switch(self.weaponframe)
-	{
-		case 1: muzzle_offset = v_up * muzzle_offset_mult + v_right * muzzle_offset_mult; break;
-		case 2: muzzle_offset = - v_right * muzzle_offset_mult; break;
-		case 3: muzzle_offset = v_right * muzzle_offset_mult - v_up * muzzle_offset_mult; break;
-		case 4: muzzle_offset = v_up * muzzle_offset_mult; break;
-		case 5: muzzle_offset = - v_up * muzzle_offset_mult - v_right * muzzle_offset_mult; break;
-		case 6: muzzle_offset = v_right * muzzle_offset_mult; break;
-		case 7: muzzle_offset = v_up * muzzle_offset_mult - v_right * muzzle_offset_mult; break;
-		case 8: muzzle_offset = - v_up * muzzle_offset_mult; break;
-			
-	}
-	
-	launch_super_spike (self.origin + muzzle_offset, dir);
+	self.attack_finished = time + 0.2;
+	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	dir = aim (self, 1000);
+	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis, "progs/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
@@ -451,19 +668,27 @@ void(float ox) W_FireSpikes =
 {
 	vector dir;
 
-	vector error_h, error_v;
-
 	makevectors (self.v_angle);
 
+	if (self.ammo_nails >= 2 && self.weapon == IT_SUPER_NAILGUN)
+	{
+		W_FireSuperSpikes ();
+		return;
+	}
+
+	if (self.ammo_nails < 1)
+	{
+		self.weapon = W_BestWeapon ();
+		W_SetCurrentAmmo ();
+		return;
+	}
+
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
+	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
-
-	fire_inaccuracy(error_h, v_right, 0.1, 0.02, self.accuracy_xp);
-	fire_inaccuracy(error_v, v_up, 0.1, 0.02, self.accuracy_xp);
-
-	dir = v_forward + error_h + error_v;
-
+	dir = aim (self, 1000);
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
+
 	self.punchangle_x = -2;
 };
 
@@ -483,12 +708,11 @@ void() spike_touch =
 		return;
 	}
 
-	float damage = 8;
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (damage, other);
-		T_Damage (other, self, self.owner, damage, DMG_BULLET);
+		spawn_touchblood (9);
+		T_Damage (other, self, self.owner, 9);
 	}
 	else
 	{
@@ -524,13 +748,11 @@ void() superspike_touch =
 		return;
 	}
 
-	float damage = 16;
-
 	// hit something that bleeds
 	if (other.takedamage)
 	{
-		spawn_touchblood (damage, other);
-		T_Damage (other, self, self.owner, damage, DMG_BULLET);
+		spawn_touchblood (18);
+		T_Damage (other, self, self.owner, 18);
 	}
 	else
 	{
@@ -541,7 +763,553 @@ void() superspike_touch =
 		WriteCoord (MSG_BROADCAST, self.origin_z);
 	}
 
-
 	remove(self);
 
 };
+
+
+/*
+===============================================================================
+
+PLAYER WEAPON USE
+
+===============================================================================
+*/
+
+void() W_SetCurrentAmmo =
+{
+	// get out of any weapon firing states
+	player_run ();
+
+	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+
+	if (self.weapon == IT_AXE)
+	{
+		self.currentammo = 0;
+		self.weaponmodel = "progs/v_axe.mdl";
+		self.weaponframe = 0;
+	}
+	else if (self.weapon == IT_SHOTGUN)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/v_shot.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+	}
+	else if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+		self.currentammo = self.ammo_shells;
+		self.weaponmodel = "progs/v_shot2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+	}
+	else if (self.weapon == IT_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.weaponmodel = "progs/v_nail.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_NAILS;
+	}
+	else if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.weaponmodel = "progs/v_nail2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_NAILS;
+	}
+	else if (self.weapon == IT_GRENADE_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponmodel = "progs/v_rock.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+	}
+	else if (self.weapon == IT_ROCKET_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponmodel = "progs/v_rock2.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+	}
+	else if (self.weapon == IT_LIGHTNING)
+	{
+		self.currentammo = self.ammo_cells;
+		self.weaponmodel = "progs/v_light.mdl";
+		self.weaponframe = 0;
+		self.items = self.items | IT_CELLS;
+	}
+	else
+	{
+		self.currentammo = 0;
+		self.weaponmodel = string_null;
+		self.weaponframe = 0;
+	}
+};
+
+float() W_BestWeapon =
+{
+	float it;
+
+	it = self.items;
+
+	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
+		return IT_LIGHTNING;
+	else if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
+		return IT_SUPER_NAILGUN;
+	else if(self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN) )
+		return IT_SUPER_SHOTGUN;
+	else if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
+		return IT_NAILGUN;
+	else if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
+		return IT_SHOTGUN;
+
+	return IT_AXE;
+};
+
+float() W_CheckNoAmmo =
+{
+	if (self.currentammo > 0)
+		return TRUE;
+
+	if (self.weapon == IT_AXE)
+		return TRUE;
+
+	self.weapon = W_BestWeapon ();
+
+	W_SetCurrentAmmo ();
+
+	// drop the weapon down
+	return FALSE;
+};
+
+/*
+============
+W_Attack
+
+An attack impulse can be triggered now
+============
+*/
+void()	player_axe1;
+void()	player_axeb1;
+void()	player_axec1;
+void()	player_axed1;
+void()	player_shot1;
+void()	player_nail1;
+void()	player_light1;
+void()	player_rocket1;
+
+void() W_Attack =
+{
+	float r;
+
+	if (!W_CheckNoAmmo ())
+		return;
+
+	// calculate forward angle for velocity
+	makevectors(self.v_angle);
+	// wake monsters up
+	self.show_hostile = time + 1;
+
+	if (self.weapon == IT_AXE)
+	{
+		sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
+		r = random();
+		if (r < 0.25)
+			player_axe1 ();
+		else if (r<0.5)
+			player_axeb1 ();
+		else if (r<0.75)
+			player_axec1 ();
+		else
+			player_axed1 ();
+		self.attack_finished = time + 0.5;
+	}
+	else if (self.weapon == IT_SHOTGUN)
+	{
+		player_shot1 ();
+		W_FireShotgun ();
+		self.attack_finished = time + 0.5;
+	}
+	else if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+		player_shot1 ();
+		W_FireSuperShotgun ();
+		self.attack_finished = time + 0.7;
+	}
+	else if (self.weapon == IT_NAILGUN)
+	{
+		player_nail1 ();
+	}
+	else if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		player_nail1 ();
+	}
+	else if (self.weapon == IT_GRENADE_LAUNCHER)
+	{
+		player_rocket1();
+		W_FireGrenade();
+		self.attack_finished = time + 0.6;
+	}
+	else if (self.weapon == IT_ROCKET_LAUNCHER)
+	{
+		player_rocket1();
+		W_FireRocket();
+		self.attack_finished = time + 0.8;
+	}
+	else if (self.weapon == IT_LIGHTNING)
+	{
+		player_light1();
+		self.attack_finished = time + 0.1;
+		sound (self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
+	}
+};
+
+/*
+============
+W_ChangeWeapon
+
+============
+*/
+void() W_ChangeWeapon =
+{
+	float it, am, fl;
+
+	it = self.items;
+	am = 0;
+	fl = 0;
+
+	if (self.impulse == 1)
+	{
+		fl = IT_AXE;
+	}
+	else if (self.impulse == 2)
+	{
+		fl = IT_SHOTGUN;
+		if (self.ammo_shells < 1)
+			am = 1;
+	}
+	else if (self.impulse == 3)
+	{
+		fl = IT_SUPER_SHOTGUN;
+		if (self.ammo_shells < 2)
+			am = 1;
+	}
+	else if (self.impulse == 4)
+	{
+		fl = IT_NAILGUN;
+		if (self.ammo_nails < 1)
+			am = 1;
+	}
+	else if (self.impulse == 5)
+	{
+		fl = IT_SUPER_NAILGUN;
+		if (self.ammo_nails < 2)
+			am = 1;
+	}
+	else if (self.impulse == 6)
+	{
+		fl = IT_GRENADE_LAUNCHER;
+		if (self.ammo_rockets < 1)
+			am = 1;
+	}
+	else if (self.impulse == 7)
+	{
+		fl = IT_ROCKET_LAUNCHER;
+		if (self.ammo_rockets < 1)
+			am = 1;
+	}
+	else if (self.impulse == 8)
+	{
+		fl = IT_LIGHTNING;
+		if (self.ammo_cells < 1)
+			am = 1;
+	}
+
+	self.impulse = 0;
+
+	if (!(self.items & fl))
+	{
+		// don't have the weapon or the ammo
+		sprint (self, "no weapon.\n");
+		return;
+	}
+
+	if (am)
+	{
+		// don't have the ammo
+		sprint (self, "not enough ammo.\n");
+		return;
+	}
+
+	// set weapon, set ammo
+	self.weapon = fl;
+	W_SetCurrentAmmo ();
+};
+
+/*
+============
+CheatCommand
+============
+*/
+void() CheatCommand =
+{
+	if (deathmatch || coop)
+		return;
+
+	self.ammo_rockets = 100;
+	self.ammo_nails = 200;
+	self.ammo_shells = 100;
+	self.items = self.items |
+		IT_AXE |
+		IT_SHOTGUN |
+		IT_SUPER_SHOTGUN |
+		IT_NAILGUN |
+		IT_SUPER_NAILGUN |
+		IT_GRENADE_LAUNCHER |
+		IT_ROCKET_LAUNCHER |
+		IT_KEY1 | IT_KEY2;
+
+	self.ammo_cells = 200;
+	self.items = self.items | IT_LIGHTNING;
+
+	self.weapon = IT_ROCKET_LAUNCHER;
+	self.impulse = 0;
+	W_SetCurrentAmmo ();
+};
+
+/*
+============
+CycleWeaponCommand
+
+Go to the next weapon with ammo
+============
+*/
+void() CycleWeaponCommand =
+{
+	float it, am;
+
+	it = self.items;
+	self.impulse = 0;
+
+	while (1)
+	{
+		am = 0;
+
+		if (self.weapon == IT_LIGHTNING)
+		{
+			self.weapon = IT_AXE;
+		}
+		else if (self.weapon == IT_AXE)
+		{
+			self.weapon = IT_SHOTGUN;
+			if (self.ammo_shells < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_SHOTGUN)
+		{
+			self.weapon = IT_SUPER_SHOTGUN;
+			if (self.ammo_shells < 2)
+				am = 1;
+		}
+		else if (self.weapon == IT_SUPER_SHOTGUN)
+		{
+			self.weapon = IT_NAILGUN;
+			if (self.ammo_nails < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_NAILGUN)
+		{
+			self.weapon = IT_SUPER_NAILGUN;
+			if (self.ammo_nails < 2)
+				am = 1;
+		}
+		else if (self.weapon == IT_SUPER_NAILGUN)
+		{
+			self.weapon = IT_GRENADE_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_GRENADE_LAUNCHER)
+		{
+			self.weapon = IT_ROCKET_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_ROCKET_LAUNCHER)
+		{
+			self.weapon = IT_LIGHTNING;
+			if (self.ammo_cells < 1)
+				am = 1;
+		}
+
+		if ( (self.items & self.weapon) && am == 0)
+		{
+			W_SetCurrentAmmo ();
+			return;
+		}
+	}
+};
+
+/*
+============
+CycleWeaponReverseCommand
+
+Go to the prev weapon with ammo
+============
+*/
+void() CycleWeaponReverseCommand =
+{
+	float it, am;
+
+	it = self.items;
+	self.impulse = 0;
+
+	while (1)
+	{
+		am = 0;
+
+		if (self.weapon == IT_LIGHTNING)
+		{
+			self.weapon = IT_ROCKET_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_ROCKET_LAUNCHER)
+		{
+			self.weapon = IT_GRENADE_LAUNCHER;
+			if (self.ammo_rockets < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_GRENADE_LAUNCHER)
+		{
+			self.weapon = IT_SUPER_NAILGUN;
+			if (self.ammo_nails < 2)
+				am = 1;
+		}
+		else if (self.weapon == IT_SUPER_NAILGUN)
+		{
+			self.weapon = IT_NAILGUN;
+			if (self.ammo_nails < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_NAILGUN)
+		{
+			self.weapon = IT_SUPER_SHOTGUN;
+			if (self.ammo_shells < 2)
+				am = 1;
+		}
+		else if (self.weapon == IT_SUPER_SHOTGUN)
+		{
+			self.weapon = IT_SHOTGUN;
+			if (self.ammo_shells < 1)
+				am = 1;
+		}
+		else if (self.weapon == IT_SHOTGUN)
+		{
+			self.weapon = IT_AXE;
+		}
+		else if (self.weapon == IT_AXE)
+		{
+			self.weapon = IT_LIGHTNING;
+			if (self.ammo_cells < 1)
+				am = 1;
+		}
+
+		if ( (it & self.weapon) && am == 0)
+		{
+			W_SetCurrentAmmo ();
+			return;
+		}
+	}
+};
+
+/*
+============
+ServerflagsCommand
+
+Just for development
+============
+*/
+void() ServerflagsCommand =
+{
+	serverflags = serverflags * 2 + 1;
+};
+
+void() QuadCheat =
+{
+	if (deathmatch || coop)
+		return;
+	self.super_time = 1;
+	self.super_damage_finished = time + 30;
+	self.items = self.items | IT_QUAD;
+	dprint ("quad cheat\n");
+};
+
+/*
+============
+ImpulseCommands
+
+============
+*/
+void() ImpulseCommands =
+{
+	if (self.impulse >= 1 && self.impulse <= 8)
+		W_ChangeWeapon ();
+
+	if (self.impulse == 9)
+		CheatCommand ();
+	if (self.impulse == 10)
+		CycleWeaponCommand ();
+	if (self.impulse == 11)
+		ServerflagsCommand ();
+	if (self.impulse == 12)
+		CycleWeaponReverseCommand ();
+	if (self.impulse == 255)
+		QuadCheat ();
+
+	self.impulse = 0;
+};
+
+/*
+============
+W_WeaponFrame
+
+Called every frame so impulse events can be handled as well as possible
+============
+*/
+void() W_WeaponFrame =
+{
+	if (time < self.attack_finished)
+		return;
+
+	ImpulseCommands ();
+
+	// check for attack
+	if (self.button0)
+	{
+		SuperDamageSound ();
+		W_Attack ();
+	}
+};
+
+/*
+========
+SuperDamageSound
+
+Plays sound if needed
+========
+*/
+void() SuperDamageSound =
+{
+	if (self.super_damage_finished > time)
+	{
+		if (self.super_sound < time)
+		{
+			self.super_sound = time + 1;
+			sound (self, CHAN_BODY, "items/damage3.wav", 1, ATTN_NORM);
+		}
+	}
+	return;
+};
+
+

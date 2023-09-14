@@ -98,9 +98,6 @@ $frame axattc1 axattc2 axattc3 axattc4 axattc5 axattc6
 $frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 
 
-
-
-
 /*
 ==============================================================================
 PLAYER
@@ -119,7 +116,7 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 		return;
 	}
 
-	if (self.weapon == W_AXE)
+	if (self.weapon == IT_AXE)
 	{
 		if (self.walkframe >= 12)
 			self.walkframe = 0;
@@ -137,8 +134,6 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 void()	player_run =[	$rockrun1,	player_run	]
 {
 	self.weaponframe=0;
-
-
 	if (!self.velocity_x && !self.velocity_y)
 	{
 		self.walkframe=0;
@@ -146,7 +141,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 		return;
 	}
 
-	if (self.weapon == W_AXE)
+	if (self.weapon == IT_AXE)
 	{
 		if (self.walkframe == 6)
 			self.walkframe = 0;
@@ -162,80 +157,71 @@ void()	player_run =[	$rockrun1,	player_run	]
 };
 
 
+void()	player_shot1 =	[$shotatt1, player_shot2	]
+{
+	self.weaponframe=1;
+	self.effects = self.effects | EF_MUZZLEFLASH;
+};
+void()	player_shot2 =	[$shotatt2, player_shot3	] {self.weaponframe=2;};
+void()	player_shot3 =	[$shotatt3, player_shot4	] {self.weaponframe=3;};
+void()	player_shot4 =	[$shotatt4, player_shot5	] {self.weaponframe=4;};
+void()	player_shot5 =	[$shotatt5, player_shot6	] {self.weaponframe=5;};
+void()	player_shot6 =	[$shotatt6, player_run	] {self.weaponframe=6;};
 
+void()	player_axe1 =	[$axatt1, player_axe2	] {self.weaponframe=1;};
+void()	player_axe2 =	[$axatt2, player_axe3	] {self.weaponframe=2;};
+void()	player_axe3 =	[$axatt3, player_axe4	] {self.weaponframe=3;W_FireAxe();};
+void()	player_axe4 =	[$axatt4, player_run	] {self.weaponframe=4;};
 
-//AXE A
+void()	player_axeb1 =	[$axattb1, player_axeb2	] {self.weaponframe=5;};
+void()	player_axeb2 =	[$axattb2, player_axeb3	] {self.weaponframe=6;};
+void()	player_axeb3 =	[$axattb3, player_axeb4	] {self.weaponframe=7;W_FireAxe();};
+void()	player_axeb4 =	[$axattb4, player_run	] {self.weaponframe=8;};
 
+void()	player_axec1 =	[$axattc1, player_axec2	] {self.weaponframe=1;};
+void()	player_axec2 =	[$axattc2, player_axec3	] {self.weaponframe=2;};
+void()	player_axec3 =	[$axattc3, player_axec4	] {self.weaponframe=3;W_FireAxe();};
+void()	player_axec4 =	[$axattc4, player_run	] {self.weaponframe=4;};
 
-
+void()	player_axed1 =	[$axattd1, player_axed2	] {self.weaponframe=5;};
+void()	player_axed2 =	[$axattd2, player_axed3	] {self.weaponframe=6;};
+void()	player_axed3 =	[$axattd3, player_axed4	] {self.weaponframe=7;W_FireAxe();};
+void()	player_axed4 =	[$axattd4, player_run	] {self.weaponframe=8;};
 
 
 //============================================================================
 
-void() player_snail = [ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), player_snail ]
+void() player_nail1   =[$nailatt1, player_nail2  ]
 {
-	if (!self.button0)
-	{
-		self.sng_accel_on = FALSE;
-		player_run ();
-		return;
-	}
-
-	if (self.ammo_big_spikes < 1)
-	{
-		self.sng_accel_on = FALSE;
-		player_run ();
-		W_SetCurrentAmmo ();
-		return;
-	}
-
-	self.reload_time = self.sng_reload_time;
-	self.sng_accel_on = TRUE;
 	self.effects = self.effects | EF_MUZZLEFLASH;
-	self.weaponframe = self.weaponframe + 1;
-	self.attack_finished = self.nextthink = time + self.reload_time;
-
-	if (self.weaponframe == 9)
-		self.weaponframe = 1;
-
-	
-
-	W_FireSuperSpikes();
-}
-
-.float nailgun_lefty;
-
-void() player_nail   = [ (self.frame == $nailatt1 ? $nailatt2 : $nailatt1), player_nail  ]
-{
 
 	if (!self.button0)
 	{
 		player_run ();
 		return;
 	}
-
-	if (self.ammo_nails < 1)
-	{
-		player_run ();
-		W_SetCurrentAmmo ();
-		return;
-	}
-
-
-	self.nailgun_lefty = self.nailgun_lefty ? 0 : 1;
-	self.ng_accel_on = TRUE;
-	self.reload_time = self.ng_reload_time;
-	self.effects = self.effects | EF_MUZZLEFLASH;
 	self.weaponframe = self.weaponframe + 1;
-	self.attack_finished = self.nextthink = time + self.reload_time;
-
 	if (self.weaponframe == 9)
 		self.weaponframe = 1;
+	SuperDamageSound();
+	W_FireSpikes (4);
+	self.attack_finished = time + 0.2;
+};
+void() player_nail2   =[$nailatt2, player_nail1  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
 
-	
-
-
-	W_FireSpikes(self.nailgun_lefty ? 3.2 : -3.2);
+	if (!self.button0)
+	{
+		player_run ();
+		return;
+	}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	W_FireSpikes (-4);
+	self.attack_finished = time + 0.2;
 };
 
 //============================================================================
@@ -252,6 +238,7 @@ void() player_light1   =[$light1, player_light2  ]
 	self.weaponframe = self.weaponframe + 1;
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
+	SuperDamageSound();
 	W_FireLightning();
 	self.attack_finished = time + 0.2;
 };
@@ -267,7 +254,7 @@ void() player_light2   =[$light2, player_light1  ]
 	self.weaponframe = self.weaponframe + 1;
 	if (self.weaponframe == 5)
 		self.weaponframe = 1;
-
+	SuperDamageSound();
 	W_FireLightning();
 	self.attack_finished = time + 0.2;
 };
@@ -279,46 +266,17 @@ void() player_rocket1   =[$rockatt1, player_rocket2  ]
 {
 	self.weaponframe=1;
 	self.effects = self.effects | EF_MUZZLEFLASH;
-
-	if (self.weapon == W_ROCKET_LAUNCHER)
-		W_FireRocket();
-
-	if (self.weapon == W_GRENADE_LAUNCHER)
-		W_FireGrenade();
-
-	self.attack_finished = time + 0.1;
-
 };
-void() player_rocket2   =[$rockatt2, player_rocket3  ] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe=2;
-};
-void() player_rocket3   =[$rockatt3, player_rocket4  ] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe=3;
-};
-void() player_rocket4   =[$rockatt4, player_rocket5  ] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe=4;
-};
-void() player_rocket5   =[$rockatt5, player_rocket6  ] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe=5;
-};
-void() player_rocket6   =[$rockatt6, player_run  ] 
-{
-	self.attack_finished = self.nextthink = time + (self.reload_time / 6);
-	self.weaponframe=6;
-};
+void() player_rocket2   =[$rockatt2, player_rocket3  ] {self.weaponframe=2;};
+void() player_rocket3   =[$rockatt3, player_rocket4  ] {self.weaponframe=3;};
+void() player_rocket4   =[$rockatt4, player_rocket5  ] {self.weaponframe=4;};
+void() player_rocket5   =[$rockatt5, player_rocket6  ] {self.weaponframe=5;};
+void() player_rocket6   =[$rockatt6, player_run  ] {self.weaponframe=6;};
 void(float num_bubbles) DeathBubbles;
 
 void() PainSound =
 {
-	local float rs;
+	float rs;
 
 	if (self.health < 0)
 		return;
@@ -421,7 +379,7 @@ void(entity attacker, float damage) player_pain =
 		// eyes don't have pain frames
 		return;
 
-	if (self.weapon == W_AXE)
+	if (self.weapon == IT_AXE)
 		player_axpain1 ();
 	else
 		player_pain1 ();
@@ -436,7 +394,7 @@ void() player_die_ax1;
 
 void() DeathBubblesSpawn =
 {
-	local entity bubble;
+	entity bubble;
 
 	if (self.owner.waterlevel != 3)
 		return;
@@ -461,7 +419,7 @@ void() DeathBubblesSpawn =
 
 void(float num_bubbles) DeathBubbles =
 {
-	local entity bubble_spawner;
+	entity bubble_spawner;
 
 	bubble_spawner = spawn();
 	setorigin (bubble_spawner, self.origin);
@@ -478,7 +436,7 @@ void(float num_bubbles) DeathBubbles =
 
 void() DeathSound =
 {
-	local float rs;
+	float rs;
 
 	// water death sounds
 	if (self.waterlevel == 3)
@@ -516,38 +474,44 @@ vector(float dm) VelocityForDamage =
 {
 	vector v;
 
-	v[2] = v[2] + random(150,300);
-	v[0] = v[0] + random(-100, 100);
-	v[1] = v[1] + random(-100, 100);
+	// check if the inflictor had velocity, e.g. like a rocket or explode box
+	if (vlen(damage_inflictor.velocity) > 0)
+	{
+		// impact some of inflictor's velocity on the gibs
+		v = 0.5 * damage_inflictor.velocity;
+		v = v + (25 * normalize(self.origin - damage_inflictor.origin));
+		v_z = 100 + 100 * random();
+		v_x = v_x + (50 * crandom());
+		v_y = v_y + (50 * crandom());
+	}
+	else
+	{
+		// use a random velocity for the gibs
+		v_x = 100 * crandom();
+		v_y = 100 * crandom();
+		v_z = 200 + 100 * random();
+	}
 
-	vector add = normalize(self.origin - damage_inflictor.origin);
-
-
-	dm = -dm;
-	float inf_vlen = vlen(damage_inflictor.velocity);
-	add = add * sqrt(inf_vlen + dm) * 8;
-	float i;
-
-	for (i = 0; i < 3; i++)
-		add[i] = lerp( add[i], add[i] * 0.25 * random(-1, 1), random(0.1, 0.8));
-	
-	v = v + add;
+	if (dm > -50)
+	{
+		v = v * 0.7;
+	}
+	else if (dm > -200)
+	{
+		v = v * 2;
+	}
+	else
+		v = v * 10;
 
 	return v;
 };
 
 void(string gibname, float dm) ThrowGib =
 {
-	local entity new;
+	entity new;
 
 	new = spawn();
 	new.origin = self.origin;
-
-	float i;
-
-	for (i = 0; i < 3; i++)
-		new.origin[i] = new.origin[i] + (self.mins[i] - self.maxs[i]) * random(0.5);
-
 	setmodel (new, gibname);
 	setsize (new, '0 0 0', '0 0 0');
 	new.velocity = VelocityForDamage (dm);
@@ -574,7 +538,7 @@ void(string gibname, float dm) ThrowHead =
 	self.view_ofs = '0 0 8';
 	setsize (self, '-16 -16 0', '16 16 56');
 	self.velocity = VelocityForDamage (dm);
-	//self.origin[2] = self.origin[2] + 22;
+	self.origin_z = self.origin_z - 24;
 	self.flags = self.flags - (self.flags & FL_ONGROUND);
 	self.avelocity = crandom() * '0 600 0';
 };
@@ -582,11 +546,10 @@ void(string gibname, float dm) ThrowHead =
 
 void() GibPlayer =
 {
-	
+	ThrowHead ("progs/h_player.mdl", self.health);
 	ThrowGib ("progs/gib1.mdl", self.health);
 	ThrowGib ("progs/gib2.mdl", self.health);
 	ThrowGib ("progs/gib3.mdl", self.health);
-	ThrowHead ("progs/h_player.mdl", self.health);
 
 	self.deadflag = DEAD_DEAD;
 
@@ -610,7 +573,7 @@ void() GibPlayer =
 
 void() PlayerDie =
 {
-	local float i;
+	float i;
 
 	self.items = self.items - (self.items & IT_INVISIBILITY);
 	// don't die as eyes
@@ -644,7 +607,7 @@ void() PlayerDie =
 	self.angles_x = 0;
 	self.angles_z = 0;
 
-	if (self.weapon == W_AXE)
+	if (self.weapon == IT_AXE)
 	{
 		player_die_ax1 ();
 		return;

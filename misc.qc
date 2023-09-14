@@ -198,7 +198,7 @@ void() misc_fireball =
 
 void() fire_fly =
 {
-	local entity fireball;
+	entity fireball;
 
 	fireball = spawn();
 	fireball.solid = SOLID_TRIGGER;
@@ -222,7 +222,7 @@ void() fire_fly =
 
 void() fire_touch =
 {
-	T_Damage (other, self, self, 20, DMG_HEAT);
+	T_Damage (other, self, self, 20);
 	remove(self);
 };
 
@@ -234,7 +234,7 @@ void() barrel_explode =
 	self.takedamage = DAMAGE_NO;
 	self.classname = "explo_box";
 	// did say self.owner
-	T_RadiusDamage (self, self, 160, 400, random(1.4, 3.3), DMG_EXPLO);
+	T_RadiusDamage (self, self, 160, world);
 	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	particle (self.origin, '0 0 0', 75, 255);
 
@@ -250,7 +250,7 @@ TESTING THING
 
 void() misc_explobox =
 {
-	local float oldz;
+	float oldz;
 
 	self.solid = SOLID_BBOX;
 	self.movetype = MOVETYPE_NONE;
@@ -282,7 +282,7 @@ Smaller exploding box, REGISTERED ONLY
 
 void() misc_explobox2 =
 {
-	local float oldz;
+	float oldz;
 
 	self.solid = SOLID_BBOX;
 	self.movetype = MOVETYPE_NONE;
@@ -406,7 +406,7 @@ void() air_bubbles =
 
 void() make_bubbles =
 {
-	local entity bubble;
+	entity bubble;
 
 	bubble = spawn();
 	setmodel (bubble, "progs/s_bubble.spr");
@@ -427,7 +427,7 @@ void() make_bubbles =
 
 void() bubble_split =
 {
-	local entity bubble;
+	entity bubble;
 
 	bubble = spawn();
 	setmodel (bubble, "progs/s_bubble.spr");
@@ -459,7 +459,7 @@ void() bubble_remove =
 
 void() bubble_bob =
 {
-	local float rnd1, rnd2, rnd3;
+	float rnd1, rnd2, rnd3;
 
 	self.cnt = self.cnt + 1;
 	if (self.cnt == 4)

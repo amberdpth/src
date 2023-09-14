@@ -1,8 +1,0 @@
-../csprogs.dat
-
-#define CSQC
-
-fteextensions.qc
-shared.qc
-csqc_interface.qc
-csqc_main.qc

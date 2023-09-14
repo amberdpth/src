@@ -299,6 +299,7 @@ float	DAMAGE_NO				= 0;
 float	DAMAGE_YES				= 1;
 float	DAMAGE_AIM				= 2;
 
+// items
 float	IT_AXE					= 4096;
 float	IT_SHOTGUN				= 1;
 float	IT_SUPER_SHOTGUN		= 2;
@@ -326,7 +327,6 @@ float	IT_INVISIBILITY			= 524288;
 float	IT_INVULNERABILITY		= 1048576;
 float	IT_SUIT					= 2097152;
 float	IT_QUAD					= 4194304;
-
 
 // point content values
 
@@ -456,7 +456,7 @@ float		skill;
 .void()		th_run;
 .void()		th_missile;
 .void()		th_melee;
-.void(entity attacker, float damage, optional float dmg_flag)		th_pain;
+.void(entity attacker, float damage)		th_pain;
 .void()		th_die;
 
 .entity		oldenemy;		// mad at this player before taking damage
@@ -529,6 +529,11 @@ float	AS_MISSILE		= 4;
 .float 		pausetime;
 .entity 	movetarget;
 
+
+//
+// doors
+//
+.float		aflag;
 .float		dmg;			// damage done by door when hit
 
 //
@@ -631,7 +636,7 @@ void(vector o, vector d, float color, float count) particle = #48;// start a par
 void() ChangeYaw = #49;						// turn towards self.ideal_yaw
 											// at self.yaw_speed
 // #50 was removed
-//vector(vector v) vectoangles			= #51;
+vector(vector v) vectoangles			= #51;
 
 //
 // direct client message generation
@@ -697,86 +702,26 @@ void() SUB_Remove;
 //
 //	combat.qc
 //
-void(entity targ, entity inflictor, entity attacker, float damage, float dmg_flag) T_Damage;
+void(entity targ, entity inflictor, entity attacker, float damage) T_Damage;
 
 
 float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
-.float weapons;
+//
+// mod defs
+//
 
-enumflags 
-{
-	W_AXE,
-	W_SHOTGUN,
-	W_SUPER_SHOTGUN,
-	W_TRIPLE_SHOTGUN,
-	W_NAILGUN,
-	W_SUPER_NAILGUN,
-	W_GRENADE_LAUNCHER,
-	W_ROCKET_LAUNCHER,
-	W_LIGHTNING,
-	W_EXTRA_WEAPON,
-	W_SHELLS,
-	W_NAILS,
-	W_ROCKETS,
-	W_CELLS,
-	W_ARMOR1,
-	W_ARMOR2,
-	W_ARMOR3,
-	W_SUPERHEALTH,
-	W_KEY1,
-	W_KEY2,
-	W_INVISIBILITY,
-	W_INVULNERABILITY,
-	W_SUIT,
-	W_QUAD,
-};
+entity reward_reciever;
 
-
-
-.float keys;
-.float shards;
-.float vials;
-
-enumflags
-{
-	SILVER_KEY,GOLD_KEY
-};
-
-.float multidamage_flag;
-.float multidamage;
-.float pain_threshold;
-
-
-
-
-
-.vector start_dir;
-.float fly_error[6];
-.float error_fraction;
-
-
-.float ammo_big_spikes;
-.float ammo_grenades;
-.float ammo_bullets;
-
-.vector dodge_moves;
-.float dodge_time;
-
-void(float t) nxtth = {
-	self.nextthink = time + t;
-}
-
-
-.float rot_time;
-
-.float heal_finished;
-.float heal_time;
-
-.vector enemy_last_org;
-
-.vector muzzle_point;
 .vector spam_point;
-.float prefire_finished;
+.float dodge_time;
+.vector velocity_delta;
+
+.float gameplay_flags_a;
+
+float GPFLAGA_GRENADE_EXTRA_RADIUS = 1<<0;
+float GPFLAGA_GRENADE_EXTRA_DAMAGE = 1<<1;
+float GPFLAGA_GRENADE_RADIUS_EXP = 1<<2;
+float GPFLAGA_GRENADE_PASS_WALLS = 1<<3;

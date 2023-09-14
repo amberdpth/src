@@ -51,7 +51,7 @@ float	enemy_yaw;
 
 void() knight_attack =
 {
-	local float len;
+	float len;
 
 	// decide if now is a good swing time
 	len = vlen(self.enemy.origin+self.enemy.view_ofs - (self.origin+self.view_ofs));
@@ -74,9 +74,9 @@ Returns FALSE if movement should continue
 */
 float() CheckAttack =
 {
-	local vector spot1, spot2;
-	local entity targ;
-	local float chance;
+	vector spot1, spot2;
+	entity targ;
+	float chance;
 
 	targ = self.enemy;
 
@@ -156,17 +156,7 @@ Stay facing the enemy
 */
 void() ai_face =
 {
-	if (visible(self.enemy))
-	{
-		self.spam_point = self.enemy.origin;
-		self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
-	}
-	else
-	{
-		self.ideal_yaw = vectoyaw(self.spam_point - self.origin);
-	}
-
-	
+	self.ideal_yaw = vectoyaw(self.enemy.origin - self.origin);
 	ChangeYaw ();
 };
 
@@ -186,14 +176,12 @@ void(float d) ai_charge =
 	ai_face ();
 	// done in C code...
 	movetogoal (d);
-
-	
 };
 
 void() ai_charge_side =
 {
-	local vector dtemp;
-	local float heading;
+	vector dtemp;
+	float heading;
 
 	// aim to the left of the enemy for a flyby
 
@@ -214,38 +202,10 @@ ai_melee
 
 =============
 */
-
-float() mon_scale_by_health =
-{ return 1; };
-
-float() ai_melee_damage =
-{
-	float damg = random(); // random for non player
-
-	if (self.enemy.flags & FL_CLIENT)
-	{
-		damg = 1 - xp_frac(self.enemy.melee_xp);
-		damg = (1 - xp_frac(self.enemy.agility_xp)) * 2 + damg;
-		damg /= 3;
-
-		if (self.enemy.weapon == W_AXE)
-		{
-			damg = damg + 1 - xp_frac(self.enemy.melee_xp);
-			damg /= 2;
-		}
-
-		xp_up(self.enemy.raw_melee_xp, RATE_MELEE_XP, damg);
-
-	}
-
-
-	return (damg * 0.5 + damg * 0.5 * random()) * 10 * mon_scale_by_health();
-}
-
 void() ai_melee =
 {
-	local vector delta;
-	local float ldmg;
+	vector delta;
+	float ldmg;
 
 	if (!self.enemy)
 		// removed before stroke
@@ -256,15 +216,15 @@ void() ai_melee =
 	if (vlen(delta) > 60)
 		return;
 
-	ldmg = ai_melee_damage();
-	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
+	ldmg = (random() + random() + random()) * 3;
+	T_Damage (self.enemy, self, self, ldmg);
 };
 
 
 void() ai_melee_side =
 {
-	local vector delta;
-	local float ldmg;
+	vector delta;
+	float ldmg;
 
 	if (!self.enemy)
 		return;		// removed before stroke
@@ -277,8 +237,8 @@ void() ai_melee_side =
 		return;
 	if (!CanDamage (self.enemy, self))
 		return;
-	ldmg = ai_melee_damage();
-	T_Damage (self.enemy, self, self, ldmg, DMG_MELEE);
+	ldmg = (random() + random() + random()) * 3;
+	T_Damage (self.enemy, self, self, ldmg);
 };
 
 
@@ -294,18 +254,23 @@ Returns FALSE if movement should continue
 */
 float() SoldierCheckAttack =
 {
-	local vector spot1, spot2;
-	local entity targ;
+	vector spot1, spot2;
+	entity targ;
+	float chance;
 
 	targ = self.enemy;
 
-	spot1 = self.origin;
-	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
-	
-	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
-	
-	if (trace_fraction != 1.0)
-		return FALSE;
+	// see if any entities are in the way of the shot
+	spot1 = self.origin + self.view_ofs;
+	spot2 = targ.origin + targ.view_ofs;
+
+	traceline (spot1, spot2, FALSE, self);
+
+	if (trace_inopen && trace_inwater)
+		return FALSE;			// sight line crossed contents
+
+	if (trace_ent != targ)
+		return FALSE;	// don't have a clear shot
 
 
 	// missile attack
@@ -315,45 +280,16 @@ float() SoldierCheckAttack =
 	if (enemy_range == RANGE_FAR)
 		return FALSE;
 
-	if (random () > 0.25)
-	{
-		self.th_missile ();
-		SUB_AttackFinished (1 + random());
-		if (random() < 0.3)
-			self.lefty = !self.lefty;
+	if (enemy_range == RANGE_MELEE)
+		chance = 0.9;
+	else if (enemy_range == RANGE_NEAR)
+		chance = 0.4;
+	else if (enemy_range == RANGE_MID)
+		chance = 0.05;
+	else
+		chance = 0;
 
-		return TRUE;
-	}
-
-	return FALSE;
-};
-
-float() EnfCheckAttack =
-{
-	local vector spot1, spot2;
-	local entity targ;
-
-	targ = self.enemy;
-
-	makevectors(self.angles);
-
-	spot1 = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
-	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
-	
-	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
-	
-	if (trace_fraction != 1.0)
-		return FALSE;
-
-
-	// missile attack
-	if (time < self.attack_finished)
-		return FALSE;
-
-	if (enemy_range == RANGE_FAR)
-		return FALSE;
-
-	if (random () > 0.25)
+	if (random () < chance)
 	{
 		self.th_missile ();
 		SUB_AttackFinished (1 + random());
@@ -377,8 +313,8 @@ Returns FALSE if movement should continue
 */
 float() ShamCheckAttack =
 {
-	local vector spot1, spot2;
-	local entity targ;
+	vector spot1, spot2;
+	entity targ;
 
 	if (enemy_range == RANGE_MELEE)
 	{
@@ -423,10 +359,67 @@ float() ShamCheckAttack =
 	return TRUE;
 };
 
+//============================================================================
+
+/*
+==============
+EnfCheckAttack
+==============
+*/
+
+float() EnfCheckAttack =
+{
+	vector spot1, spot2;
+	entity targ;
+
+	targ = self.enemy;
+
+	makevectors(self.angles);
+
+	spot1 = self.origin + v_forward * 30 + v_right * 8.5 + '0 0 16';
+	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
+	
+	traceline (spot1, spot2, TRUE, self);
+	
+	if (trace_fraction != 1.0)
+		return FALSE;
+
+
+	// missile attack
+	if (time < self.attack_finished)
+		return FALSE;
+
+	if (enemy_range == RANGE_FAR)
+		return FALSE;
+
+	if (random () > 0.25)
+	{
+		self.th_missile ();
+		SUB_AttackFinished (1 + random());
+		if (random() < 0.3)
+			self.lefty = !self.lefty;
+
+		return TRUE;
+	}
+
+	return FALSE;
+};
+
+//============================================================================
+
+/*
+===========
+OgreCheckAttack
+
+The player is in view, so decide to move or launch an attack
+Returns FALSE if movement should continue
+============
+*/
+
 float() OgreCheckAttack =
 {
-	local vector spot1, spot2;
-	local entity targ;
+	vector spot1, spot2;
+	entity targ;
 
 	if (enemy_range == RANGE_MELEE)
 	{
@@ -444,7 +437,7 @@ float() OgreCheckAttack =
 	spot1 = self.origin + v_up * 22 - v_right * 4;
 	spot2 = (!visible(targ)) ? self.spam_point : (targ.origin + targ.view_ofs);
 	
-	traceline (spot1, spot2, MOVE_NOMONSTERS, self);
+	traceline (spot1, spot2, TRUE, self);
 	
 	if (trace_fraction != 1.0)
 		return FALSE;
@@ -459,6 +452,103 @@ float() OgreCheckAttack =
 	self.attack_state = AS_MISSILE;
 
 	SUB_AttackFinished (random(1,6));
-	dprint("ALL DONE?\n");
 	return TRUE;
 };
+
+/*
+================
+AimToMovingEnemy
+================
+*/
+
+float(vector delta, vector dir, float proj_speed) SetDeltaTime =
+{
+	float a = dotproduct(dir, dir) - proj_speed * proj_speed;
+	float b = 2 * dotproduct(dir, delta);
+	float c = dotproduct(delta, delta);
+
+	float desc = b * b - 4 * a * c;
+
+	if (desc > 0.0)
+		return (2 * c) / (sqrt(desc) - b);
+	
+	return -1;
+}
+
+vector(float proj_speed, vector org) AimToMovingEnemy =
+{
+	vector dir;
+	vector delta;
+	float deltatime;
+
+	if (!visible(self.enemy))
+	{
+		dir = normalize(self.spam_point - org);
+		return dir;
+	}
+
+	dir = self.enemy.origin - org;
+	delta = self.enemy.velocity_delta - self.velocity;
+
+	deltatime = SetDeltaTime(dir, delta, proj_speed);
+
+	traceline(org, self.enemy.origin + self.enemy.velocity * deltatime, TRUE, self);
+
+	float able_to = 0;
+
+	if (trace_fraction == 1)
+		able_to++;
+
+	traceline(self.enemy.origin, self.enemy.origin + self.enemy.velocity * deltatime, TRUE, self);
+
+	if (trace_fraction == 1)
+		able_to++;
+
+	if (able_to == 2)
+		dir = normalize((self.enemy.origin + self.enemy.velocity * deltatime) - org);
+	else
+		dir = normalize(dir);
+
+
+	return dir;
+	
+}
+
+/*
+================
+LaunchPitchAngle
+================
+*/
+
+float (float proj_speed, float grav, float distance, float height) MaxDist = 
+{
+	float m = height / distance;
+	float spd2 = proj_speed * proj_speed;
+	return (spd2 * sqrt( m * m + 1) - m * spd2) / grav;
+}
+
+float (vector dir, float proj_speed, float grav_mult) LaunchPitchAngle =
+{
+
+	float grav = cvar("sv_gravity") * grav_mult;
+
+	float spd2 = proj_speed * proj_speed;
+	float pitch;
+	float distance = vlen(dir);
+	float height = dir[2];
+
+	float maxd = MaxDist(proj_speed, grav, distance, height);
+
+	if (vlen(dir) > maxd)
+	{
+		pitch = atan(spd2 / (grav * maxd));
+	}
+	else
+	{	
+		float spd4 = spd2 * spd2;
+		float root = sqrt(spd4 - grav * ( grav * distance * distance + 2 * dir[2] * spd2));
+		pitch = atan( (spd2 - root ) / (grav * distance));
+	}
+
+	return -pitch * 180 / 3.14159265359 ;
+}

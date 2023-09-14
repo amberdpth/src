@@ -1,3 +1,41 @@
+/*  Copyright (C) 1996-1997  Id Software, Inc.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    See file, 'COPYING', for details.
+*/
+/* ALL MONSTERS SHOULD BE 1 0 0 IN COLOR */
+
+// name =[framenum,	nexttime, nextthink] {code}
+// expands to:
+// name ()
+// {
+//		self.frame=framenum;
+//		self.nextthink = time + nexttime;
+//		self.think = nextthink
+//		<code>
+// };
+
+
+/*
+================
+monster_use
+
+Using a monster makes it angry at the current activator
+================
+*/
 void() monster_use =
 {
 	if (self.enemy)
@@ -18,6 +56,14 @@ void() monster_use =
 	self.think = FoundTarget;
 };
 
+/*
+================
+monster_death_use
+
+When a mosnter dies, it fires all of its targets with the current
+enemy as activator.
+================
+*/
 void() monster_death_use =
 {
 	// fall to ground
@@ -44,7 +90,7 @@ void() walkmonster_start_go =
 
 	if (!walkmove(0,0))
 	{
-		dprint (self.classname, "walkmonster in wall at: ");
+		dprint ("walkmonster in wall at: ");
 		dprint (vtos(self.origin));
 		dprint ("\n");
 	}
@@ -65,7 +111,7 @@ void() walkmonster_start_go =
 		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 		if (!self.movetarget)
 		{
-			dprint (self.classname, " Monster can't find target at ");
+			dprint ("Monster can't find target at ");
 			dprint (vtos(self.origin));
 			dprint ("\n");
 		}
@@ -89,6 +135,8 @@ void() walkmonster_start_go =
 
 void() walkmonster_start =
 {
+	// delay drop to floor to make sure all doors have been spawned
+	// spread think times so they don't all happen at same time
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = walkmonster_start_go;
 	total_monsters = total_monsters + 1;
@@ -111,7 +159,7 @@ void() flymonster_start_go =
 
 	if (!walkmove(0,0))
 	{
-		dprint (self.classname, " flymonster in wall at: ");
+		dprint ("flymonster in wall at: ");
 		dprint (vtos(self.origin));
 		dprint ("\n");
 	}
@@ -141,6 +189,7 @@ void() flymonster_start_go =
 
 void() flymonster_start =
 {
+	// spread think times so they don't all happen at same time
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = flymonster_start_go;
 	total_monsters = total_monsters + 1;
@@ -154,8 +203,6 @@ void() swimmonster_start_go =
 		remove(self);
 		return;
 	}
-
-	
 
 	self.takedamage = DAMAGE_AIM;
 
@@ -193,6 +240,7 @@ void() swimmonster_start_go =
 
 void() swimmonster_start =
 {
+	// spread think times so they don't all happen at same time
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = swimmonster_start_go;
 	total_monsters = total_monsters + 1;

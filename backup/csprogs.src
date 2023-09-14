@@ -1,0 +1,12 @@
+../csprogs.dat
+
+#define CSQC
+
+fteextensions.qc
+shared.qc
+csqc_defs.qc
+csqc_stat_names.qc
+csqc_gameplay_options_info.qc
+csqc_buttons.qc
+csqc_menu.qc
+csqc_main.qc

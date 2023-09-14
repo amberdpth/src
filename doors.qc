@@ -49,7 +49,7 @@ void() door_go_up;
 
 void() door_blocked =
 {
-	T_Damage (other, self, self, self.dmg, 0);
+	T_Damage (other, self, self, self.dmg);
 
 	// if a door has a negative wait, it would never come back if blocked,
 	// so let it just squash the object to death real fast
@@ -123,14 +123,14 @@ ACTIVATION FUNCTIONS
 
 void() door_fire =
 {
-	local entity oself;
-	local entity starte;
+	entity oself;
+	entity starte;
 
 	if (self.owner != self)
 		objerror ("door_fire: self.owner != self");
 
 	// play use key sound
-	if (self.keys)
+	if (self.items)
 		sound (self, CHAN_ITEM, self.noise4, 1, ATTN_NORM);
 
 	self.message = string_null;		// no more message
@@ -164,7 +164,7 @@ void() door_fire =
 
 void() door_use =
 {
-	local entity oself;
+	entity oself;
 
 	// door message are for touch only
 	self.message = string_null;
@@ -195,7 +195,7 @@ void() door_trigger_touch =
 
 void() door_killed =
 {
-	local entity oself;
+	entity oself;
 
 	oself = self;
 	self = self.owner;
@@ -230,13 +230,13 @@ void() door_touch =
 	}
 
 	// key door stuff
-	if (!self.keys)
+	if (!self.items)
 		return;
 
 	// FIXME: blink key on player's status bar
-	if ( (self.keys & other.keys) != self.keys )
+	if ( (self.items & other.items) != self.items )
 	{
-		if (self.owner.keys == SILVER_KEY)
+		if (self.owner.items == IT_KEY1)
 		{
 			if (world.worldtype == 2)
 			{
@@ -275,7 +275,7 @@ void() door_touch =
 		return;
 	}
 
-	other.keys = other.keys - self.keys;
+	other.items = other.items - self.items;
 	self.touch = SUB_Null;
 	if (self.enemy)
 		// get paired door
@@ -294,8 +294,8 @@ SPAWNING FUNCTIONS
 
 entity(vector fmins, vector fmaxs) spawn_field =
 {
-	local entity trigger;
-	local vector t1, t2;
+	entity trigger;
+	vector t1, t2;
 
 	trigger = spawn();
 	trigger.movetype = MOVETYPE_NONE;
@@ -337,8 +337,8 @@ LinkDoors
 */
 void() LinkDoors =
 {
-	local entity t, starte;
-	local vector cmins, cmaxs;
+	entity t, starte;
+	vector cmins, cmaxs;
 
 	if (self.enemy)
 		return;		// already linked by another door
@@ -381,7 +381,7 @@ void() LinkDoors =
 				return;
 			if (self.targetname != string_null)
 				return;
-			if (self.keys)
+			if (self.items)
 				return;
 
 			self.owner.trigger_field = spawn_field(cmins, cmaxs);
@@ -517,9 +517,9 @@ void() func_door =
 	self.use = door_use;
 
 	if (self.spawnflags & DOOR_SILVER_KEY)
-		self.keys = SILVER_KEY;
+		self.items = IT_KEY1;
 	if (self.spawnflags & DOOR_GOLD_KEY)
-		self.keys = GOLD_KEY;
+		self.items = IT_KEY2;
 
 	if (!self.speed)
 		self.speed = 100;
@@ -550,7 +550,7 @@ void() func_door =
 		self.th_die = door_killed;
 	}
 
-	if (self.keys)
+	if (self.items)
 		self.wait = -1;
 
 	self.touch = door_touch;
@@ -588,7 +588,7 @@ void(entity attacker, float damage) pain_empty = {};
 
 void () fd_secret_use =
 {
-	local float temp;
+	float temp;
 
 	self.health = 10000;
 
@@ -708,7 +708,7 @@ void () secret_blocked =
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + 0.5;
-	T_Damage (other, self, self, self.dmg, 0);
+	T_Damage (other, self, self, self.dmg);
 };
 
 /*

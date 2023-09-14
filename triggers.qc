@@ -58,8 +58,11 @@ void() multi_trigger =
 	{
 		if (self.enemy.classname != "player")
 			return;
+
 		found_secrets = found_secrets + 1;
+		reward_reciever = self.enemy;
 		WriteByte (MSG_ALL, SVC_FOUNDSECRET);
+		
 	}
 
 	if (self.noise != string_null)
@@ -302,8 +305,8 @@ float	SILENT = 2;
 
 void() play_teleport =
 {
-	local float v;
-	local string tmpstr;
+	float v;
+	string tmpstr;
 
 	v = random() * 5;
 	if (v < 1)
@@ -349,21 +352,21 @@ void() tdeath_touch =
 		if (self.owner.classname != "player")
 		{
 			// other monsters explode themselves
-			T_Damage (self.owner, self, self, 50000, DMG_MAGIC);
+			T_Damage (self.owner, self, self, 50000);
 			return;
 		}
 	}
 
 	if (other.health)
 	{
-		T_Damage (other, self, self, 50000, DMG_MAGIC);
+		T_Damage (other, self, self, 50000);
 	}
 };
 
 
 void(vector org, entity death_owner) spawn_tdeath =
 {
-	local entity death;
+	entity death;
 
 	death = spawn();
 	death.classname = "teledeath";
@@ -382,8 +385,8 @@ void(vector org, entity death_owner) spawn_tdeath =
 
 void() teleport_touch =
 {
-	local entity t;
-	local vector org;
+	entity t;
+	vector org;
 
 	if (self.targetname != string_null)
 	{
@@ -469,7 +472,7 @@ If the trigger_teleport has a targetname, it will only teleport entities when it
 */
 void() trigger_teleport =
 {
-	local vector o;
+	vector o;
 
 	InitTrigger ();
 	self.touch = teleport_touch;
@@ -494,7 +497,7 @@ trigger_setskill
 ==============================================================================
 */
 
-void() trigger_xp_touch =
+void() trigger_skill_touch =
 {
 	if (other.classname != "player")
 		return;
@@ -509,7 +512,7 @@ Only used on start map.
 void() trigger_setskill =
 {
 	InitTrigger ();
-	self.touch = trigger_xp_touch;
+	self.touch = trigger_skill_touch;
 };
 
 
@@ -568,7 +571,7 @@ void() hurt_touch =
 	if (other.takedamage)
 	{
 		self.solid = SOLID_NOT;
-		T_Damage (other, self, self, self.dmg, 0);
+		T_Damage (other, self, self, self.dmg);
 		self.think = hurt_on;
 		self.nextthink = time + 1;
 	}

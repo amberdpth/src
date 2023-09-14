@@ -28,8 +28,8 @@ float PLAT_LOW_TRIGGER = 1;
 
 void() plat_spawn_inside_trigger =
 {
-	local entity trigger;
-	local vector tmin, tmax;
+	entity trigger;
+	vector tmin, tmax;
 
 	// middle trigger
 	trigger = spawn();
@@ -126,7 +126,7 @@ void() plat_trigger_use =
 
 void() plat_crush =
 {
-	T_Damage (other, self, self, 1, 0);
+	T_Damage (other, self, self, 1);
 
 	if (self.state == STATE_UP)
 		plat_go_down ();
@@ -236,7 +236,7 @@ void() train_blocked =
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + 0.5;
-	T_Damage (other, self, self, self.dmg, 0);
+	T_Damage (other, self, self, self.dmg);
 };
 void() train_use =
 {
@@ -261,7 +261,7 @@ void() train_wait =
 
 void() train_next =
 {
-	local entity targ;
+	entity targ;
 
 	targ = find (world, targetname, self.target);
 	self.target = targ.target;
@@ -278,7 +278,7 @@ void() train_next =
 void() func_train_find =
 
 {
-	local entity targ;
+	entity targ;
 
 	targ = find (world, targetname, self.target);
 	self.target = targ.target;
